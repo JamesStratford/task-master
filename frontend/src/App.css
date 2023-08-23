@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+.tab-panel {
+  display: none; /* Hide all tab panels by default */
+}
+
+.tab-panel.active {
+  display: block; /* Show the active tab panel */
+}
+

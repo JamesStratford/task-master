@@ -1,23 +1,29 @@
-import logo from './logo.svg';
 import './App.css';
+import { DiscordWidget, DiscordWidgetCrate } from './components/DiscordWidget';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
+import React, { useState } from 'react';
+
 
 function App() {
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Tabs onSelect={index => setActiveTabIndex(index)}>
+        <TabList>
+          <Tab>Title 1</Tab>
+          <Tab>Discord</Tab>
+        </TabList>
+
+        <TabPanel className={activeTabIndex === 0 ? 'tab-panel active' : 'tab-panel'}>
+          <h2>Any content 1</h2>
+        </TabPanel>
+        <TabPanel className={activeTabIndex === 1 ? 'tab-panel active' : 'tab-panel'}>
+          <DiscordWidget server='1133857547305111592' channel='1133857547816808530' />
+        </TabPanel>
+      </Tabs>
+      <DiscordWidgetCrate server='1133857547305111592' channel='1133857547816808530' />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import WidgetBot from '@widgetbot/react-embed'
 import React, { useEffect } from 'react'
 
+
 const DiscordWidgetCrate = React.memo(function DiscordWidgetCrate(props) {
     useEffect(() => {
         const script = document.createElement('script');

@@ -1,23 +1,10 @@
-import logo from './logo.svg';
 import './App.css';
+import DiscordWidget from './components/DiscordWidget';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App"> 
+      <DiscordWidget server='1133857547305111592' channel='1133857547816808530'/>
     </div>
   );
 }

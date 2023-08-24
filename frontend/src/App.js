@@ -18,7 +18,7 @@ function App() {
         </TabList>
 
         <TabPanel className={activeTabIndex === 0 ? 'tab-panel active' : 'tab-panel'}>
-          <KanbanBoard/>
+        <KanbanBoard/>
        </TabPanel>
         <TabPanel className={activeTabIndex === 1 ? 'tab-panel active' : 'tab-panel'}>
           <DiscordWidget server='1133857547305111592' channel='1133857547816808530' />

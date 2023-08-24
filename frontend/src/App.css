@@ -45,12 +45,3 @@ body {
 .tab-panel.active {
   display: block; /* Show the active tab panel */
 }
-
-@import "../node_modules/@syncfusion/ej2-base/styles/bootstrap5.css";
-@import '../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5.css';
-@import "../node_modules/@syncfusion/ej2-layouts/styles/bootstrap5.css";
-@import '../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5.css';
-@import '../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5.css';
-@import "../node_modules/@syncfusion/ej2-navigations/styles/bootstrap5.css";
-@import "../node_modules/@syncfusion/ej2-popups/styles/bootstrap5.css";
-@import "../node_modules/@syncfusion/ej2-react-kanban/styles/bootstrap5.css";

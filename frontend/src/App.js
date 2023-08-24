@@ -9,7 +9,7 @@ const discordServerId = '1133857547305111592';
 const discordChallengeId = '1133857547816808530';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleSuccessfulAuth = () => {
@@ -40,7 +40,6 @@ function App() {
   return (
     <div className="App-header">
       {/*!isAuthenticated && <DiscordAuth onSuccessfulAuth={handleSuccessfulAuth} /> */}
-      {isAuthenticated = true}
       {isAuthenticated && (
         <>
           <DiscordWidgetCrate server={discordServerId} channel={discordChallengeId} />

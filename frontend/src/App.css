@@ -29,46 +29,19 @@ body {
   line-height: 28px;
 } */
 
-::-webkit-scrollbar {
-  width: 5px;
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: left;
+  font-size: calc(10px + 2vmin);
+  color: rgb(255, 255, 255);
+
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
   background: #f2f2f2;
 }
-
-<<<<<<< HEAD
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 20px 20px 20px 20px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(195, 195, 195);
-}
-.add__board > textarea {
-  border: 0.5px solid rgb(167, 167, 167) !important;
-  height: 2rem !important;
-}
-.card_detail > textarea {
-  border: 0.5px solid rgb(167, 167, 167) !important;
-}
-.card__values > p {
-  background: #ccc !important;
-}
-.cardinfo__editable {
-  width: fit-content;
-}
-=======
-.tab-panel {
-  display: none; /* Hide all tab panels by default */
-}
-
-.tab-panel.active {
-  display: block; /* Show the active tab panel */
-}
-
->>>>>>> 7d891dc425821fdb7c53ecb9a1023048c823ae48

@@ -2,28 +2,40 @@ import './App.css';
 import { DiscordWidget, DiscordWidgetCrate } from './components/DiscordWidget';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
-import React, { useState } from 'react';
+import React from 'react';
 
+const discordServerId = '1133857547305111592';
+const discordChallengeId = '1133857547816808530';
 
 function App() {
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
-
   return (
-    <div className="App">
-      <Tabs onSelect={index => setActiveTabIndex(index)}>
+    <div className="App-header">
+      <DiscordWidgetCrate server={discordServerId} channel={discordChallengeId} />
+      <Tabs>
         <TabList>
-          <Tab>Title 1</Tab>
+          <Tab>Kanban Board</Tab>
+          <Tab>Gantt Chart</Tab>
+          <Tab>Calendar</Tab>
           <Tab>Discord</Tab>
         </TabList>
 
-        <TabPanel className={activeTabIndex === 0 ? 'tab-panel active' : 'tab-panel'}>
-          <h2>Any content 1</h2>
+        <TabPanel>
+          <h2>Kanban</h2>
         </TabPanel>
-        <TabPanel className={activeTabIndex === 1 ? 'tab-panel active' : 'tab-panel'}>
-          <DiscordWidget server='1133857547305111592' channel='1133857547816808530' />
+
+        <TabPanel>
+          <h2>Gantt</h2>
+        </TabPanel>
+
+        <TabPanel>
+          <h2>Calendar</h2>
+        </TabPanel>
+
+        <TabPanel>
+          <DiscordWidget server={discordServerId} channel={discordChallengeId} />
         </TabPanel>
       </Tabs>
-      <DiscordWidgetCrate server='1133857547305111592' channel='1133857547816808530' />
+      
     </div>
   );
 }

@@ -39,7 +39,8 @@ function App() {
 
   return (
     <div className="App-header">
-      {!isAuthenticated && <DiscordAuth onSuccessfulAuth={handleSuccessfulAuth} /> }
+      {/*!isAuthenticated && <DiscordAuth onSuccessfulAuth={handleSuccessfulAuth} /> */}
+      {isAuthenticated = true}
       {isAuthenticated && (
         <>
           <DiscordWidgetCrate server={discordServerId} channel={discordChallengeId} />

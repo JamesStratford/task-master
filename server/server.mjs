@@ -1,51 +1,35 @@
 import express from "express";
 import cors from "cors";
-import axios from "axios";
-import { exchangeCodeForToken } from "./routes/discordAuth.mjs";
-import { sessionMiddleware } from './sessionConfig.mjs';
-//import "./loadEnvironment.mjs";
-//import records from "./routes/record.mjs";
 import dotenv from "dotenv";
-dotenv.config();
+import session from "express-session";
+import discordRoutes from "./routes/discordAuth.mjs"
+import MongoStore from "connect-mongo";
 
+dotenv.config();
 
 const PORT = process.env.PORT || 5050;
 const app = express();
 
 app.use(express.json());
+
 app.use(cors({
+  origin: 'http://localhost:53134',
   credentials: true
 }));
-app.use(sessionMiddleware);
 
-//app.use("/record", records);
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: false,
+  store: new MongoStore({ mongoUrl: process.env.MONGO_URI, collectionName: 'sessions' }),
+  cookie: {
+    path    : '/',
+    httpOnly: false,
+    maxAge  : 24*60*60*1000
+  },
+}))
 
-
-app.post('/api/exchange', async (req, res) => {
-  const { code } = req.body;
-  try {
-    const data = await exchangeCodeForToken(code);
-
-    // Assuming the returned data contains a user object with an id property
-    req.session.userId = data.user.id;
-    req.session.save(err => {
-      if (err) {
-        return res.status(500).json({ error: "Failed to save session." });
-      }
-      res.json(data);
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/api/check-auth', (req, res) => {
-  if (req.session.userId) {  // Assuming you store userId in the session upon successful authentication
-    res.json({ isAuthenticated: true });
-  } else {
-    res.json({ isAuthenticated: true });
-  }
-});
+app.use("/api/discordAuth", discordRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

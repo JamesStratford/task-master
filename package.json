@@ -7,7 +7,7 @@
         "start": "concurrently \"npm run server\" \"npm run frontend\""
     },
     "dependencies": {
-        "dotenv": "^16.3.1"
+
     },
     "devDependencies": {
         "concurrently": "^6.2.0"

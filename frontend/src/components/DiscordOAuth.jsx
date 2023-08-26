@@ -28,8 +28,9 @@ const DiscordAuth = (props) => {
                     if (data) {
                         if (data.isAuthenticated) {
                             console.log('User Authenticated')
-                            if (props.onSuccessfulAuth) {
-                                props.onSuccessfulAuth();
+                            if (props.onLogin) {
+                                props.onLogin(true);
+                                getUserInfo();
                             }
                         } else {
                             console.log('User not authenticated')
@@ -48,8 +49,8 @@ const DiscordAuth = (props) => {
                 const data = response.data;
                 if (data.isAuthenticated) {
                     console.log('checkAuth data:', data.isAuthenticated)
-                    props.onSuccessfulAuth()
-                    
+                    props.onLogin(true)
+
 
                     return true
                 }
@@ -72,6 +73,17 @@ const DiscordAuth = (props) => {
             });
     }
 
+    const handleLogout = () => {
+        axios.get(`${backendUrl}/api/discordAuth/logout`, { withCredentials: true })
+            .then(response => {
+                setUser(null);
+                props.onLogin(false);
+            })
+            .catch(error => {
+                console.error('Failed to log out:', error);
+            });
+    };
+
 
     useEffect(() => {
         checkAuth()
@@ -81,8 +93,19 @@ const DiscordAuth = (props) => {
     return (
         <div>
             {
-                user ? <span> Welcome, {user.global_name} </span> :
-                <OauthPopup url={url} onCode={handleLogin} onClose={() => console.log('Closed Discord OAuth2 Window')} width={1000} height={1000}>Login with Discord</OauthPopup>
+                user ?
+                    <div className="header">
+                        <span> Welcome, {user.global_name} </span>
+                        <button className="logout-button" onClick={handleLogout}>
+                            &#x1F6AA; Logout
+                        </button>
+                    </div>
+                    :
+                    <div className="login-overlay">
+                        <OauthPopup url={url} onCode={handleLogin} onClose={() => console.log('Closed Discord OAuth2 Window')} width={1000} height={1000}>
+                            Login
+                        </OauthPopup>
+                    </div>
             }
         </div>
     );

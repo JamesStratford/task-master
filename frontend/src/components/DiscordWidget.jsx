@@ -54,11 +54,11 @@ const DiscordWidget = (props) => {
             display: 'grid', 
             placeItems: 'center', 
             width: '100%', 
-            height: '10vh'  // 100vh for full viewport height
+            height: '10vh'
         }}>
             <WidgetBot
                 width={width * 0.90}
-                height={height * 0.90}
+                height={height * 0.85}
                 server={props.server}
                 channel={props.channel}
             />

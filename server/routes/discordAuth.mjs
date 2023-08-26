@@ -20,7 +20,6 @@ async function exchangeCodeForToken(code) {
         });
 
         const accessToken = await tokenResponse.data.access_token;
-        console.log('Access token:', accessToken);
         const userResponse = await axios.get('https://discord.com/api/users/@me', {
             headers: {
                 Authorization: `Bearer ${accessToken}`
@@ -39,7 +38,6 @@ router.get('/check-auth', (req, res) => {
         // TODO: Access MongoDB to check if the user exists
         if (whitlistedUsers.includes(req.session.userId)) {
             // User is authenticated
-            console.log('User is authenticated');
             res.json({ isAuthenticated: true });
 
             return

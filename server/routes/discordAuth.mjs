@@ -7,7 +7,7 @@ const router = express.Router();
 function addUserToWhitelist(discordId) {
     console.log(`Adding ${discordId} to the whitelist`);
 
-    db.collection('users').updateMany({ discordId }, { $set: { isWhitelisted: true } }, { upsert: true }, (err, result) => {
+    db.collection('whitelist').updateMany({ discordId }, { $set: { isWhitelisted: true } }, { upsert: true }, (err, result) => {
         if (err) {
             console.log("An error occurred:", err);
             return;
@@ -15,6 +15,7 @@ function addUserToWhitelist(discordId) {
         console.log(`Added ${discordId} to the whitelist`);
     });
 }
+
 
 async function exchangeCodeForToken(code) {
     try {
@@ -31,6 +32,7 @@ async function exchangeCodeForToken(code) {
         });
 
         const accessToken = await tokenResponse.data.access_token;
+        console.log("Access token:", accessToken);
         const userResponse = await axios.get('https://discord.com/api/users/@me', {
             headers: {
                 Authorization: `Bearer ${accessToken}`
@@ -47,7 +49,7 @@ async function exchangeCodeForToken(code) {
 
 router.get('/check-auth', async (req, res) => {
     if (req.session.userId) {
-        const userDocument = await db.collection('users').findOne({ discordId: req.session.userId });
+        const userDocument = await db.collection('whitelist').findOne({ discordId: req.session.userId });
         if (userDocument.isWhitelisted) {
             // User is authenticated
             res.json({ isAuthenticated: true });
@@ -60,6 +62,21 @@ router.get('/check-auth', async (req, res) => {
     res.json({ isAuthenticated: false });
 });
 
+router.get('/get-user', async (req, res) => {
+    if (req.session.userId) {
+        const userDocument = await db.collection('user-info').findOne({ discordId: req.session.userId });
+        res.json({ user: userDocument });
+    } else {
+        res.json({ user: null });
+    }
+});
+
+router.get('/logout', async (req, res) => {
+    console.log("Logging out");
+    req.session.destroy();
+    res.json({ success: true });
+});
+
 
 router.get('/exchange', async (req, res) => {
     const { code } = req.query;
@@ -67,9 +84,20 @@ router.get('/exchange', async (req, res) => {
         const data = await exchangeCodeForToken(code);
 
         req.session.userId = data.user.id;
-        req.session.save();
-        
-        const userDocument = await db.collection('users').findOne({ discordId: req.session.userId });
+        await new Promise((resolve, reject) => {
+            req.session.save(err => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        await db.collection('user-info').updateOne(
+            { discordId: data.user.id },
+            { $set: { ...data.user } },
+            { upsert: true }
+        );
+
+        const userDocument = await db.collection('whitelist').findOne({ discordId: req.session.userId });
         if (userDocument.isWhitelisted) {
             res.json({ isAuthenticated: true })
         } else {

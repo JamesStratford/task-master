@@ -50,15 +50,20 @@ const DiscordWidget = (props) => {
     }, []);
 
     return (
-        <div style={{ width: '100%', height: '100%' }}>
+        <div style={{ 
+            display: 'grid', 
+            placeItems: 'center', 
+            width: '100%', 
+            height: '10vh'
+        }}>
             <WidgetBot
-                width={width * 0.99}
-                height={height * 0.93}
+                width={width * 0.90}
+                height={height * 0.85}
                 server={props.server}
                 channel={props.channel}
             />
         </div>
-    )
+    );    
 }
 
 export { DiscordWidget, DiscordWidgetCrate };

@@ -17,11 +17,12 @@ app.use(cors({
   credentials: true
 }));
 
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: true,
   saveUninitialized: false,
-  store: new MongoStore({ mongoUrl: process.env.MONGO_URI, collectionName: 'sessions' }),
+  store: new MongoStore({ dbName: 'sessionStore', mongoUrl: process.env.MONGO_URI, collectionName: 'sessions' }),
   cookie: {
     path    : '/',
     httpOnly: false,

@@ -1,9 +1,20 @@
 import axios from 'axios';
 import express from 'express';
+import db from '../db/conn.mjs';
+
 const router = express.Router();
 
-const whitlistedUsers = ['219271204794662917']
+function addUserToWhitelist(discordId) {
+    console.log(`Adding ${discordId} to the whitelist`);
 
+    db.collection('users').updateMany({ discordId }, { $set: { isWhitelisted: true } }, { upsert: true }, (err, result) => {
+        if (err) {
+            console.log("An error occurred:", err);
+            return;
+        }
+        console.log(`Added ${discordId} to the whitelist`);
+    });
+}
 
 async function exchangeCodeForToken(code) {
     try {
@@ -33,10 +44,11 @@ async function exchangeCodeForToken(code) {
     }
 }
 
-router.get('/check-auth', (req, res) => {
+
+router.get('/check-auth', async (req, res) => {
     if (req.session.userId) {
-        // TODO: Access MongoDB to check if the user exists
-        if (whitlistedUsers.includes(req.session.userId)) {
+        const userDocument = await db.collection('users').findOne({ discordId: req.session.userId });
+        if (userDocument.isWhitelisted) {
             // User is authenticated
             res.json({ isAuthenticated: true });
 
@@ -48,6 +60,7 @@ router.get('/check-auth', (req, res) => {
     res.json({ isAuthenticated: false });
 });
 
+
 router.get('/exchange', async (req, res) => {
     const { code } = req.query;
     try {
@@ -55,13 +68,13 @@ router.get('/exchange', async (req, res) => {
 
         req.session.userId = data.user.id;
         req.session.save();
-
-        if (whitlistedUsers.includes(data.user.id)) {
+        
+        const userDocument = await db.collection('users').findOne({ discordId: req.session.userId });
+        if (userDocument.isWhitelisted) {
             res.json({ isAuthenticated: true })
         } else {
             res.json({ isAuthenticated: false })
         }
-        //res.json(data);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

@@ -2,6 +2,9 @@ import axios from 'axios';
 import express from 'express';
 const router = express.Router();
 
+const whitlistedUsers = ['219271204794662917']
+
+
 async function exchangeCodeForToken(code) {
     try {
         const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
@@ -33,13 +36,18 @@ async function exchangeCodeForToken(code) {
 
 router.get('/check-auth', (req, res) => {
     if (req.session.userId) {
-        // User is authenticated
-        console.log('User is authenticated');
-        res.json({ isAuthenticated: true });
-    } else {
-        // User is not authenticated
-        res.json({ isAuthenticated: false });
+        // TODO: Access MongoDB to check if the user exists
+        if (whitlistedUsers.includes(req.session.userId)) {
+            // User is authenticated
+            console.log('User is authenticated');
+            res.json({ isAuthenticated: true });
+
+            return
+        }
     }
+
+    // User is not authenticated
+    res.json({ isAuthenticated: false });
 });
 
 router.get('/exchange', async (req, res) => {
@@ -49,7 +57,13 @@ router.get('/exchange', async (req, res) => {
 
         req.session.userId = data.user.id;
         req.session.save();
-        res.json(data);
+
+        if (whitlistedUsers.includes(data.user.id)) {
+            res.json({ isAuthenticated: true })
+        } else {
+            res.json({ isAuthenticated: false })
+        }
+        //res.json(data);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

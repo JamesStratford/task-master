@@ -71,6 +71,11 @@ router.get('/get-user', async (req, res) => {
     }
 });
 
+router.get('/logout', async (req, res) => {
+    console.log("Logging out");
+    req.session.destroy();
+    res.json({ success: true });
+});
 
 
 router.get('/exchange', async (req, res) => {

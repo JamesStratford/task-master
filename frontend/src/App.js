@@ -10,13 +10,13 @@ function App() {
   const discordServerId = process.env.REACT_APP_DISCORD_SERVER_ID;
   const discordChannelId = process.env.REACT_APP_DISCORD_CHANNEL_ID;
 
-  const handleSuccessfulAuth = () => {
-    setIsAuthenticated(true);
+  const handleLogin = (isAuthed) => {
+    setIsAuthenticated(isAuthed);
   }
 
   return (
     <div className="App-header">
-      <DiscordAuth onSuccessfulAuth={handleSuccessfulAuth} />
+      <DiscordAuth onLogin={handleLogin} />
       {isAuthenticated && (
         <>
           <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} />

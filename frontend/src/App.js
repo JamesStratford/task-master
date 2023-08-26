@@ -5,12 +5,11 @@ import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
 
-const discordServerId = '1133857547305111592';
-const discordChannelId = '1133857547816808530';
-
-
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const discordServerId = process.env.REACT_APP_DISCORD_SERVER_ID;
+  const discordChannelId = process.env.REACT_APP_DISCORD_CHANNEL_ID;
+  console.log(discordServerId);
 
   const handleSuccessfulAuth = () => {
     setIsAuthenticated(true);

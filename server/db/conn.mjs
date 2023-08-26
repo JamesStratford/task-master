@@ -1,6 +1,8 @@
 import { MongoClient } from "mongodb";
+import dotenv from "dotenv";
+dotenv.config();
 
-const connectionString = process.env.ATLAS_URI || "";
+const connectionString = process.env.MONGO_URI;
 
 const client = new MongoClient(connectionString);
 
@@ -11,6 +13,6 @@ try {
   console.error(e);
 }
 
-let db = conn.db("task-master");
+const db = conn.db("task-master");
 
 export default db;

@@ -50,7 +50,7 @@ const DiscordAuth = (props) => {
                 if (data.isAuthenticated) {
                     console.log('checkAuth data:', data.isAuthenticated)
                     props.onLogin(true)
-
+                    getUserInfo()
 
                     return true
                 }
@@ -87,7 +87,6 @@ const DiscordAuth = (props) => {
 
     useEffect(() => {
         checkAuth()
-        getUserInfo()
     }, []);
 
     return (

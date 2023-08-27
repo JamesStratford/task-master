@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --recursive './tests/*.test.mjs'",
     "start": "nodemon server.mjs"
   },
   "keywords": [],
@@ -23,5 +23,12 @@
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.4",
     "nodemon": "^3.0.1"
+  },
+  "devDependencies": {
+    "axios-mock-adapter": "^1.21.5",
+    "chai": "^4.3.8",
+    "chai-http": "^4.4.0",
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
   }
 }

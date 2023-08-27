@@ -5,17 +5,13 @@ import db from '../db/conn.mjs';
 const router = express.Router();
 
 function addUserToWhitelist(discordId) {
-    console.log(`Adding ${discordId} to the whitelist`);
-
     db.collection('whitelist').updateMany({ discordId }, { $set: { isWhitelisted: true } }, { upsert: true }, (err, result) => {
         if (err) {
             console.log("An error occurred:", err);
             return;
         }
-        console.log(`Added ${discordId} to the whitelist`);
     });
 }
-
 
 async function exchangeCodeForToken(code) {
     try {
@@ -32,7 +28,6 @@ async function exchangeCodeForToken(code) {
         });
 
         const accessToken = await tokenResponse.data.access_token;
-        console.log("Access token:", accessToken);
         const userResponse = await axios.get('https://discord.com/api/users/@me', {
             headers: {
                 Authorization: `Bearer ${accessToken}`
@@ -41,10 +36,21 @@ async function exchangeCodeForToken(code) {
 
         return { user: userResponse.data };
     } catch (error) {
-        console.error("Error during the OAuth exchange:", error);
+        console.error("Error during the OAuth exchange:", error.message);
         throw new Error('Authentication failed');
     }
 }
+
+router.get('/add-to-whitelist', async (req, res) => {
+    const discordId = req.query.discordId;
+
+    if (!discordId) {
+        return res.status(400).json({ error: "Discord ID is required" });
+    }
+
+    addUserToWhitelist(discordId);
+    res.status(200).json({ message: `Adding ${discordId} to the whitelist` });
+});
 
 
 router.get('/check-auth', async (req, res) => {
@@ -72,7 +78,6 @@ router.get('/get-user', async (req, res) => {
 });
 
 router.get('/logout', async (req, res) => {
-    console.log("Logging out");
     req.session.destroy();
     res.json({ success: true });
 });
@@ -84,18 +89,25 @@ router.get('/exchange', async (req, res) => {
         const data = await exchangeCodeForToken(code);
 
         req.session.userId = data.user.id;
-        await new Promise((resolve, reject) => {
-            req.session.save(err => {
-                if (err) reject(err);
-                else resolve();
+        try {
+            await new Promise((resolve, reject) => {
+                req.session.save(err => {
+                    if (err) reject(err);
+                    else resolve();
+                });
             });
-        });
+        } catch (err) {
+            console.error("Failed to save session:", err);
+            res.status(500).json({ error: "Internal Server Error" });
+            return;
+        }
 
         await db.collection('user-info').updateOne(
             { discordId: data.user.id },
             { $set: { ...data.user } },
             { upsert: true }
         );
+
 
         const userDocument = await db.collection('whitelist').findOne({ discordId: req.session.userId });
         if (userDocument.isWhitelisted) {

@@ -22,15 +22,12 @@
     "express-session": "^1.17.3",
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.4",
-    "nodemon": "^3.0.1",
-    "sinon": "^15.2.0",
-    "supertest-session": "^5.0.1"
+    "nodemon": "^3.0.1"
   },
   "devDependencies": {
     "axios-mock-adapter": "^1.21.5",
     "chai": "^4.3.8",
     "chai-http": "^4.4.0",
-    "mocha": "^10.2.0",
-    "supertest": "^6.3.3"
+    "mocha": "^10.2.0"
   }
 }

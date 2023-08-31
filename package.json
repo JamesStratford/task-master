@@ -4,7 +4,8 @@
     "scripts": {
         "frontend": "cd frontend && npm start",
         "server": "cd server && npm start",
-        "start": "concurrently \"npm run server\" \"npm run frontend\""
+        "start": "concurrently \"npm run server\" \"npm run frontend\"",
+        "test": "cd server && npm test"
     },
     "dependencies": {
 

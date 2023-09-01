@@ -108,6 +108,7 @@ router.get('/exchange', async (req, res) => {
             { upsert: true }
         );
 
+
         const userDocument = await db.collection('whitelist').findOne({ discordId: req.session.userId });
         if (userDocument.isWhitelisted) {
             res.json({ isAuthenticated: true })

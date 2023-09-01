@@ -92,5 +92,4 @@ describe("Discord Auth", () => {
                 expect(res.body).to.have.property('isAuthenticated', true);
             });
     });
-
 });

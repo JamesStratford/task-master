@@ -1,35 +1,63 @@
 import WidgetBot from '@widgetbot/react-embed'
 import React, { useState, useEffect } from 'react'
 
+let crateOn = false;
+
 const DiscordWidgetCrate = (props) => {
     useEffect(() => {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@widgetbot/crate@3';
-        script.async = true;
+        const loadScript = () => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@widgetbot/crate@3';
+            script.async = true;
+            script.defer = true;
+            let crate;
+            script.onload = () => {
+                // Once the script is loaded, initialize the Crate object
+                crate = new window.Crate({
+                    server: props.server,
+                    channel: props.channel,
+                    glyph: ['https://cdn.discordapp.com/icons/1133857547305111592/bb123cd4ac09172b67bb767f51ac21c2.webp', '100%']
+                });
 
-        script.onload = () => {
-            // Once the script is loaded, initialize the Crate object
-            const crate = new window.Crate({
-                server: props.server,
-                channel: props.channel
-            });
+                crate.on('signIn', data => {
+                    console.log(`Guest signed in as ${data.name}`);
+                });
+            };
 
-            crate.on('signIn', data => {
-                console.log(`Guest signed in as ${data.name}`);
-            });
+            // Append the script to the document
+            document.body.appendChild(script);
+
+            // Cleanup the script when the component unmounts
+            return () => {
+                document.body.removeChild(script);
+
+            };
         };
 
-        // Append the script to the document
-        document.body.appendChild(script);
 
-        // Cleanup the script when the component unmounts
+        if (!crateOn)
+        {
+            crateOn = true;
+            loadScript();
+        }
+        
         return () => {
-            document.body.removeChild(script);
+            const scriptElement = document.querySelector(`script[src='https://cdn.jsdelivr.net/npm/@widgetbot/crate@3']`);
+            if (scriptElement) {
+                document.body.removeChild(scriptElement);
+            }
+            const widgetElement = document.querySelector('widgetbot-crate');
+            if (widgetElement) {
+                widgetElement.remove();
+                crateOn = false;
+            }
         };
-    })
+        
+    }, [props.channel, props.server]);  // Empty dependency array to run the effect only once
 
     return null;
-}
+};
+
 
 const DiscordWidget = (props) => {
     const [width, setWidth] = useState(window.innerWidth);
@@ -50,10 +78,10 @@ const DiscordWidget = (props) => {
     }, []);
 
     return (
-        <div style={{ 
-            display: 'grid', 
-            placeItems: 'center', 
-            width: '100%', 
+        <div style={{
+            display: 'grid',
+            placeItems: 'center',
+            width: '100%',
             height: '10vh'
         }}>
             <WidgetBot
@@ -63,7 +91,7 @@ const DiscordWidget = (props) => {
                 channel={props.channel}
             />
         </div>
-    );    
+    );
 }
 
 export { DiscordWidget, DiscordWidgetCrate };

@@ -17,12 +17,13 @@ describe('DiscordWidget', () => {
   afterEach(cleanup);
 
   it('renders correctly', () => {
-    const { getByTestId } = render(<DiscordWidget visible={true} server="serverID" channel="channelID" />);
+    render(<DiscordWidget visible={true} server="serverID" channel="channelID" />);
     expect(screen.getByTestId('widgetbot')).toHaveTextContent('"server":"serverID","channel":"channelID"');
   });
 
   it('hides when visible is false', () => {
-    const { queryByTestId } = render(<DiscordWidget visible={false} server="serverID" channel="channelID" />);
+    render(<DiscordWidget visible={false} server="serverID" channel="channelID" />);
+    // eslint-disable-next-line testing-library/no-node-access
     expect(screen.queryByTestId('widgetbot').parentNode).toHaveStyle('display: none');
   });
 });
@@ -32,6 +33,7 @@ describe('DiscordWidgetCrate', () => {
 
   it('loads the crate script', () => {
     render(<DiscordWidgetCrate server="serverID" channel="channelID" />);
+    // eslint-disable-next-line testing-library/no-node-access
     const script = document.querySelector(`script[src='https://cdn.jsdelivr.net/npm/@widgetbot/crate@3']`);
     expect(script).toBeInTheDocument();
   });
@@ -39,6 +41,7 @@ describe('DiscordWidgetCrate', () => {
   it('cleans up on unmount', () => {
     const { unmount } = render(<DiscordWidgetCrate server="serverID" channel="channelID" />);
     unmount();
+    // eslint-disable-next-line testing-library/no-node-access
     const script = document.querySelector(`script[src='https://cdn.jsdelivr.net/npm/@widgetbot/crate@3']`);
     expect(script).not.toBeInTheDocument();
   });

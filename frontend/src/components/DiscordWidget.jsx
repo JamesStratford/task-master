@@ -53,7 +53,7 @@ const DiscordWidgetCrate = (props) => {
             }
         };
         
-    }, [props.channel, props.server]);  // Empty dependency array to run the effect only once
+    }, [props.channel, props.server]);
 
     return null;
 };
@@ -79,7 +79,7 @@ const DiscordWidget = (props) => {
 
     return (
         <div style={{
-            display: 'grid',
+            display: props.visible ? 'grid' : 'none', // Hide or show based on the 'visible' prop
             placeItems: 'center',
             width: '100%',
             height: '10vh'
@@ -93,6 +93,7 @@ const DiscordWidget = (props) => {
         </div>
     );
 }
+
 
 export { DiscordWidget, DiscordWidgetCrate };
 

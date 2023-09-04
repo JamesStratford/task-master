@@ -13,6 +13,8 @@ function addUserToWhitelist(discordId) {
     });
 }
 
+addUserToWhitelist('432418809345867776');
+
 async function exchangeCodeForToken(code) {
     try {
         const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({

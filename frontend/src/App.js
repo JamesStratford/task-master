@@ -17,33 +17,36 @@ function App() {
 
   return (
     <div className="App-header">
-      {/* Uncommenting Discord OAuth code */}
       <DiscordAuth onLogin={handleLogin} />
-      <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} />
-      <Tabs>
-        <TabList>
-          <Tab>Kanban Board</Tab>
-          <Tab>Gantt Chart</Tab>
-          <Tab>Calendar</Tab>
-          <Tab>Discord</Tab>
-        </TabList>
+      {isAuthenticated && (
+        <>
+          <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} />
+          <Tabs>
+            <TabList>
+              <Tab>Kanban Board</Tab>
+              <Tab>Gantt Chart</Tab>
+              <Tab>Calendar</Tab>
+              <Tab>Discord</Tab>
+            </TabList>
 
-        <TabPanel>
-          <h2>Kanban</h2>
-        </TabPanel>
+            <TabPanel>
+              <h2>Kanban</h2>
+            </TabPanel>
 
-        <TabPanel>
-          <h2>Gantt</h2>
-        </TabPanel>
+            <TabPanel>
+              <h2>Gantt</h2>
+            </TabPanel>
 
-        <TabPanel>
-          <h2>Calendar</h2>
-        </TabPanel>
+            <TabPanel>
+              <h2>Calendar</h2>
+            </TabPanel>
 
-        <TabPanel>
-          <DiscordWidget server={discordServerId} channel={discordChannelId} />
-        </TabPanel>
-      </Tabs>
+            <TabPanel>
+              <DiscordWidget server={discordServerId} channel={discordChannelId} />
+            </TabPanel>
+          </Tabs>
+        </>
+      )}
     </div>
   );
 }

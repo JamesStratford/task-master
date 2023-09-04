@@ -1,8 +1,7 @@
 import WidgetBot from '@widgetbot/react-embed'
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
-
-const DiscordWidgetCrate = React.memo(function DiscordWidgetCrate(props) {
+const DiscordWidgetCrate = (props) => {
     useEffect(() => {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/@widgetbot/crate@3';
@@ -27,23 +26,45 @@ const DiscordWidgetCrate = React.memo(function DiscordWidgetCrate(props) {
         return () => {
             document.body.removeChild(script);
         };
-    }, []);
+    })
 
     return null;
-})
+}
 
-const DiscordWidget = React.memo(function DiscordWidget(props) {
+const DiscordWidget = (props) => {
+    const [width, setWidth] = useState(window.innerWidth);
+    const [height, setHeight] = useState(window.innerHeight);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWidth(window.innerWidth);
+            setHeight(window.innerHeight);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        // Clean up the event listener when the component is unmounted
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     return (
-        <div>
+        <div style={{ 
+            display: 'grid', 
+            placeItems: 'center', 
+            width: '100%', 
+            height: '10vh'
+        }}>
             <WidgetBot
-                width={props.width || "100%"}
-                height={props.height || "500px"}
+                width={width * 0.90}
+                height={height * 0.85}
                 server={props.server}
                 channel={props.channel}
             />
         </div>
-    )
-})
+    );    
+}
 
 export { DiscordWidget, DiscordWidgetCrate };
 

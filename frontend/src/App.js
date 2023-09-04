@@ -4,27 +4,46 @@ import KanbanBoard from './components/KanbanBoard';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
-
+import DiscordAuth from './components/DiscordOAuth';
 
 function App() {
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const discordServerId = process.env.REACT_APP_DISCORD_SERVER_ID;
+  const discordChannelId = process.env.REACT_APP_DISCORD_CHANNEL_ID;
+
+  const handleLogin = (isAuthed) => {
+    setIsAuthenticated(isAuthed);
+  }
 
   return (
-    <div className="App">
-      <Tabs onSelect={index => setActiveTabIndex(index)}>
+    <div className="App-header">
+      {/* Uncommenting Discord OAuth code */}
+      <DiscordAuth onLogin={handleLogin} />
+      <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} />
+      <Tabs>
         <TabList>
-          <Tab>Kanban</Tab>
+          <Tab>Kanban Board</Tab>
+          <Tab>Gantt Chart</Tab>
+          <Tab>Calendar</Tab>
           <Tab>Discord</Tab>
         </TabList>
 
-        <TabPanel className={activeTabIndex === 0 ? 'tab-panel active' : 'tab-panel'}>
-        <KanbanBoard/>
-       </TabPanel>
-        <TabPanel className={activeTabIndex === 1 ? 'tab-panel active' : 'tab-panel'}>
-          <DiscordWidget server='1133857547305111592' channel='1133857547816808530' />
+        <TabPanel>
+          <h2>Kanban</h2>
+        </TabPanel>
+
+        <TabPanel>
+          <h2>Gantt</h2>
+        </TabPanel>
+
+        <TabPanel>
+          <h2>Calendar</h2>
+        </TabPanel>
+
+        <TabPanel>
+          <DiscordWidget server={discordServerId} channel={discordChannelId} />
         </TabPanel>
       </Tabs>
-      <DiscordWidgetCrate server='1133857547305111592' channel='1133857547816808530' />
     </div>
   );
 }

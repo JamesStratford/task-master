@@ -29,8 +29,16 @@ body {
   line-height: 28px;
 } */
 
-::-webkit-scrollbar {
-  width: 5px;
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: left;
+  font-size: calc(10px + 2vmin);
+  color: rgb(255, 255, 255);
+
 }
 
 /* Track */
@@ -40,8 +48,31 @@ body {
 
 .tab-panel {
   display: none; /* Hide all tab panels by default */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.tab-panel.active {
-  display: block; /* Show the active tab panel */
+.logout-button {
+  background-color: rgb(0, 0, 0);
+  align-items: right;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -1,5 +1,5 @@
 {
-  "name": "my-app",
+  "name": "task-master",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,9 +8,12 @@
     "@testing-library/user-event": "^13.5.0",
     "@widgetbot/embed-api": "^1.2.11",
     "@widgetbot/react-embed": "^1.8.2",
+    "axios": "^1.4.0",
+    "discord": "^0.8.2",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
+    "react-oauth-popup": "^1.0.5",
     "react-scripts": "^5.0.1",
     "react-tabs": "^6.0.2",
     "web-vitals": "^2.1.4"

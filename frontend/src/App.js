@@ -1,12 +1,16 @@
 import './App.css';
 import { DiscordWidget, DiscordWidgetCrate } from './components/DiscordWidget';
-import KanbanBoard from './components/KanbanBoard';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
 
+import KanbanBoard from './components/KanbanBoard';
+import initialData from './components/initialData';
+import Column from './components/column';
+
 function App() {
+  const [state, setState] = useState(initialData);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const discordServerId = process.env.REACT_APP_DISCORD_SERVER_ID;
   const discordChannelId = process.env.REACT_APP_DISCORD_CHANNEL_ID;
@@ -17,7 +21,6 @@ function App() {
 
   return (
     <div className="App-header">
-      {/* Uncommenting Discord OAuth code */}
       <DiscordAuth onLogin={handleLogin} />
       <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} />
       <Tabs>
@@ -30,6 +33,13 @@ function App() {
 
         <TabPanel>
           <h2>Kanban</h2>
+          {state.columnOrder.map((columnId) => {
+            const column = state.columns[columnId];
+            const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
+
+            return <Column key={column.id} column={column} tasks={tasks} />;
+          })}
+          {/* <KanbanBoard /> */}
         </TabPanel>
 
         <TabPanel>

@@ -7,7 +7,9 @@
         "start": "concurrently \"npm run server\" \"npm run frontend\""
     },
     "dependencies": {
-
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "styled-components": "^6.0.7"
     },
     "devDependencies": {
         "concurrently": "^6.2.0"

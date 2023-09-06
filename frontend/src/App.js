@@ -31,29 +31,24 @@ function App() {
           <Tab>Discord</Tab>
         </TabList>
 
-        <TabPanel>
-          <h2>Kanban</h2>
-          {state.columnOrder.map((columnId) => {
-            const column = state.columns[columnId];
-            const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
+          <TabPanel>
+            <h2>Kanban</h2>
+          </TabPanel>
 
-            return <Column key={column.id} column={column} tasks={tasks} />;
-          })}
-          {/* <KanbanBoard /> */}
-        </TabPanel>
+            <TabPanel>
+              <h2>Gantt</h2>
+            </TabPanel>
 
-        <TabPanel>
-          <h2>Gantt</h2>
-        </TabPanel>
+            <TabPanel>
+              <h2>Calendar</h2>
+            </TabPanel>
 
-        <TabPanel>
-          <h2>Calendar</h2>
-        </TabPanel>
-
-        <TabPanel>
-          <DiscordWidget server={discordServerId} channel={discordChannelId} />
-        </TabPanel>
-      </Tabs>
+            <TabPanel>
+              <DiscordWidget server={discordServerId} channel={discordChannelId} />
+            </TabPanel>
+          </Tabs>
+        </>
+      )}
     </div>
   );
 }

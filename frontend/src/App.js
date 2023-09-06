@@ -4,7 +4,6 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
-
 import KanbanBoard from './components/KanbanBoard';
 import initialData from './components/initialData';
 import Column from './components/column';
@@ -30,25 +29,19 @@ function App() {
           <Tab>Calendar</Tab>
           <Tab>Discord</Tab>
         </TabList>
-
-          <TabPanel>
-            <h2>Kanban</h2>
-          </TabPanel>
-
-            <TabPanel>
-              <h2>Gantt</h2>
-            </TabPanel>
-
-            <TabPanel>
-              <h2>Calendar</h2>
-            </TabPanel>
-
-            <TabPanel>
-              <DiscordWidget server={discordServerId} channel={discordChannelId} />
-            </TabPanel>
-          </Tabs>
-        </>
-      )}
+        <TabPanel>
+          <h2>Kanban</h2>
+        </TabPanel>
+        <TabPanel>
+          <h2>Gantt</h2>
+        </TabPanel>
+        <TabPanel>
+          <h2>Calendar</h2>
+        </TabPanel>
+        <TabPanel>
+          <DiscordWidget server={discordServerId} channel={discordChannelId} />
+        </TabPanel>
+      </Tabs>
     </div>
   );
 }

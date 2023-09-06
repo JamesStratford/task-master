@@ -4,9 +4,9 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
-import KanbanBoard from './components/KanbanBoard';
-import initialData from './components/initialData';
-import Column from './components/column';
+import KanbanBoard from './components/Kanban/KanbanBoard';
+import initialData from './components/Kanban/initialData';
+import Column from './components/Kanban/column';
 
 function App() {
   const [state, setState] = useState(initialData);
@@ -31,6 +31,7 @@ function App() {
         </TabList>
         <TabPanel>
           <h2>Kanban</h2>
+          <KanbanBoard/>
         </TabPanel>
         <TabPanel>
           <h2>Gantt</h2>

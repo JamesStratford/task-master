@@ -7,8 +7,13 @@ import DiscordAuth from './components/DiscordOAuth';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const discordServerId = process.env.REACT_APP_DISCORD_SERVER_ID;
   const discordChannelId = process.env.REACT_APP_DISCORD_CHANNEL_ID;
+
+  const handleTabSelect = (index) => {
+    setActiveTabIndex(index);
+  };
 
   const toggleAuth = (isAuthed) => {
     setIsAuthenticated(isAuthed);
@@ -20,7 +25,7 @@ function App() {
       {isAuthenticated && (
         <>
           <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} on={isAuthenticated} />
-          <Tabs>
+          <Tabs onSelect={handleTabSelect}>
             <TabList>
               <Tab>Kanban Board</Tab>
               <Tab>Gantt Chart</Tab>
@@ -41,12 +46,16 @@ function App() {
             </TabPanel>
 
             <TabPanel>
-              <DiscordWidget server={discordServerId} channel={discordChannelId} />
             </TabPanel>
+          {/* Always render DiscordWidget but hide it when the tab is not active */}
+          <DiscordWidget
+            server={discordServerId}
+            channel={discordChannelId}
+            visible={activeTabIndex === 3} // Show only when the Discord tab is active
+          />
           </Tabs>
         </>
       )}
-
     </div>
   );
 }

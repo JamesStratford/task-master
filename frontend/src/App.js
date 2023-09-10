@@ -10,16 +10,16 @@ function App() {
   const discordServerId = process.env.REACT_APP_DISCORD_SERVER_ID;
   const discordChannelId = process.env.REACT_APP_DISCORD_CHANNEL_ID;
 
-  const handleLogin = (isAuthed) => {
+  const toggleAuth = (isAuthed) => {
     setIsAuthenticated(isAuthed);
   }
 
   return (
     <div className="App-header">
-      <DiscordAuth onLogin={handleLogin} />
+      <DiscordAuth onLogin={toggleAuth} />
       {isAuthenticated && (
         <>
-          <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} />
+          <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} on={isAuthenticated} />
           <Tabs>
             <TabList>
               <Tab>Kanban Board</Tab>

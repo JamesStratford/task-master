@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
 import KanbanBoard from './components/Kanban/KanbanBoard';
 import initialData from './components/Kanban/initialData';
-import Column from './components/Kanban/column';
 
 function App() {
   const [state, setState] = useState(initialData);

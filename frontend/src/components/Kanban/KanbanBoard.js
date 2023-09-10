@@ -49,7 +49,7 @@ function KanbanBoard() {
       {state.columnOrder.map((columnId) => {
         const column = state.columns[columnId];
         const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
-
+        
         return (
           <Droppable droppableId={column.id} key={column.id}>
             {(provided) => (
@@ -86,5 +86,4 @@ function KanbanBoard() {
     </DragDropContext>
   );
 }
-
 export default KanbanBoard;

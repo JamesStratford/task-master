@@ -32,6 +32,7 @@ const DiscordWidgetCrate = (props) => {
 }
 
 const DiscordWidget = (props) => {
+    // Set height and width of the widget
     const [width, setWidth] = useState(window.innerWidth);
     const [height, setHeight] = useState(window.innerHeight);
 
@@ -50,6 +51,7 @@ const DiscordWidget = (props) => {
     }, []);
 
     return (
+        // Returns the Discord widget with the specified server, channel, and styling
         <div style={{ 
             display: 'grid', 
             placeItems: 'center', 

@@ -8,41 +8,46 @@ function KanbanBoard() {
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
-
+  
     // Check if the task was dropped outside a valid droppable area
     if (!destination) {
       return;
     }
-
-    // Check if the task was dropped in a different position
+  
+    // Check if the task was dropped in a different column
     if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
+      destination.droppableId !== source.droppableId ||
+      destination.index !== source.index
     ) {
-      return;
+      // Create a copy of the source column
+      const sourceColumn = state.columns[source.droppableId];
+      const newSourceTaskIds = Array.from(sourceColumn.taskIds);
+      newSourceTaskIds.splice(source.index, 1);
+  
+      // Create a copy of the destination column
+      const destinationColumn = state.columns[destination.droppableId];
+      const newDestinationTaskIds = Array.from(destinationColumn.taskIds);
+      newDestinationTaskIds.splice(destination.index, 0, draggableId);
+  
+      // Update the state with the new task orders
+      const newState = {
+        ...state,
+        columns: {
+          ...state.columns,
+          [source.droppableId]: {
+            ...sourceColumn,
+            taskIds: newSourceTaskIds,
+          },
+          [destination.droppableId]: {
+            ...destinationColumn,
+            taskIds: newDestinationTaskIds,
+          },
+        },
+      };
+  
+      setState(newState);
     }
-
-    // Perform the reorder operation in your state
-    const column = state.columns[source.droppableId];
-    const newTaskIds = Array.from(column.taskIds);
-    newTaskIds.splice(source.index, 1);
-    newTaskIds.splice(destination.index, 0, draggableId);
-
-    const newColumn = {
-      ...column,
-      taskIds: newTaskIds,
-    };
-
-    const newState = {
-      ...state,
-      columns: {
-        ...state.columns,
-        [newColumn.id]: newColumn,
-      },
-    };
-
-    setState(newState);
-  };
+  };  
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

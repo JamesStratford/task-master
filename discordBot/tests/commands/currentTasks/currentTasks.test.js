@@ -29,7 +29,7 @@ describe("Test /getTasks command", () => {
 
         // Mock the request
         mockAxios
-            .onGet(`${process.env.SERVER_ORIGIN}/api/kanban/getTasks?userId=${mockInteraction.user.id}`)
+            .onGet(`${process.env.SERVER_ORIGIN}/api/discord-bot/kanban/getTasks?userId=${mockInteraction.user.id}`)
             .reply(200, fakeData);
 
         await command.execute(mockInteraction);
@@ -41,7 +41,7 @@ describe("Test /getTasks command", () => {
 
     it("should handle no tasks", async () => {
         // Mock the server response
-        mockAxios.onGet(`${process.env.SERVER_ORIGIN}/api/kanban/getTasks?userId=${mockInteraction.user.id}`).reply(200, {
+        mockAxios.onGet(`${process.env.SERVER_ORIGIN}/api/discord-bot/kanban/getTasks?userId=${mockInteraction.user.id}`).reply(200, {
             tasks: [],
         });
 

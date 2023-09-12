@@ -14,7 +14,7 @@ module.exports = {
 
         // Get tasks from web server
         try {
-            const response = await axios.get(`${process.env.SERVER_ORIGIN}/api/kanban/getTasks?userId=${userId}`);
+            const response = await axios.get(`${process.env.SERVER_ORIGIN}/api/discord-bot/kanban/getTasks?userId=${userId}`);
             const tasks = response.data.tasks;
 
             // Sort tasks by priority

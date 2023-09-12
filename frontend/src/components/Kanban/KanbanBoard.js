@@ -109,14 +109,13 @@ function KanbanBoard() {
                 {provided.placeholder}
                 <button
                   onClick={() => {
-                    // Example: Add a new card to the current column
                     const newCard = {
                       id: `new-card-${Date.now()}`,
                       content: 'New Task',
                     };
                     addCardToColumn(column.id, newCard);
                   }}
-                  className="add-card-button" // Add a custom CSS class
+                  className="add-card-button"
                 >
                   + Add a card
                 </button>

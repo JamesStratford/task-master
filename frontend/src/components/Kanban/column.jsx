@@ -34,7 +34,6 @@ function Column(props) {
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
-            {/* ...existing task rendering code */}
             {showAddCardForm ? (
               <div className="add-card-form">
                 <textarea

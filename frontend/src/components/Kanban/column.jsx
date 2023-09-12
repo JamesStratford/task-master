@@ -1,7 +1,29 @@
-import React from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import React, { useState } from 'react';
+import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 function Column(props) {
+  const [showAddCardForm, setShowAddCardForm] = useState(false);
+  const [newCardContent, setNewCardContent] = useState('');
+
+  const toggleAddCardForm = () => {
+    setShowAddCardForm(!showAddCardForm);
+  };
+
+  const handleAddCard = () => {
+    // Create a new card with the provided content and add it to the column
+    const newCard = {
+      id: 1,
+      content: newCardContent,
+    };
+
+    // Update the state with the new card
+    props.addCardToColumn(props.column.id, newCard);
+
+    // Reset the form and hide it
+    setNewCardContent('');
+    setShowAddCardForm(false);
+  };
+
   return (
     <div className="column-container">
       <h3 className="column-title">{props.column.title}</h3>
@@ -12,12 +34,19 @@ function Column(props) {
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
-            {props.tasks.map((task, index) => (
-              <div key={task.id} task={task} index={index} className="task">
-                <div className="task-content">{task.content}</div>
+            {/* ...existing task rendering code */}
+            {showAddCardForm ? (
+              <div className="add-card-form">
+                <textarea
+                  value={newCardContent}
+                  onChange={(e) => setNewCardContent(e.target.value)}
+                  placeholder="Enter card content"
+                />
+                <button onClick={handleAddCard}>Add a card</button>
               </div>
-            ))}
-            {provided.placeholder}
+            ) : (
+              <button onClick={toggleAddCardForm}>Add a card</button>
+            )}
           </div>
         )}
       </Droppable>

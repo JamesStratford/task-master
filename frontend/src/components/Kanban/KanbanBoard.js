@@ -8,12 +8,12 @@ function KanbanBoard() {
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
-  
+
     // Check if the task was dropped outside a valid droppable area
     if (!destination) {
       return;
     }
-  
+
     // Check if the task was dropped in a different column
     if (
       destination.droppableId !== source.droppableId ||
@@ -23,12 +23,12 @@ function KanbanBoard() {
       const sourceColumn = state.columns[source.droppableId];
       const newSourceTaskIds = Array.from(sourceColumn.taskIds);
       newSourceTaskIds.splice(source.index, 1);
-  
+
       // Create a copy of the destination column
       const destinationColumn = state.columns[destination.droppableId];
       const newDestinationTaskIds = Array.from(destinationColumn.taskIds);
       newDestinationTaskIds.splice(destination.index, 0, draggableId);
-  
+
       // Update the state with the new task orders
       const newState = {
         ...state,
@@ -44,17 +44,41 @@ function KanbanBoard() {
           },
         },
       };
-  
+
       setState(newState);
     }
-  };  
+  };
+
+  const addCardToColumn = (columnId, newCard) => {
+    // Update the state to add the new card to the specified column
+    const updatedColumns = {
+      ...state.columns,
+      [columnId]: {
+        ...state.columns[columnId],
+        taskIds: [...state.columns[columnId].taskIds, newCard.id],
+      },
+    };
+
+    const updatedTasks = {
+      ...state.tasks,
+      [newCard.id]: newCard,
+    };
+
+    const newState = {
+      ...state,
+      columns: updatedColumns,
+      tasks: updatedTasks,
+    };
+
+    setState(newState);
+  };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       {state.columnOrder.map((columnId) => {
         const column = state.columns[columnId];
         const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
-        
+
         return (
           <Droppable droppableId={column.id} key={column.id}>
             {(provided) => (
@@ -83,6 +107,19 @@ function KanbanBoard() {
                   </Draggable>
                 ))}
                 {provided.placeholder}
+                <button
+                  onClick={() => {
+                    // Example: Add a new card to the current column
+                    const newCard = {
+                      id: `new-card-${Date.now()}`,
+                      content: 'New Task',
+                    };
+                    addCardToColumn(column.id, newCard);
+                  }}
+                  className="add-card-button" // Add a custom CSS class
+                >
+                  + Add a card
+                </button>
               </div>
             )}
           </Droppable>

@@ -117,3 +117,19 @@ body {
   font-size: 14px;
   color: #282c34;
 }
+
+.add-card-button {
+  background-color:  #3273dc; 
+  color: #ffffff; /* White text */
+  border: none;
+  padding-right: 215px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-card-button:hover {
+  background-color:#2a60b7;
+}

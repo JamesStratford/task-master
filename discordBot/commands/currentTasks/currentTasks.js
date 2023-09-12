@@ -1,9 +1,11 @@
 const { SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
 
+require("dotenv").config();
+
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("getTasks")
+        .setName("get-tasks")
         .setDescription("Replies a list of current tasks in order of priority"),
 
     async execute(interaction) {
@@ -12,7 +14,7 @@ module.exports = {
 
         // Get tasks from web server
         try {
-            const response = await axios.get(`${process.env.SERVER_ORIGIN}/getTasks?userId=${userId}`);
+            const response = await axios.get(`${process.env.SERVER_ORIGIN}/api/kanban/getTasks?userId=${userId}`);
             const tasks = response.data.tasks;
 
             // Sort tasks by priority
@@ -27,7 +29,7 @@ module.exports = {
                 await interaction.reply("You have no tasks!");
             }
         } catch (error) {
-            console.error("Error fetching tasks: ", error);
+            console.error("Error fetching tasks: ", error.message);
             await interaction.reply("Sorry, something went wrong while fetching your tasks.");
         }
     }

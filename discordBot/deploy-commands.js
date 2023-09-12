@@ -1,5 +1,5 @@
 const { REST, Routes } = require('discord.js');
-require("dotenv").config({path: "discordBot/.env"});
+require("dotenv").config({ path: ".env" });
 const fs = require('node:fs');
 const path = require('node:path');
 

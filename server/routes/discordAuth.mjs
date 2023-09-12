@@ -20,7 +20,7 @@ async function exchangeCodeForToken(code) {
             client_secret: process.env.DISCORD_CLIENT_SECRET,
             grant_type: 'authorization_code',
             code,
-            redirect_uri: `http://localhost:${process.env.DISCORD_PORT}`
+            redirect_uri: `${process.env.FRONTEND_ORIGIN}:${process.env.FRONTEND_PORT}`
         }), {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'

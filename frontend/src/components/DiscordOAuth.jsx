@@ -48,7 +48,6 @@ const DiscordAuth = (props) => {
             .then(response => {
                 const data = response.data;
                 if (data.isAuthenticated) {
-                    console.log('checkAuth data:', data.isAuthenticated)
                     props.onLogin(true)
                     getUserInfo()
 
@@ -101,7 +100,7 @@ const DiscordAuth = (props) => {
                     </div>
                     :
                     <div className="login-overlay">
-                        <OauthPopup url={url} onCode={handleLogin} onClose={() => console.log('Closed Discord OAuth2 Window')} width={1000} height={1000}>
+                        <OauthPopup url={url} onCode={handleLogin} onClose={() => {}} width={1000} height={1000}>
                             Login
                         </OauthPopup>
                     </div>

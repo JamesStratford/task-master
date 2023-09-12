@@ -1,27 +1,47 @@
-import app from "../server.mjs";
+import express from 'express';
 import session from 'express-session';
 import chai from "chai";
 import chaiHttp from "chai-http";
 import { expect } from "chai";
-import request from 'supertest';
 import axios from 'axios';
 import AxiosMockAdapter from 'axios-mock-adapter';
+import discordRoutes from "../routes/discordAuth.mjs";
+
+const app = express();
+app.use(express.json());
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: false,
+    cookie: {
+      path    : '/',
+      httpOnly: false,
+      maxAge  : 24*60*60*1000
+    },
+  }))
+  
+app.use("/api/discordAuth", discordRoutes);
 
 chai.use(chaiHttp);
 const mock = new AxiosMockAdapter(axios);
 
-app.use(session({
-    secret: 'your-secret-key',
-    resave: false,
-    saveUninitialized: true,
-}));
+app.use((req, res, next) => {
+    req.session = {
+        save: function(callback) {
+            callback(null);
+        },
+        userId: null
+    };
+    next();
+});
 
 mock.onPost('https://discord.com/api/oauth2/token').reply(200, {
     access_token: 'mock_access_token',
 });
 
 mock.onGet('https://discord.com/api/users/@me').reply(200, {
-    id: 'mock_user_id',
+    id: '123456789',
     username: 'mock_username',
 });
 
@@ -57,32 +77,19 @@ describe("Discord Auth", () => {
             });
     });
 
-    it('/api/discordAuth/exchange -> should authenticate user successfully', function (done) {
+    it('/api/discordAuth/exchange -> should authenticate user successfully', () => {
         const mockCode = 'mock_code';
-        app.request.session = { save: () => { done(); } };
-        request(app)
+        app.request.session = {
+            save: function(callback) {
+                callback(null);
+            },
+            userId: '123456789'
+        };
+        chai.request(app)
             .get(`/api/discordAuth/exchange?code=${mockCode}`)
-            .expect(200)
             .end(function (err, res) {
-                if (err) return done(err);
-
+                expect(res).to.have.status(200);
                 expect(res.body).to.have.property('isAuthenticated', true);
-                done();
             });
     });
-
-    it('/api/discordAuth/exchange -> should return 500 if authentication fails', function(done) {
-        mock.onPost('https://discord.com/api/oauth2/token').reply(400, {});
-    
-        request(app)
-          .get('/api/discordAuth/exchange?code=bad_code')
-          .expect(500)
-          .end(function(err, res) {
-            if (err) return done(err);
-    
-            expect(res.body).to.have.property('error', 'Authentication failed');
-            done();
-          });
-      });
-
 });

@@ -10,38 +10,56 @@ import initialData from './components/Kanban/initialData';
 function App() {
   const [state, setState] = useState(initialData);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const discordServerId = process.env.REACT_APP_DISCORD_SERVER_ID;
   const discordChannelId = process.env.REACT_APP_DISCORD_CHANNEL_ID;
 
-  const handleLogin = (isAuthed) => {
+  const handleTabSelect = (index) => {
+    setActiveTabIndex(index);
+  };
+
+  const toggleAuth = (isAuthed) => {
     setIsAuthenticated(isAuthed);
   }
 
   return (
     <div className="App-header">
-      <DiscordAuth onLogin={handleLogin} />
-      <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} />
-      <Tabs>
-        <TabList>
-          <Tab>Kanban Board</Tab>
-          <Tab>Gantt Chart</Tab>
-          <Tab>Calendar</Tab>
-          <Tab>Discord</Tab>
-        </TabList>
-        <TabPanel>
-          <h2>Kanban</h2>
-          <KanbanBoard/>
-        </TabPanel>
-        <TabPanel>
-          <h2>Gantt</h2>
-        </TabPanel>
-        <TabPanel>
-          <h2>Calendar</h2>
-        </TabPanel>
-        <TabPanel>
-          <DiscordWidget server={discordServerId} channel={discordChannelId} />
-        </TabPanel>
-      </Tabs>
+      <DiscordAuth onLogin={toggleAuth} />
+      {isAuthenticated && (
+        <>
+          <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} on={isAuthenticated} />
+          <Tabs onSelect={handleTabSelect}>
+            <TabList>
+              <Tab>Kanban Board</Tab>
+              <Tab>Gantt Chart</Tab>
+              <Tab>Calendar</Tab>
+              <Tab>Discord</Tab>
+            </TabList>
+
+            <TabPanel>
+              <h2>Kanban</h2>
+            <KanbanBoard/>
+            </TabPanel>
+
+            <TabPanel>
+              <h2>Gantt</h2>
+            </TabPanel>
+
+            <TabPanel>
+              <h2>Calendar</h2>
+            </TabPanel>
+
+            <TabPanel>
+            </TabPanel>
+          {/* Always render DiscordWidget but hide it when the tab is not active */}
+          <DiscordWidget
+            server={discordServerId}
+            channel={discordChannelId}
+            visible={activeTabIndex === 3} // Show only when the Discord tab is active
+          />
+          </Tabs>
+        </>
+      )}
     </div>
   );
 }

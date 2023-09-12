@@ -4,11 +4,12 @@
     "scripts": {
         "frontend": "cd frontend && npm start",
         "server": "cd server && npm start",
-        "start": "concurrently \"npm run server\" \"npm run frontend\"",
+        "discordBot": "cd discordBot && npm start",
+        "start": "concurrently \"npm run server\" \"npm run frontend\" \"npm run discordBot\"",
         "test": "cd server && npm test"
     },
     "dependencies": {
-
+        "dotenv": "^16.3.1"
     },
     "devDependencies": {
         "concurrently": "^6.2.0"

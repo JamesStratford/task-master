@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import initialData from './initialData';
-import Column from './column';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function KanbanBoard() {

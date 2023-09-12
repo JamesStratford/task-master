@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
+import { Droppable } from 'react-beautiful-dnd';
 
 function Column(props) {
   const [showAddCardForm, setShowAddCardForm] = useState(false);

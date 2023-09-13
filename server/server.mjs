@@ -1,12 +1,10 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import discordRoutes from "./routes/discordAuth.mjs"
 import discordBotKanbanRoutes from "./routes/discord-bot/kanban.mjs";
-
-dotenv.config();
+import "./loadEnvironment.mjs";
 
 const PORT = process.env.PORT || 5050;
 const app = express();

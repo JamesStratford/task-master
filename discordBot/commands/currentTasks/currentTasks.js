@@ -14,7 +14,11 @@ module.exports = {
 
         // Get tasks from web server
         try {
-            const response = await axios.get(`${process.env.SERVER_ORIGIN}/api/discord-bot/kanban/getTasks?userId=${userId}`);
+            const response = await axios.get(`${process.env.SERVER_ORIGIN}/api/discord-bot/kanban/getTasks?userId=${userId}`, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.SERVER_AUTH_TOKEN}`
+                }
+            });
             const tasks = response.data.tasks;
 
             // Sort tasks by priority
@@ -22,7 +26,7 @@ module.exports = {
 
             // Reply with the list of tasks
             const taskList = tasks.map((task, index) => `${index + 1}. ${task.description} (Priority: ${task.priority})`).join('\n');
-            
+
             if (taskList) {
                 await interaction.reply(`Here are your tasks:\n${taskList}`);
             } else {

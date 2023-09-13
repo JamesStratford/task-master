@@ -5,10 +5,8 @@ import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
 import KanbanBoard from './components/Kanban/KanbanBoard';
-import initialData from './components/Kanban/initialData';
 
 function App() {
-  const [state, setState] = useState(initialData);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const discordServerId = process.env.REACT_APP_DISCORD_SERVER_ID;

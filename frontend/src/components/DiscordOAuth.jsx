@@ -29,7 +29,7 @@ const DiscordAuth = (props) => {
                         if (data.isAuthenticated) {
                             console.log('User Authenticated')
                             if (props.onLogin) {
-                                props.onLogin(true);
+                                props.onLogin();
                                 getUserInfo();
                             }
                         } else {
@@ -48,7 +48,7 @@ const DiscordAuth = (props) => {
             .then(response => {
                 const data = response.data;
                 if (data.isAuthenticated) {
-                    props.onLogin(true)
+                    props.onLogin()
                     getUserInfo()
 
                     return true
@@ -76,7 +76,7 @@ const DiscordAuth = (props) => {
         axios.get(`${backendUrl}/api/discordAuth/logout`, { withCredentials: true })
             .then(response => {
                 setUser(null);
-                props.onLogin(false);
+                props.onLogout();
             })
             .catch(error => {
                 console.error('Failed to log out:', error);

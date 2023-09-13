@@ -93,10 +93,8 @@ function KanbanBoard() {
     setState(newState);
   };
 
-  //Update a card that has already been created.
+  //Update a card that has already been created. TODO: Move edit buttons to the far right, may need to update css file to make this work.
   
-  // TODO: Add functionality that allows empty cards to be updated.
-
   const updateCardContent = (taskId, newContent) => {
     const updatedTasks = {
       ...state.tasks,
@@ -117,7 +115,7 @@ function KanbanBoard() {
       {state.columnOrder.map((columnId) => {
         const column = state.columns[columnId];
         const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
-  
+
         return (
           <Droppable droppableId={column.id} key={column.id}>
             {(provided) => (
@@ -144,8 +142,14 @@ function KanbanBoard() {
                             onBlur={() => setEditingTaskId(null)}
                           />
                         ) : (
-                          <div className="task-content" onClick={() => setEditingTaskId(task.id)}>
+                          <div className="task-content">
                             {task.content}
+                            <button 
+                              className="edit-button" 
+                              onClick={() => setEditingTaskId(task.id)}
+                            >
+                              Edit
+                            </button>
                           </div>
                         )}
                       </div>
@@ -172,8 +176,8 @@ function KanbanBoard() {
       })}
     </DragDropContext>
   );
+}
+
+export default KanbanBoard;
   
-  }
-  
-  export default KanbanBoard;
   

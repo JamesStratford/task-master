@@ -16,13 +16,18 @@ function App() {
     setActiveTabIndex(index);
   };
 
-  const toggleAuth = (isAuthed) => {
-    setIsAuthenticated(isAuthed);
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  }
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setActiveTabIndex(0);
   }
 
   return (
     <div className="App-header">
-      <DiscordAuth onLogin={toggleAuth} />
+      <DiscordAuth onLogin={handleLogin} onLogout={handleLogout} />
       {isAuthenticated && (
         <>
           <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} on={isAuthenticated} />

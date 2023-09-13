@@ -12,6 +12,7 @@
         "dotenv": "^16.3.1"
     },
     "devDependencies": {
-        "concurrently": "^6.2.0"
+        "concurrently": "^6.2.0",
+        "nodemon": "^3.0.1"
     }
 }

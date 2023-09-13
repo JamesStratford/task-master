@@ -4,6 +4,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
+import KanbanBoard from './components/Kanban/KanbanBoard';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -35,6 +36,7 @@ function App() {
 
             <TabPanel>
               <h2>Kanban</h2>
+              <KanbanBoard />
             </TabPanel>
 
             <TabPanel>
@@ -47,12 +49,12 @@ function App() {
 
             <TabPanel>
             </TabPanel>
-          {/* Always render DiscordWidget but hide it when the tab is not active */}
-          <DiscordWidget
-            server={discordServerId}
-            channel={discordChannelId}
-            visible={activeTabIndex === 3} // Show only when the Discord tab is active
-          />
+            {/* Always render DiscordWidget but hide it when the tab is not active */}
+            <DiscordWidget
+              server={discordServerId}
+              channel={discordChannelId}
+              visible={activeTabIndex === 3} // Show only when the Discord tab is active
+            />
           </Tabs>
         </>
       )}

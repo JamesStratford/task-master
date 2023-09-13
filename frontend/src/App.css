@@ -183,12 +183,10 @@ body {
 }
 
 .edit-button {
-  background-color:  #70747c; 
   color: #ffffff;
   border: none;
   float: right;
-  margin-top: -2px;
-  padding: 5px;
+  padding: 3px;
   font-size: 12px;
   border-radius: 4px;
   cursor: pointer;

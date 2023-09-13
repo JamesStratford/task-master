@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function KanbanBoard() {
   const [state, setState] = useState(initialData);
+  const [editingTaskId, setEditingTaskId] = useState(null);
 
   const moveTaskWithinSameColumn = (column, sourceIndex, destinationIndex) => {
     const newTaskIds = Array.from(column.taskIds);
@@ -92,12 +93,31 @@ function KanbanBoard() {
     setState(newState);
   };
 
+  //Update a card that has already been created.
+  
+  // TODO: Add functionality that allows empty cards to be updated.
+
+  const updateCardContent = (taskId, newContent) => {
+    const updatedTasks = {
+      ...state.tasks,
+      [taskId]: {
+        ...state.tasks[taskId],
+        content: newContent,
+      },
+    };
+  
+    setState({
+      ...state,
+      tasks: updatedTasks,
+    });
+  };
+  
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       {state.columnOrder.map((columnId) => {
         const column = state.columns[columnId];
         const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
-
+  
         return (
           <Droppable droppableId={column.id} key={column.id}>
             {(provided) => (
@@ -108,11 +128,7 @@ function KanbanBoard() {
               >
                 <h3 className="column-title">{column.title}</h3>
                 {tasks.map((task, index) => (
-                  <Draggable
-                    draggableId={task.id}
-                    index={index}
-                    key={task.id}
-                  >
+                  <Draggable draggableId={task.id} index={index} key={task.id}>
                     {(provided) => (
                       <div
                         className="task"
@@ -120,7 +136,18 @@ function KanbanBoard() {
                         {...provided.dragHandleProps}
                         ref={provided.innerRef}
                       >
-                        <div className="task-content">{task.content}</div>
+                        {editingTaskId === task.id ? (
+                          <input
+                            type="text"
+                            value={task.content}
+                            onChange={(e) => updateCardContent(task.id, e.target.value)}
+                            onBlur={() => setEditingTaskId(null)}
+                          />
+                        ) : (
+                          <div className="task-content" onClick={() => setEditingTaskId(task.id)}>
+                            {task.content}
+                          </div>
+                        )}
                       </div>
                     )}
                   </Draggable>
@@ -145,5 +172,8 @@ function KanbanBoard() {
       })}
     </DragDropContext>
   );
-}
-export default KanbanBoard;
+  
+  }
+  
+  export default KanbanBoard;
+  

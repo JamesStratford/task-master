@@ -110,6 +110,27 @@ function KanbanBoard() {
     });
   };
 
+  const removeCard = (taskId) => {
+    // Filter out the task with the specified taskId to remove it
+    const updatedTasks = { ...state.tasks };
+    delete updatedTasks[taskId];
+
+    // Update the columns to remove the taskId from its taskIds array
+    const updatedColumns = { ...state.columns };
+    for (const columnId in updatedColumns) {
+      updatedColumns[columnId].taskIds = updatedColumns[columnId].taskIds.filter(
+        (id) => id !== taskId
+      );
+    }
+
+    // Set the updated state
+    setState({
+      ...state,
+      tasks: updatedTasks,
+      columns: updatedColumns,
+    });
+  };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       {state.columnOrder.map((columnId) => {
@@ -144,6 +165,7 @@ function KanbanBoard() {
                             />
                             <div className="button-container">
                               <button className="open-button">Open Card</button>
+                              <button className="remove-button" onClick={() => removeCard(task.id)}>Remove Card</button>
                               <button className="save-button" onClick={() => setEditingTaskId(null)}>Save Card</button>
                             </div>
                           </div>
@@ -151,9 +173,10 @@ function KanbanBoard() {
                           <div className="task-content">
                             {task.content}
                             <button className="edit-button" onClick={() => setEditingTaskId(task.id)}>
-                              <img src={require('./edit.png')} alt="Edit" style={{ width: '15px', height: '15px' }}/>
+                              <img src={require('./edit.png')} alt="Edit" style={{ width: '15px', height: '15px' }} />
                             </button>
                           </div>
+
                         )}
                       </div>
                     )}

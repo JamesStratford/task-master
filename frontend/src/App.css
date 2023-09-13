@@ -109,7 +109,7 @@ body {
 }
 
 .task:hover {
-  background-color: #e0e0e0;
+  background-color: #e0e0e0d0;
 }
 
 /* Text styling for inside the tasks (cards) */
@@ -157,12 +157,11 @@ body {
 }
 
 .open-button {
-  background-color:  #70747c; 
+  background-color: #303030cf; 
   color: #ffffff;
   border: none;
-  margin-top: 5px;
+  margin-top: 10px;
   margin-right: 5px;
-  margin-bottom: 5px;
   padding: 5px;
   font-size: 12px;
   border-radius: 4px;
@@ -170,12 +169,11 @@ body {
 }
 
 .save-button {
-  background-color:  #70747c; 
+  background-color:  #303030cf; 
   color: #ffffff;
   border: none;
-  margin-top: 5px;
+  margin-top: 10px;
   margin-right: 5px;
-  margin-bottom: 5px;
   padding: 5px;
   font-size: 12px;
   border-radius: 4px;
@@ -183,13 +181,22 @@ body {
 }
 
 .edit-button {
-  color: #ffffff;
   border: none;
   float: right;
-  padding: 3px;
+  padding-top: 3px;
   font-size: 12px;
   border-radius: 4px;
   cursor: pointer;
 }
 
-
+.remove-button {
+  background-color: #303030cf; 
+  color: #ffffff;
+  border: none;
+  margin-top: 10px;
+  margin-right: 5px;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}

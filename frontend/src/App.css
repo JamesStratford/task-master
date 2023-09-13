@@ -186,9 +186,8 @@ body {
   background-color:  #70747c; 
   color: #ffffff;
   border: none;
-  margin-top: 5px;
-  margin-right: 5px;
-  margin-bottom: 5px;
+  float: right;
+  margin-top: -2px;
   padding: 5px;
   font-size: 12px;
   border-radius: 4px;

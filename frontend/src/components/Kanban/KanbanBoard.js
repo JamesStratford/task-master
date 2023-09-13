@@ -133,6 +133,7 @@ function KanbanBoard() {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         ref={provided.innerRef}
+                        onDoubleClick={() => setEditingTaskId(task.id)} // Double-click handler
                       >
                         {editingTaskId === task.id ? (
                           <div className="task-content">

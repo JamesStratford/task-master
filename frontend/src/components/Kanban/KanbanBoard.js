@@ -12,16 +12,16 @@ function KanbanBoard() {
     newTaskIds.splice(destinationIndex, 0, movedTask);
     return { ...column, taskIds: newTaskIds };
   };
-  
+
   const moveTaskToDifferentColumn = (state, source, destination, draggableId) => {
     const sourceColumn = state.columns[source.droppableId];
     const newSourceTaskIds = Array.from(sourceColumn.taskIds);
     newSourceTaskIds.splice(source.index, 1);
-  
+
     const destinationColumn = state.columns[destination.droppableId];
     const newDestinationTaskIds = Array.from(destinationColumn.taskIds);
     newDestinationTaskIds.splice(destination.index, 0, draggableId);
-  
+
     return {
       ...state,
       columns: {
@@ -40,7 +40,7 @@ function KanbanBoard() {
 
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
-    
+
     if (!destination) return;
 
     switch (true) {
@@ -93,8 +93,8 @@ function KanbanBoard() {
     setState(newState);
   };
 
-  //Update a card that has already been created. TODO: Move edit buttons to the far right, may need to update css file to make this work.
-  
+  // Update a card that has already been created. TODO: Move edit buttons to the far right, may need to update css file to make this work.
+
   const updateCardContent = (taskId, newContent) => {
     const updatedTasks = {
       ...state.tasks,
@@ -103,13 +103,13 @@ function KanbanBoard() {
         content: newContent,
       },
     };
-  
+
     setState({
       ...state,
       tasks: updatedTasks,
     });
   };
-  
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       {state.columnOrder.map((columnId) => {
@@ -129,23 +129,28 @@ function KanbanBoard() {
                   <Draggable draggableId={task.id} index={index} key={task.id}>
                     {(provided) => (
                       <div
-                        className="task"
+                        className={`task ${editingTaskId === task.id ? 'editing' : ''}`}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         ref={provided.innerRef}
                       >
                         {editingTaskId === task.id ? (
-                          <input
-                            type="text"
-                            value={task.content}
-                            onChange={(e) => updateCardContent(task.id, e.target.value)}
-                            onBlur={() => setEditingTaskId(null)}
-                          />
+                          <div className="task-content">
+                            <input
+                              type="text"
+                              value={task.content}
+                              onChange={(e) => updateCardContent(task.id, e.target.value)}
+                            />
+                            <div className="button-container">
+                              <button className="open-button">Open Card</button>
+                              <button className="save-button green" onClick={() => setEditingTaskId(null)}>Save Card</button>
+                            </div>
+                          </div>
                         ) : (
                           <div className="task-content">
                             {task.content}
-                            <button 
-                              className="edit-button" 
+                            <button
+                              className="edit-button"
                               onClick={() => setEditingTaskId(task.id)}
                             >
                               Edit
@@ -179,5 +184,3 @@ function KanbanBoard() {
 }
 
 export default KanbanBoard;
-  
-  

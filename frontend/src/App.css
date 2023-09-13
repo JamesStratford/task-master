@@ -133,3 +133,66 @@ body {
 .add-card-button:hover {
   background-color:#2a60b7;
 }
+
+/* Dim the background when editing a card */
+.dim-background {
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust opacity as needed */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999; /* Ensure it appears above other elements */
+}
+
+/* Style for the card buttons */
+.card-buttons {
+  position: absolute;
+  top: 10px; /* Adjust positioning as needed */
+  right: 10px; /* Adjust positioning as needed */
+}
+
+.card-buttons button {
+  margin-right: 10px; /* Adjust spacing as needed */
+}
+
+.open-button {
+  background-color:  #70747c; 
+  color: #ffffff;
+  border: none;
+  margin-top: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-button {
+  background-color:  #70747c; 
+  color: #ffffff;
+  border: none;
+  margin-top: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-button {
+  background-color:  #70747c; 
+  color: #ffffff;
+  border: none;
+  margin-top: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+

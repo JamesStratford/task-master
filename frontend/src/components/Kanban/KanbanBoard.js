@@ -1,10 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import initialData from './initialData';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 function KanbanBoard() {
   const [state, setState] = useState(initialData);
   const [editingTaskId, setEditingTaskId] = useState(null);
+  const editMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (editMenuRef.current && !editMenuRef.current.contains(e.target)) {
+        // Clicked outside of the edit menu, so close it
+        setEditingTaskId(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   const moveTaskWithinSameColumn = (column, sourceIndex, destinationIndex) => {
     const newTaskIds = Array.from(column.taskIds);
@@ -93,8 +109,7 @@ function KanbanBoard() {
     setState(newState);
   };
 
-  // Update a card that has already been created. TODO: Move edit buttons to the far right, may need to update css file to make this work.
-
+  // Update a card that has already been created.
   const updateCardContent = (taskId, newContent) => {
     const updatedTasks = {
       ...state.tasks,
@@ -142,7 +157,7 @@ function KanbanBoard() {
                               value={task.content}
                               onChange={(e) => updateCardContent(task.id, e.target.value)}
                             />
-                            <div className="button-container">
+                            <div className="button-container" ref={editMenuRef}>
                               <button className="open-button">Open Card</button>
                               <button className="save-button green" onClick={() => setEditingTaskId(null)}>Save Card</button>
                             </div>

@@ -4,6 +4,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
+import KanbanBoard from './components/Kanban/KanbanBoard';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -15,13 +16,18 @@ function App() {
     setActiveTabIndex(index);
   };
 
-  const toggleAuth = (isAuthed) => {
-    setIsAuthenticated(isAuthed);
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  }
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setActiveTabIndex(0);
   }
 
   return (
     <div className="App-header">
-      <DiscordAuth onLogin={toggleAuth} />
+      <DiscordAuth onLogin={handleLogin} onLogout={handleLogout} />
       {isAuthenticated && (
         <>
           <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} on={isAuthenticated} />
@@ -35,6 +41,7 @@ function App() {
 
             <TabPanel>
               <h2>Kanban</h2>
+              <KanbanBoard />
             </TabPanel>
 
             <TabPanel>
@@ -47,12 +54,12 @@ function App() {
 
             <TabPanel>
             </TabPanel>
-          {/* Always render DiscordWidget but hide it when the tab is not active */}
-          <DiscordWidget
-            server={discordServerId}
-            channel={discordChannelId}
-            visible={activeTabIndex === 3} // Show only when the Discord tab is active
-          />
+            {/* Always render DiscordWidget but hide it when the tab is not active */}
+            <DiscordWidget
+              server={discordServerId}
+              channel={discordChannelId}
+              visible={activeTabIndex === 3} // Show only when the Discord tab is active
+            />
           </Tabs>
         </>
       )}

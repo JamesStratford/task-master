@@ -60,6 +60,7 @@ const DiscordWidgetCrate = (props) => {
 
 
 const DiscordWidget = (props) => {
+    // Set height and width of the widget
     const [width, setWidth] = useState(window.innerWidth);
     const [height, setHeight] = useState(window.innerHeight);
 

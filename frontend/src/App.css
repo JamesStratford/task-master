@@ -46,6 +46,10 @@ body {
   background: #f2f2f2;
 }
 
+.tab-panel {
+  display: none; /* Hide all tab panels by default */
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -73,4 +77,59 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Column container for tasks */
+.column-container {
+  background-color: #3273dc; 
+  color: #fff;
+  border-radius: 4px;
+  width: 300px;
+  margin: 8px;
+  padding: 8px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+/* Column title for tasks */
+.column-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+/* Styling for tasks (resembling cards) */
+.task {
+  background-color: #f4f5f7;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.task:hover {
+  background-color: #e0e0e0;
+}
+
+/* Text styling for inside the tasks (cards) */
+.task-content {
+  font-size: 14px;
+  color: #282c34;
+}
+
+.add-card-button {
+  background-color:  #3273dc; 
+  color: #ffffff;
+  border: none;
+  padding-right: 215px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-card-button:hover {
+  background-color:#2a60b7;
 }

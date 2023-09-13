@@ -5,46 +5,66 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 function KanbanBoard() {
   const [state, setState] = useState(initialData);
 
+  const moveTaskWithinSameColumn = (column, sourceIndex, destinationIndex) => {
+    const newTaskIds = Array.from(column.taskIds);
+    const [movedTask] = newTaskIds.splice(sourceIndex, 1);
+    newTaskIds.splice(destinationIndex, 0, movedTask);
+    return { ...column, taskIds: newTaskIds };
+  };
+  
+  const moveTaskToDifferentColumn = (state, source, destination, draggableId) => {
+    const sourceColumn = state.columns[source.droppableId];
+    const newSourceTaskIds = Array.from(sourceColumn.taskIds);
+    newSourceTaskIds.splice(source.index, 1);
+  
+    const destinationColumn = state.columns[destination.droppableId];
+    const newDestinationTaskIds = Array.from(destinationColumn.taskIds);
+    newDestinationTaskIds.splice(destination.index, 0, draggableId);
+  
+    return {
+      ...state,
+      columns: {
+        ...state.columns,
+        [source.droppableId]: {
+          ...sourceColumn,
+          taskIds: newSourceTaskIds,
+        },
+        [destination.droppableId]: {
+          ...destinationColumn,
+          taskIds: newDestinationTaskIds,
+        },
+      },
+    };
+  };
+
   const onDragEnd = (result) => {
     const { destination, source, draggableId } = result;
+    
+    if (!destination) return;
 
-    // Check if the task was dropped outside a valid droppable area
-    if (!destination) {
-      return;
-    }
+    switch (true) {
+      case (destination.droppableId === source.droppableId && destination.index === source.index):
+        // Case: Dropped at the same location
+        return;
 
-    // Check if the task was dropped in a different column
-    if (
-      destination.droppableId !== source.droppableId ||
-      destination.index !== source.index
-    ) {
-      // Create a copy of the source column
-      const sourceColumn = state.columns[source.droppableId];
-      const newSourceTaskIds = Array.from(sourceColumn.taskIds);
-      newSourceTaskIds.splice(source.index, 1);
-
-      // Create a copy of the destination column
-      const destinationColumn = state.columns[destination.droppableId];
-      const newDestinationTaskIds = Array.from(destinationColumn.taskIds);
-      newDestinationTaskIds.splice(destination.index, 0, draggableId);
-
-      // Update the state with the new task orders
-      const newState = {
-        ...state,
-        columns: {
-          ...state.columns,
-          [source.droppableId]: {
-            ...sourceColumn,
-            taskIds: newSourceTaskIds,
+      case (destination.droppableId === source.droppableId && destination.index !== source.index):
+        // Case: Re-ordering within the same column
+        const column = state.columns[source.droppableId];
+        const updatedColumn = moveTaskWithinSameColumn(column, source.index, destination.index);
+        setState({
+          ...state,
+          columns: {
+            ...state.columns,
+            [source.droppableId]: updatedColumn,
           },
-          [destination.droppableId]: {
-            ...destinationColumn,
-            taskIds: newDestinationTaskIds,
-          },
-        },
-      };
+        });
+        return;
 
-      setState(newState);
+      default:
+        // Case: Moving to a different column
+        const newState = moveTaskToDifferentColumn(state, source, destination, draggableId);
+        setState(newState);
+        return;
     }
   };
 

@@ -242,3 +242,8 @@ body {
 }
 
 
+.card-overlay .overlay-content h4 { /* Changes the text to black*/
+  color: black; 
+}
+
+

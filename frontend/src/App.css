@@ -267,14 +267,18 @@ body {
 
 .labels-header {
   color: black;
-  position: relative;
-  top: -40px;
-  left: 3px;
   font-size: 20px;
+  margin-top: auto;
+  margin-bottom: 0px; 
 }
 
 .labels {
   color: black;
+}
+
+.labels-list {
+  align-self: flex-start;
+  margin-bottom: 20px;
 }
 
 .add-labels-btn {
@@ -291,6 +295,64 @@ body {
   font-size: 16px;
   border-radius: 15px;
   cursor: pointer;
+}
+
+.create-label-input {
+  width: 50%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.change-color-btn {
+  background-color: rgb(238, 238, 238);
+  width: 8%;
+  border: none;
+  padding: 3px 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 5px;
+  position: relative;
+  top: 3px;
+}
+
+.change-color-btn:hover {
+  background-color:rgb(228, 228, 228);
+}
+
+.create-label-btn {
+  width: 24%;
+  background-color: #3273dc;
+  color: #ffffff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
+  position: relative;
+  top: -1px;
+}
+
+/* Add hover effect for better user experience */
+.create-label-btn:hover {
+  background-color: #2759b2;
+}
+
+.label-text {
+  color: black;
+  font-size: 16px;
+  margin-top: 10px;
+  margin-left: 10px;
+  background-color: #3273dc;
+  color: #ffffff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
 }
 
 .description {

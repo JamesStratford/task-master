@@ -8,22 +8,25 @@ function KanbanBoard() {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
+  const [currentColumn, setCurrentColumn] = useState(null);
+
+  const openOverlay = (taskId) => {
+    const task = state.tasks[taskId];
+    const column = state.columns[task.column];
+    setCurrentTask(task);
+    setCurrentColumn(column); // Set the current column
+    setIsOverlayOpen(true);
+  };
+
+  const closeOverlay = () => {
+    setIsOverlayOpen(false); // Only close the overlay, no need to modify currentTask
+  };
 
   const moveTaskWithinSameColumn = (column, sourceIndex, destinationIndex) => {
     const newTaskIds = Array.from(column.taskIds);
     const [movedTask] = newTaskIds.splice(sourceIndex, 1);
     newTaskIds.splice(destinationIndex, 0, movedTask);
     return { ...column, taskIds: newTaskIds };
-  };
-
-  const openOverlay = (taskId) => {
-    setCurrentTask(state.tasks[taskId]);
-    setIsOverlayOpen(true);
-  };
-
-  const closeOverlay = () => {
-    setCurrentTask(null);
-    setIsOverlayOpen(false);
   };
 
   const moveTaskToDifferentColumn = (state, source, destination, draggableId) => {
@@ -167,7 +170,7 @@ function KanbanBoard() {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         ref={provided.innerRef}
-                        onDoubleClick={() => setEditingTaskId(task.id)} // Double-click handler
+                        onDoubleClick={() => setEditingTaskId(task.id)}
                       >
                         {editingTaskId === task.id ? (
                           <div className="task-content">
@@ -177,7 +180,7 @@ function KanbanBoard() {
                               onChange={(e) => updateCardContent(task.id, e.target.value)}
                             />
                             <div className="button-container">
-                            <button className="open-button" onClick={() => openOverlay(task.id)}>Open Card</button>
+                              <button className="open-button" onClick={() => openOverlay(task.id)}>Open Card</button>
                               <button className="remove-button" onClick={() => removeCard(task.id)}>Remove Card</button>
                               <button className="save-button" onClick={() => setEditingTaskId(null)}>Save Card</button>
                             </div>
@@ -213,9 +216,8 @@ function KanbanBoard() {
           </Droppable>
         );
       })}
-
       {isOverlayOpen && (
-        <CardOverlay task={currentTask} onClose={closeOverlay} />
+        <CardOverlay task={currentTask} onClose={closeOverlay} currentColumn={currentColumn} />
       )}
     </DragDropContext>
   );

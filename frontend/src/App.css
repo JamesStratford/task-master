@@ -247,3 +247,56 @@ body {
 .card-overlay .overlay-content h4 {
   color: black;
 }
+
+.task-details {
+  color: black;
+}
+
+.task-in-column {
+  color: black;
+  position: relative;
+  top: -40px;
+  left: 3px;
+  font-size: 16px;
+}
+
+.labels {
+  color: black;
+}
+
+.acceptance-tests {
+  color: black;
+}
+
+.add-labels-btn {
+  background-color: #3273dc; 
+  color: #ffffff;
+  border: none;
+  margin-left: 7px;
+  position: relative;
+  top: -2px;
+  padding-right: 7px;
+  padding-left: 7px;
+  padding-top: 3px;
+  padding-bottom: 2px;
+  font-size: 16px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.add-acceptance-tests-btn {
+  background-color: #3273dc; 
+  color: #ffffff;
+  border: none;
+  margin-left: 7px;
+  position: relative;
+  top: -2px;
+  padding-right: 7px;
+  padding-left: 7px;
+  padding-top: 3px;
+  padding-bottom: 2px;
+  font-size: 16px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+

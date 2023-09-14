@@ -19,7 +19,7 @@ function KanbanBoard() {
     }
     setTaskDescriptions(descriptions);
   }, []);
-  
+
   // Function to update the description in initialData
   const updateTaskDescription = (taskId, newDescription) => {
     // Update initialData with the new description
@@ -224,7 +224,7 @@ function KanbanBoard() {
                           <div className="task-content">
                             {task.content}
                             <button className="edit-button" onClick={() => setEditingTaskId(task.id)}>
-                            <img src={require('./edit.png')} alt="Edit" style={{ width: '15px', height: '15px' }} />
+                              <img src={require('./edit.png')} alt="Edit" style={{ width: '15px', height: '15px' }} />
                             </button>
                           </div>
                         )}
@@ -255,8 +255,9 @@ function KanbanBoard() {
         <CardOverlay
           task={currentTask}
           onClose={closeOverlay}
-          updateTaskDescription={updateTaskDescription} // Pass the updateTaskDescription function
-          taskDescription={taskDescriptions[currentTask.id]} // Pass the task description
+          currentColumn={currentColumn} // Pass the current column as a prop
+          updateTaskDescription={updateTaskDescription}
+          taskDescription={taskDescriptions[currentTask.id]}
         />
       )}
     </DragDropContext>

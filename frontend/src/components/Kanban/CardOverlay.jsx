@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import initialData from './initialData';
+import React, { useState, useEffect } from "react";
+import initialData from "./initialData";
 
 function CardOverlay({
   task,
@@ -8,7 +8,7 @@ function CardOverlay({
   updateTaskDescription,
   taskDescription,
 }) {
-  const [description, setDescription] = useState(taskDescription || '');
+  const [description, setDescription] = useState(taskDescription || "");
 
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
@@ -20,16 +20,16 @@ function CardOverlay({
   };
 
   const handleCancelEdit = () => {
-    setDescription(taskDescription || '');
-  }
+    setDescription(taskDescription || "");
+  };
 
   return (
     <div className="card-overlay">
       <div className="overlay-content">
         <div className="task-details">
           <h4 className="task-name">{task.content}</h4>
-          {task.column && (
-            <p className="task-in-column">in column: {currentColumn ? currentColumn.title : ''}</p>
+          {currentColumn && (
+            <p className="task-in-column">in column: {currentColumn.title}</p>
           )}
         </div>
         <div className="labels">
@@ -39,9 +39,7 @@ function CardOverlay({
           </h5>
         </div>
         <div className="description">
-          <h5 className="description-header">
-            Description
-          </h5>
+          <h5 className="description-header">Description</h5>
           <input
             type="text"
             className="description-input"
@@ -49,16 +47,22 @@ function CardOverlay({
             onChange={handleDescriptionChange}
           />
           <div className="input-button-container">
-            <button className="save-description-btn" onClick={handleSaveDescription}>
+            <button
+              className="save-description-btn"
+              onClick={handleSaveDescription}
+            >
               Save
             </button>
-            <button className="cancel-description-btn" onClick={handleCancelEdit}>
+            <button
+              className="cancel-description-btn"
+              onClick={handleCancelEdit}
+            >
               Cancel
             </button>
           </div>
         </div>
         <button onClick={onClose} className="close-button-overlay">
-          <img src={require('./close.png')} alt="Close" />
+          <img src={require("./close.png")} alt="Close" />
         </button>
       </div>
     </div>

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import initialData from './initialData';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import CardOverlay from './CardOverlay';
 
 function KanbanBoard() {
   const [state, setState] = useState(initialData);
   const [editingTaskId, setEditingTaskId] = useState(null);
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [currentTask, setCurrentTask] = useState(null);
 
   const moveTaskWithinSameColumn = (column, sourceIndex, destinationIndex) => {
     const newTaskIds = Array.from(column.taskIds);
@@ -12,6 +15,19 @@ function KanbanBoard() {
     newTaskIds.splice(destinationIndex, 0, movedTask);
     return { ...column, taskIds: newTaskIds };
   };
+
+
+
+  const openOverlay = (taskId) => {
+    setCurrentTask(state.tasks[taskId]);
+    setIsOverlayOpen(true);
+  };
+
+  const closeOverlay = () => {
+    setCurrentTask(null);
+    setIsOverlayOpen(false);
+  };
+
 
   const moveTaskToDifferentColumn = (state, source, destination, draggableId) => {
     const sourceColumn = state.columns[source.droppableId];
@@ -93,7 +109,7 @@ function KanbanBoard() {
     setState(newState);
   };
 
-  // Update a card that has already been created. TODO: Move edit buttons to the far right, may need to update css file to make this work.
+
 
   const updateCardContent = (taskId, newContent) => {
     const updatedTasks = {
@@ -164,7 +180,7 @@ function KanbanBoard() {
                               onChange={(e) => updateCardContent(task.id, e.target.value)}
                             />
                             <div className="button-container">
-                              <button className="open-button">Open Card</button>
+                            <button className="open-button" onClick={() => openOverlay(task.id)}>Open Card</button>
                               <button className="remove-button" onClick={() => removeCard(task.id)}>Remove Card</button>
                               <button className="save-button" onClick={() => setEditingTaskId(null)}>Save Card</button>
                             </div>
@@ -200,6 +216,10 @@ function KanbanBoard() {
           </Droppable>
         );
       })}
+
+      {isOverlayOpen && (
+        <CardOverlay task={currentTask} onClose={closeOverlay} />
+      )}
     </DragDropContext>
   );
 }

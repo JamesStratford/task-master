@@ -220,3 +220,25 @@ body {
   border-radius: 8px;
   width: 400px; /* Will be changed later*/
 }
+
+.close-button-overlay {
+  background: none; 
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%; 
+  overflow: hidden;
+  transition: background-color 0.3s ease; 
+}
+
+.close-button-overlay:hover {
+  background-color: #ccc; 
+}
+
+.close-button-overlay img {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+
+

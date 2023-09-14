@@ -5,8 +5,9 @@ function CardOverlay({ task, onClose }) {
     <div className="card-overlay">
       <div className="overlay-content">
         <h3>{task.content}</h3>
-        {/* You can add more card details here */}
-        <button onClick={onClose}>Close</button>
+        <button onClick={onClose} className="close-button-overlay">
+          <img src={require('./close.png')} alt="Close" />
+        </button>
       </div>
     </div>
   );

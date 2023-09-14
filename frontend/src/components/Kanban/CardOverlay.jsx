@@ -1,25 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import initialData from './initialData';
 
-function CardOverlay({ task, onClose, currentColumn }) {
-  const [description, setDescription] = useState(task.description || '');
-  const [isInputFocused, setInputFocused] = useState(false);
+function CardOverlay({
+  task,
+  onClose,
+  currentColumn,
+  updateTaskDescription,
+  taskDescription,
+}) {
+  const [description, setDescription] = useState(taskDescription || '');
 
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
   const handleSaveDescription = () => {
-    console.log('Description saved:', description);
+    updateTaskDescription(task.id, description);
     onClose();
   };
 
   const handleCancelEdit = () => {
-    // Handle canceling the edit here, for example, reset the description to its original value.
-    // You can use setDescription to reset the description in state.
-    // Once canceled, you can set isInputFocused to false.
-    setDescription(task.description || '');
-    setInputFocused(false);
-  };
+    setDescription(taskDescription || '');
+  }
 
   return (
     <div className="card-overlay">
@@ -45,19 +47,15 @@ function CardOverlay({ task, onClose, currentColumn }) {
             className="description-input"
             value={description}
             onChange={handleDescriptionChange}
-            onFocus={() => setInputFocused(true)}
-            onBlur={() => setInputFocused(false)}
           />
-          {isInputFocused && (
-            <div className="input-button-container">
-              <button className="save-description-btn" onClick={handleSaveDescription}>
-                Save
-              </button>
-              <button className="cancel-description-btn" onClick={handleCancelEdit}>
-                Cancel
-              </button>
-            </div>
-          )}
+          <div className="input-button-container">
+            <button className="save-description-btn" onClick={handleSaveDescription}>
+              Save
+            </button>
+            <button className="cancel-description-btn" onClick={handleCancelEdit}>
+              Cancel
+            </button>
+          </div>
         </div>
         <button onClick={onClose} className="close-button-overlay">
           <img src={require('./close.png')} alt="Close" />

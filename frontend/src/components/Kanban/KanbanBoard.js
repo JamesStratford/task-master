@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import initialData from './initialData';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import CardOverlay from './CardOverlay';
@@ -9,6 +9,35 @@ function KanbanBoard() {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [currentColumn, setCurrentColumn] = useState(null);
+  const [taskDescriptions, setTaskDescriptions] = useState({}); // Track task descriptions
+
+  // Load task descriptions from initialData on component mount
+  useEffect(() => {
+    const descriptions = {};
+    for (const taskId in initialData.tasks) {
+      descriptions[taskId] = initialData.tasks[taskId].description || '';
+    }
+    setTaskDescriptions(descriptions);
+  }, []);
+  
+  // Function to update the description in initialData
+  const updateTaskDescription = (taskId, newDescription) => {
+    // Update initialData with the new description
+    const updatedData = {
+      ...initialData,
+      tasks: {
+        ...initialData.tasks,
+        [taskId]: {
+          ...initialData.tasks[taskId],
+          description: newDescription,
+        },
+      },
+    };
+    // Update the state and initialData
+    setState(updatedData);
+    // Update the taskDescriptions state
+    setTaskDescriptions({ ...taskDescriptions, [taskId]: newDescription });
+  };
 
   const openOverlay = (taskId) => {
     const task = state.tasks[taskId];
@@ -180,19 +209,24 @@ function KanbanBoard() {
                               onChange={(e) => updateCardContent(task.id, e.target.value)}
                             />
                             <div className="button-container">
-                              <button className="open-button" onClick={() => openOverlay(task.id)}>Open Card</button>
-                              <button className="remove-button" onClick={() => removeCard(task.id)}>Remove Card</button>
-                              <button className="save-button" onClick={() => setEditingTaskId(null)}>Save Card</button>
+                              <button className="open-button" onClick={() => openOverlay(task.id)}>
+                                Open Card
+                              </button>
+                              <button className="remove-button" onClick={() => removeCard(task.id)}>
+                                Remove Card
+                              </button>
+                              <button className="save-button" onClick={() => setEditingTaskId(null)}>
+                                Save Card
+                              </button>
                             </div>
                           </div>
                         ) : (
                           <div className="task-content">
                             {task.content}
                             <button className="edit-button" onClick={() => setEditingTaskId(task.id)}>
-                              <img src={require('./edit.png')} alt="Edit" style={{ width: '15px', height: '15px' }} />
+                            <img src={require('./edit.png')} alt="Edit" style={{ width: '15px', height: '15px' }} />
                             </button>
                           </div>
-
                         )}
                       </div>
                     )}
@@ -204,6 +238,7 @@ function KanbanBoard() {
                     const newCard = {
                       id: `new-card-${Date.now()}`,
                       content: 'New Task',
+                      description: '', // Initialize the description as empty
                     };
                     addCardToColumn(column.id, newCard);
                   }}
@@ -217,7 +252,12 @@ function KanbanBoard() {
         );
       })}
       {isOverlayOpen && (
-        <CardOverlay task={currentTask} onClose={closeOverlay} currentColumn={currentColumn} />
+        <CardOverlay
+          task={currentTask}
+          onClose={closeOverlay}
+          updateTaskDescription={updateTaskDescription} // Pass the updateTaskDescription function
+          taskDescription={taskDescriptions[currentTask.id]} // Pass the task description
+        />
       )}
     </DragDropContext>
   );

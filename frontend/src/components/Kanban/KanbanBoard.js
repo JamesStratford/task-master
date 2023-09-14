@@ -16,8 +16,6 @@ function KanbanBoard() {
     return { ...column, taskIds: newTaskIds };
   };
 
-
-
   const openOverlay = (taskId) => {
     setCurrentTask(state.tasks[taskId]);
     setIsOverlayOpen(true);
@@ -27,7 +25,6 @@ function KanbanBoard() {
     setCurrentTask(null);
     setIsOverlayOpen(false);
   };
-
 
   const moveTaskToDifferentColumn = (state, source, destination, draggableId) => {
     const sourceColumn = state.columns[source.droppableId];

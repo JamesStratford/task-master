@@ -201,7 +201,6 @@ body {
   cursor: pointer;
 }
 
-
 .card-overlay {
   position: fixed;
   top: 0;
@@ -218,21 +217,25 @@ body {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
-  width: 400px; /* Will be changed later*/
+  width: 400px; 
+  position: relative;
 }
 
 .close-button-overlay {
-  background: none; 
+  background: none;
   border: none;
   padding: 0;
   cursor: pointer;
-  border-radius: 50%; 
+  border-radius: 50%;
   overflow: hidden;
-  transition: background-color 0.3s ease; 
+  transition: background-color 0.3s ease;
+  position: absolute;
+  top: 10px; 
+  right: 10px; 
 }
 
 .close-button-overlay:hover {
-  background-color: #ccc; 
+  background-color: #ccc;
 }
 
 .close-button-overlay img {
@@ -241,9 +244,6 @@ body {
   display: block;
 }
 
-
-.card-overlay .overlay-content h4 { /* Changes the text to black*/
-  color: black; 
+.card-overlay .overlay-content h4 {
+  color: black;
 }
-
-

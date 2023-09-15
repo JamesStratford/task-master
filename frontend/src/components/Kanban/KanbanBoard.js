@@ -86,38 +86,52 @@ function KanbanBoard() {
   };
 
   const onDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source, draggableId, type } = result;
 
-    if (!destination) return;
+    if (!destination) return; // If not dropped on a valid droppable, do nothing
 
-    switch (true) {
-      case (destination.droppableId === source.droppableId && destination.index === source.index):
-        // Case: Dropped at the same location
-        return;
-
-      case (destination.droppableId === source.droppableId && destination.index !== source.index):
-        // Case: Re-ordering within the same column
-        const column = state.columns[source.droppableId];
-        const updatedColumn = moveTaskWithinSameColumn(column, source.index, destination.index);
-        setState({
-          ...state,
-          columns: {
-            ...state.columns,
-            [source.droppableId]: updatedColumn,
-          },
-        });
-        return;
-
-      default:
-        // Case: Moving to a different column
-        const newState = moveTaskToDifferentColumn(state, source, destination, draggableId);
-        setState(newState);
-        return;
-    }
+    if (type === 'column') {
+      // Column dragging logic
+      const newColumnOrder = Array.from(state.columnOrder);
+      newColumnOrder.splice(source.index, 1);
+      newColumnOrder.splice(destination.index, 0, draggableId);
+  
+      // Create a new state object preserving the previous state
+      const newState = {
+        ...state,
+        columnOrder: newColumnOrder,
+      };
+  
+      setState(newState);
+    } else {
+      switch (true) {
+        case (destination.droppableId === source.droppableId && destination.index === source.index):
+          // Case: Dropped at the same location
+          return;
+  
+        case (destination.droppableId === source.droppableId && destination.index !== source.index):
+          // Case: Re-ordering within the same column
+          const column = state.columns[source.droppableId];
+          const updatedColumn = moveTaskWithinSameColumn(column, source.index, destination.index);
+          setState({
+            ...state,
+            columns: {
+              ...state.columns,
+              [source.droppableId]: updatedColumn,
+            },
+          });
+          return;
+  
+        default:
+          // Case: Moving to a different column
+          const newState = moveTaskToDifferentColumn(state, source, destination, draggableId);
+          setState(newState);
+          return;
+      }  
+    } 
   };
 
   const addCardToColumn = (columnId, newCard) => {
-    // Update the state to add the new card to the specified column
     const updatedColumns = {
       ...state.columns,
       [columnId]: {
@@ -131,6 +145,7 @@ function KanbanBoard() {
       [newCard.id]: newCard,
     };
 
+    // Create a new state object preserving the previous state
     const newState = {
       ...state,
       columns: updatedColumns,
@@ -204,121 +219,143 @@ function KanbanBoard() {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      {state.columnOrder.map((columnId) => {
-        const column = state.columns[columnId];
-        const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
-  
-        return (
-          <Droppable droppableId={column.id} key={column.id}>
-            {(provided) => (
-              <div
-                className="column-container"
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-              >
-                {isEditingColumnTitle === column.id ? (
-                  <input
-                    type="text"
-                    value={editedColumn.title}
-                    onChange={handleColumnTitleChange}
-                    className="column-title-input"
-                    onKeyPress={(e) => handleColumnTitleKeyPress(e, column.id)}
-                    onBlur={() => setIsEditingColumnTitle(null)}
-                    autoFocus
-                  />
-                ) : (
-                  <h3
-                    className="column-title"
-                    onDoubleClick={() => handleColumnTitleDoubleClick(column.id)}
-                  >
-                    {column.title}
-                  </h3>
-                )}
-                {tasks.map((task, index) => (
-                  <Draggable draggableId={task.id} index={index} key={task.id}>
-                    {(provided) => (
-                      <div
-                        className={`task ${editingTaskId === task.id ? 'editing' : ''}`}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        ref={provided.innerRef}
-                        onDoubleClick={() => setEditingTaskId(task.id)}
-                      >
-                        {editingTaskId === task.id ? (
-                          <div className="task-content">
-                            <input
-                              type="text"
-                              value={task.content}
-                              onChange={(e) => updateCardContent(task.id, e.target.value)}
-                            />
-                            <div className="button-container">
-                              <button
-                                className="open-button"
-                                onClick={() => openOverlay(task.id)}
-                              >
-                                Open Card
-                              </button>
-                              <button
-                                className="remove-button"
-                                onClick={() => removeCard(task.id)}
-                              >
-                                Remove Card
-                              </button>
-                              <button
-                                className="save-button"
-                                onClick={() => setEditingTaskId(null)}
-                              >
-                                Save Card
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="task-content">
-                            {task.content}
+      <Droppable droppableId="all-columns" direction="horizontal" type="column">
+        {(provided) => (
+          <div
+            className="kanban-board"
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
+            {state.columnOrder.map((columnId, index) => {
+              const column = state.columns[columnId];
+              const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
+
+              return (
+                <Draggable draggableId={column.id} index={index} key={column.id}>
+                  {(provided) => (
+                    <div
+                      className="column-container"
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                    >
+                      {isEditingColumnTitle === column.id ? (
+                        <input
+                          type="text"
+                          value={editedColumn.title}
+                          onChange={handleColumnTitleChange}
+                          className="column-title-input"
+                          onKeyPress={(e) => handleColumnTitleKeyPress(e, column.id)}
+                          onBlur={() => setIsEditingColumnTitle(null)}
+                          autoFocus
+                        />
+                      ) : (
+                        <h3
+                          className="column-title"
+                          {...provided.dragHandleProps}
+                          onDoubleClick={() => handleColumnTitleDoubleClick(column.id)}
+                        >
+                          {column.title}
+                        </h3>
+                      )}
+                      <Droppable droppableId={column.id} direction="vertical">
+                        {(provided) => (
+                          <div
+                            className="task-list"
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                          >
+                            {tasks.map((task, index) => (
+                              <Draggable draggableId={task.id} index={index} key={task.id}>
+                                {(provided) => (
+                                  <div
+                                    className={`task ${editingTaskId === task.id ? 'editing' : ''}`}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    ref={provided.innerRef}
+                                    onDoubleClick={() => setEditingTaskId(task.id)}
+                                  >
+                                    {editingTaskId === task.id ? (
+                                      <div className="task-content">
+                                        <input
+                                          type="text"
+                                          value={task.content}
+                                          onChange={(e) => updateCardContent(task.id, e.target.value)}
+                                        />
+                                        <div className="button-container">
+                                          <button
+                                            className="open-button"
+                                            onClick={() => openOverlay(task.id)}
+                                          >
+                                            Open Card
+                                          </button>
+                                          <button
+                                            className="remove-button"
+                                            onClick={() => removeCard(task.id)}
+                                          >
+                                            Remove Card
+                                          </button>
+                                          <button
+                                            className="save-button"
+                                            onClick={() => setEditingTaskId(null)}
+                                          >
+                                            Save Card
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="task-content">
+                                        {task.content}
+                                        <button
+                                          className="edit-button"
+                                          onClick={() => setEditingTaskId(task.id)}
+                                        >
+                                          <img
+                                            src={require('./edit.png')}
+                                            alt="Edit"
+                                            style={{ width: '15px', height: '15px' }}
+                                          />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
                             <button
-                              className="edit-button"
-                              onClick={() => setEditingTaskId(task.id)}
+                              onClick={() => {
+                                const newCard = {
+                                  id: `new-card-${Date.now()}`,
+                                  content: 'New Task',
+                                  description: '', // Initialize the description as empty
+                                };
+                                addCardToColumn(column.id, newCard);
+                              }}
+                              className="add-card-button"
                             >
-                              <img
-                                src={require('./edit.png')}
-                                alt="Edit"
-                                style={{ width: '15px', height: '15px' }}
-                              />
+                              + Add a card
                             </button>
                           </div>
                         )}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-                <button
-                  onClick={() => {
-                    const newCard = {
-                      id: `new-card-${Date.now()}`,
-                      content: 'New Task',
-                      description: '', // Initialize the description as empty
-                    };
-                    addCardToColumn(column.id, newCard);
-                  }}
-                  className="add-card-button"
-                >
-                  + Add a card
-                </button>
-              </div>
+                      </Droppable>
+                    </div>
+                  )}
+                </Draggable>
+              );
+            })}
+            {isOverlayOpen && (
+              <CardOverlay
+                task={currentTask}
+                onClose={closeOverlay}
+                currentColumn={currentColumn}
+                updateTaskDescription={updateTaskDescription}
+                taskDescription={taskDescriptions[currentTask.id]}
+              />
             )}
-          </Droppable>
-        );
-      })}
-      {isOverlayOpen && (
-        <CardOverlay
-          task={currentTask}
-          onClose={closeOverlay}
-          currentColumn={currentColumn}
-          updateTaskDescription={updateTaskDescription}
-          taskDescription={taskDescriptions[currentTask.id]}
-        />
-      )}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
     </DragDropContext>
   );
 }

@@ -12,6 +12,9 @@ function KanbanBoard() {
   const [currentColumn, setCurrentColumn] = useState(null);
   const [taskDescriptions, setTaskDescriptions] = useState({});
   const [isEditingColumnTitle, setIsEditingColumnTitle] = useState(null);
+  const [isAddingColumn, setIsAddingColumn] = useState(false);
+  const [newColumnTitle, setNewColumnTitle] = useState('');
+  const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
 
   // Load task descriptions from initialData on component mount
   useEffect(() => {
@@ -85,6 +88,53 @@ function KanbanBoard() {
     };
   };
 
+  const addColumn = () => {
+    if (newColumnTitle.trim() === '') {
+      // Don't add an empty column
+      return;
+    }
+
+    const newColumnId = `column-${Date.now()}`;
+    const newColumn = {
+      id: newColumnId,
+      title: newColumnTitle,
+      taskIds: [],
+    };
+    const updatedColumns = { ...state.columns, [newColumnId]: newColumn };
+    const newColumnOrder = [...state.columnOrder, newColumnId];
+    const newState = { ...state, columns: updatedColumns, columnOrder: newColumnOrder };
+    setState(newState);
+    setNewColumnTitle(''); // Clear the newColumnTitle
+    setIsAddingColumn(false); // Close the "Add Column" input field
+  };
+
+  const deleteColumn = (columnId) => {
+    const { [columnId]: deletedColumn, ...updatedColumns } = state.columns;
+    const newColumnOrder = state.columnOrder.filter((id) => id !== columnId);
+
+    // Remove tasks associated with the deleted column
+    const updatedTasks = { ...state.tasks };
+    deletedColumn.taskIds.forEach((taskId) => {
+      delete updatedTasks[taskId];
+    });
+
+    setState({
+      ...state,
+      columns: updatedColumns,
+      columnOrder: newColumnOrder,
+      tasks: updatedTasks,
+    });
+  };
+
+  const openDropdown = (columnId) => {
+    setOpenDropdownColumnId(columnId);
+  };
+
+  // Function to close the dropdown menu for a column
+  const closeDropdown = () => {
+    setOpenDropdownColumnId(null);
+  };
+
   const onDragEnd = (result) => {
     const { destination, source, draggableId, type } = result;
 
@@ -95,20 +145,20 @@ function KanbanBoard() {
       const newColumnOrder = Array.from(state.columnOrder);
       newColumnOrder.splice(source.index, 1);
       newColumnOrder.splice(destination.index, 0, draggableId);
-  
+
       // Create a new state object preserving the previous state
       const newState = {
         ...state,
         columnOrder: newColumnOrder,
       };
-  
+
       setState(newState);
     } else {
       switch (true) {
         case (destination.droppableId === source.droppableId && destination.index === source.index):
           // Case: Dropped at the same location
           return;
-  
+
         case (destination.droppableId === source.droppableId && destination.index !== source.index):
           // Case: Re-ordering within the same column
           const column = state.columns[source.droppableId];
@@ -121,14 +171,14 @@ function KanbanBoard() {
             },
           });
           return;
-  
+
         default:
           // Case: Moving to a different column
           const newState = moveTaskToDifferentColumn(state, source, destination, draggableId);
           setState(newState);
           return;
-      }  
-    } 
+      }
+    }
   };
 
   const addCardToColumn = (columnId, newCard) => {
@@ -238,17 +288,7 @@ function KanbanBoard() {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                     >
-                      {isEditingColumnTitle === column.id ? (
-                        <input
-                          type="text"
-                          value={editedColumn.title}
-                          onChange={handleColumnTitleChange}
-                          className="column-title-input"
-                          onKeyPress={(e) => handleColumnTitleKeyPress(e, column.id)}
-                          onBlur={() => setIsEditingColumnTitle(null)}
-                          autoFocus
-                        />
-                      ) : (
+                      <div className="column-header">
                         <h3
                           className="column-title"
                           {...provided.dragHandleProps}
@@ -256,7 +296,32 @@ function KanbanBoard() {
                         >
                           {column.title}
                         </h3>
-                      )}
+                        <div className="dropdown">
+                          {openDropdownColumnId === column.id ? (
+                            <div className="dropdown-content">
+                              <button
+                                className="delete-column-button"
+                                onClick={() => deleteColumn(column.id)}
+                              >
+                                Delete Column
+                              </button>
+                              <button
+                                className="close-dropdown-button"
+                                onClick={closeDropdown}
+                              >
+                                Close
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              className="dropdown-button"
+                              onClick={() => openDropdown(column.id)}
+                            >
+                              ...
+                            </button>
+                          )}
+                        </div>
+                      </div>
                       <Droppable droppableId={column.id} direction="vertical">
                         {(provided) => (
                           <div
@@ -343,6 +408,33 @@ function KanbanBoard() {
                 </Draggable>
               );
             })}
+            {isAddingColumn ? (
+              <div className="column-container">
+                <input
+                  type="text"
+                  placeholder="Enter Column Title"
+                  value={newColumnTitle}
+                  onChange={(e) => setNewColumnTitle(e.target.value)}
+                  className="column-title-input"
+                  onKeyPress={(e) => handleColumnTitleKeyPress(e, editedColumn.id)}
+                  onBlur={() => setIsEditingColumnTitle(null)}
+                  autoFocus
+                />
+                <button
+                  className="add-column-button"
+                  onClick={addColumn}
+                >
+                  Add column
+                </button>
+              </div>
+            ) : (
+              <button
+                className="add-column-button"
+                onClick={() => setIsAddingColumn(true)}
+              >
+                + Add another column
+              </button>
+            )}
             {isOverlayOpen && (
               <CardOverlay
                 task={currentTask}
@@ -358,6 +450,7 @@ function KanbanBoard() {
       </Droppable>
     </DragDropContext>
   );
+
 }
 
 export default KanbanBoard;

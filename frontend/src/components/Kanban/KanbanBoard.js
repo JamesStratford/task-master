@@ -296,7 +296,7 @@ function KanbanBoard() {
                         >
                           {column.title}
                         </h3>
-                        <div className="dropdown">
+                        <div className="dropdown top-right"> {/* Modified class name here */}
                           {openDropdownColumnId === column.id ? (
                             <div className="dropdown-content">
                               <button

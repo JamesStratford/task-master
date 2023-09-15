@@ -7,14 +7,16 @@ function KanbanBoard() {
   const [state, setState] = useState(initialData);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editedColumn, setEditedColumn] = useState({ id: null, title: '' });
+  const [editedColumnTitle, setEditedColumnTitle] = useState(''); 
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [currentColumn, setCurrentColumn] = useState(null);
   const [taskDescriptions, setTaskDescriptions] = useState({});
-  const [isEditingColumnTitle, setIsEditingColumnTitle] = useState(null);
+  const [isEditingColumnTitle, setIsEditingColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
+  
 
   // Load task descriptions from initialData on component mount
   useEffect(() => {
@@ -242,28 +244,29 @@ function KanbanBoard() {
   };
 
   const handleColumnTitleDoubleClick = (columnId) => {
-    // Enable editing of the column title
+    // Set the edited column title when double-clicking
+    const column = state.columns[columnId];
+    setEditedColumnTitle(column.title);
     setIsEditingColumnTitle(columnId);
-    setEditedColumn({ id: columnId, title: state.columns[columnId].title });
   };
 
-  const handleColumnTitleChange = (e) => {
+  const handleEditedColumnTitleChange = (e) => {
     // Update the edited column title
-    setEditedColumn({ ...editedColumn, title: e.target.value });
+    setEditedColumnTitle(e.target.value);
   };
 
   const handleColumnTitleKeyPress = (e, columnId) => {
     if (e.key === 'Enter') {
       // Save the edited column title when Enter key is pressed
-      setIsEditingColumnTitle(null);
       const updatedColumns = {
         ...state.columns,
-        [editedColumn.id]: {
-          ...state.columns[editedColumn.id],
-          title: editedColumn.title,
+        [columnId]: {
+          ...state.columns[columnId],
+          title: editedColumnTitle,
         },
       };
       setState({ ...state, columns: updatedColumns });
+      setIsEditingColumnTitle(''); // Clear the editing state
     }
   };
 
@@ -289,14 +292,26 @@ function KanbanBoard() {
                       {...provided.draggableProps}
                     >
                       <div className="column-header">
-                        <h3
-                          className="column-title"
-                          {...provided.dragHandleProps}
-                          onDoubleClick={() => handleColumnTitleDoubleClick(column.id)}
-                        >
-                          {column.title}
-                        </h3>
-                        <div className="dropdown top-right"> {/* Modified class name here */}
+                        {isEditingColumnTitle === column.id ? ( // Check if currently editing
+                          <input
+                            type="text"
+                            className="column-title-input"
+                            value={editedColumnTitle}
+                            onChange={handleEditedColumnTitleChange}
+                            onKeyPress={(e) => handleColumnTitleKeyPress(e, column.id)}
+                            onBlur={() => setIsEditingColumnTitle('')} // Clear the editing state
+                            autoFocus
+                          />
+                        ) : (
+                          <h3
+                            className="column-title"
+                            {...provided.dragHandleProps}
+                            onDoubleClick={() => handleColumnTitleDoubleClick(column.id)}
+                          >
+                            {column.title}
+                          </h3>
+                        )}
+                        <div className="dropdown top-right">
                           {openDropdownColumnId === column.id ? (
                             <div className="dropdown-content">
                               <button
@@ -417,7 +432,7 @@ function KanbanBoard() {
                   onChange={(e) => setNewColumnTitle(e.target.value)}
                   className="column-title-input"
                   onKeyPress={(e) => handleColumnTitleKeyPress(e, editedColumn.id)}
-                  onBlur={() => setIsEditingColumnTitle(null)}
+                  onBlur={() => setIsEditingColumnTitle('')} // Clear the editing state
                   autoFocus
                 />
                 <button
@@ -450,7 +465,6 @@ function KanbanBoard() {
       </Droppable>
     </DragDropContext>
   );
-
 }
 
 export default KanbanBoard;

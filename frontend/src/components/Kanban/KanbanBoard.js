@@ -6,10 +6,12 @@ import CardOverlay from './CardOverlay';
 function KanbanBoard() {
   const [state, setState] = useState(initialData);
   const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editedColumn, setEditedColumn] = useState({ id: null, title: '' });
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [currentColumn, setCurrentColumn] = useState(null);
-  const [taskDescriptions, setTaskDescriptions] = useState({}); // Track task descriptions
+  const [taskDescriptions, setTaskDescriptions] = useState({});
+  const [isEditingColumnTitle, setIsEditingColumnTitle] = useState(null);
 
   // Load task descriptions from initialData on component mount
   useEffect(() => {
@@ -138,8 +140,6 @@ function KanbanBoard() {
     setState(newState);
   };
 
-
-
   const updateCardContent = (taskId, newContent) => {
     const updatedTasks = {
       ...state.tasks,
@@ -176,12 +176,38 @@ function KanbanBoard() {
     });
   };
 
+  const handleColumnTitleDoubleClick = (columnId) => {
+    // Enable editing of the column title
+    setIsEditingColumnTitle(columnId);
+    setEditedColumn({ id: columnId, title: state.columns[columnId].title });
+  };
+
+  const handleColumnTitleChange = (e) => {
+    // Update the edited column title
+    setEditedColumn({ ...editedColumn, title: e.target.value });
+  };
+
+  const handleColumnTitleKeyPress = (e, columnId) => {
+    if (e.key === 'Enter') {
+      // Save the edited column title when Enter key is pressed
+      setIsEditingColumnTitle(null);
+      const updatedColumns = {
+        ...state.columns,
+        [editedColumn.id]: {
+          ...state.columns[editedColumn.id],
+          title: editedColumn.title,
+        },
+      };
+      setState({ ...state, columns: updatedColumns });
+    }
+  };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       {state.columnOrder.map((columnId) => {
         const column = state.columns[columnId];
         const tasks = column.taskIds.map((taskId) => state.tasks[taskId]);
-
+  
         return (
           <Droppable droppableId={column.id} key={column.id}>
             {(provided) => (
@@ -190,7 +216,24 @@ function KanbanBoard() {
                 ref={provided.innerRef}
                 {...provided.droppableProps}
               >
-                <h3 className="column-title">{column.title}</h3>
+                {isEditingColumnTitle === column.id ? (
+                  <input
+                    type="text"
+                    value={editedColumn.title}
+                    onChange={handleColumnTitleChange}
+                    className="column-title-input"
+                    onKeyPress={(e) => handleColumnTitleKeyPress(e, column.id)}
+                    onBlur={() => setIsEditingColumnTitle(null)}
+                    autoFocus
+                  />
+                ) : (
+                  <h3
+                    className="column-title"
+                    onDoubleClick={() => handleColumnTitleDoubleClick(column.id)}
+                  >
+                    {column.title}
+                  </h3>
+                )}
                 {tasks.map((task, index) => (
                   <Draggable draggableId={task.id} index={index} key={task.id}>
                     {(provided) => (
@@ -209,13 +252,22 @@ function KanbanBoard() {
                               onChange={(e) => updateCardContent(task.id, e.target.value)}
                             />
                             <div className="button-container">
-                              <button className="open-button" onClick={() => openOverlay(task.id)}>
+                              <button
+                                className="open-button"
+                                onClick={() => openOverlay(task.id)}
+                              >
                                 Open Card
                               </button>
-                              <button className="remove-button" onClick={() => removeCard(task.id)}>
+                              <button
+                                className="remove-button"
+                                onClick={() => removeCard(task.id)}
+                              >
                                 Remove Card
                               </button>
-                              <button className="save-button" onClick={() => setEditingTaskId(null)}>
+                              <button
+                                className="save-button"
+                                onClick={() => setEditingTaskId(null)}
+                              >
                                 Save Card
                               </button>
                             </div>
@@ -223,8 +275,15 @@ function KanbanBoard() {
                         ) : (
                           <div className="task-content">
                             {task.content}
-                            <button className="edit-button" onClick={() => setEditingTaskId(task.id)}>
-                              <img src={require('./edit.png')} alt="Edit" style={{ width: '15px', height: '15px' }} />
+                            <button
+                              className="edit-button"
+                              onClick={() => setEditingTaskId(task.id)}
+                            >
+                              <img
+                                src={require('./edit.png')}
+                                alt="Edit"
+                                style={{ width: '15px', height: '15px' }}
+                              />
                             </button>
                           </div>
                         )}
@@ -255,7 +314,7 @@ function KanbanBoard() {
         <CardOverlay
           task={currentTask}
           onClose={closeOverlay}
-          currentColumn={currentColumn} // Pass the current column as a prop
+          currentColumn={currentColumn}
           updateTaskDescription={updateTaskDescription}
           taskDescription={taskDescriptions[currentTask.id]}
         />

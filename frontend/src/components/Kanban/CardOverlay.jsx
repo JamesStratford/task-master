@@ -21,8 +21,7 @@ function CardOverlay({
   };
 
   const handleSaveDescription = () => {
-    updateTaskDescription(task.id, description);
-    onClose();
+    updateTaskDescription(task.id, description);;
   };
 
   const handleCancelEdit = () => {

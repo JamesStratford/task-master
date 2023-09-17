@@ -13,8 +13,6 @@ function addUserToWhitelist(discordId) {
     });
 }
 
-addUserToWhitelist('432418809345867776');
-
 async function exchangeCodeForToken(code) {
     try {
         const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
@@ -58,14 +56,13 @@ router.get('/add-to-whitelist', async (req, res) => {
 router.get('/check-auth', async (req, res) => {
     if (req.session.userId) {
         const userDocument = await db.collection('whitelist').findOne({ discordId: req.session.userId });
-        if (userDocument.isWhitelisted) {
+        if (userDocument && userDocument.isWhitelisted) {
             // User is authenticated
             res.json({ isAuthenticated: true });
 
             return
         }
     }
-
     // User is not authenticated
     res.json({ isAuthenticated: false });
 });
@@ -112,7 +109,7 @@ router.get('/exchange', async (req, res) => {
 
 
         const userDocument = await db.collection('whitelist').findOne({ discordId: req.session.userId });
-        if (userDocument.isWhitelisted) {
+        if (userDocument && userDocument.isWhitelisted) {
             res.json({ isAuthenticated: true })
         } else {
             res.json({ isAuthenticated: false })

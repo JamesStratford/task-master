@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import initialData from './initialData';
+import { getInitialData, updateData } from './initialData';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import CardOverlay from './CardOverlay';
 
 function KanbanBoard() {
-  const [state, setState] = useState(initialData);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editedColumn, setEditedColumn] = useState({ id: null, title: '' });
   const [editedColumnTitle, setEditedColumnTitle] = useState(''); 
@@ -16,36 +15,48 @@ function KanbanBoard() {
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
+  const [state, setState] = useState({
+    tasks: {},
+    columns: {},
+    columnOrder: []
+  });
   
 
-  // Load task descriptions from initialData on component mount
+  // Load task descriptions from the database on component mount
   useEffect(() => {
-    const descriptions = {};
-    for (const taskId in initialData.tasks) {
-      descriptions[taskId] = initialData.tasks[taskId].description || '';
-    }
-    setTaskDescriptions(descriptions);
+    const fetchData = async () => {
+      const data = await getInitialData();
+      setState(data);
+      
+      const descriptions = {};
+      for (const taskId in data.tasks) {
+        descriptions[taskId] = data.tasks[taskId].description || '';
+      }
+      setTaskDescriptions(descriptions);
+    };
+
+    fetchData();
   }, []);
 
-  // Function to update the description in initialData
-  const updateTaskDescription = (taskId, newDescription) => {
-    // Update initialData with the new description
+  // Function to update the description in the database
+  const updateTaskDescription = async (taskId, newDescription) => {
     const updatedData = {
-      ...initialData,
+      ...state,
       tasks: {
-        ...initialData.tasks,
+        ...state.tasks,
         [taskId]: {
-          ...initialData.tasks[taskId],
+          ...state.tasks[taskId],
           description: newDescription,
         },
       },
     };
-    // Update the state and initialData
     setState(updatedData);
-    // Update the taskDescriptions state
     setTaskDescriptions({ ...taskDescriptions, [taskId]: newDescription });
+
+    await updateData(updatedData); // Update the database.
   };
 
+  
   const openOverlay = (taskId) => {
     const task = state.tasks[taskId];
     const column = state.columns[task.column];

@@ -9,6 +9,10 @@ function CardOverlay({
   updateTaskDescription,
   taskDescription,
 }) {
+
+  // TODO: Add priorities and dates to card overlay
+  
+  // State to manage task description and labels
   const [description, setDescription] = useState(taskDescription || "");
   const [newLabel, setNewLabel] = useState("");
   const [labelColor, setLabelColor] = useState("#ffffff");
@@ -16,27 +20,33 @@ function CardOverlay({
   const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
 
+  // Function to handle description change
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
+  // Function to save task description
   const handleSaveDescription = () => {
-    updateTaskDescription(task.id, description);;
+    updateTaskDescription(task.id, description);
   };
 
+  // Function to cancel editing description
   const handleCancelEdit = () => {
     setDescription(taskDescription || "");
   };
 
+  // Function to toggle label input visibility
   const toggleLabelInput = () => {
     setIsLabelInputVisible(!isLabelInputVisible);
     setNewLabel("");
   };
 
+  // Function to toggle color picker visibility
   const toggleColorPicker = () => {
     setIsColorPickerVisible(!isColorPickerVisible);
   };
 
+  // Function to create a new label
   const createNewLabel = () => {
     if (newLabel) {
       setLabels([...labels, { text: newLabel, color: labelColor }]);

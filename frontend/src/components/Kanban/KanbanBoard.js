@@ -4,6 +4,10 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import CardOverlay from './CardOverlay';
 
 function KanbanBoard() {
+  // TODO: Restructure file to add respective components/functions in column.jsx and Task.jsx
+  // TODO: Finish Label Component so that it saves labels when reopening
+
+  // State variables for various aspects of the Kanban board
   const [state, setState] = useState(initialData);
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editedColumn, setEditedColumn] = useState({ id: null, title: '' });
@@ -16,7 +20,6 @@ function KanbanBoard() {
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
-  
 
   // Load task descriptions from initialData on component mount
   useEffect(() => {
@@ -276,6 +279,7 @@ function KanbanBoard() {
         {(provided) => (
           <div
             className="kanban-board"
+            data-testid="kanban-board" // Added data-testid
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
@@ -290,6 +294,7 @@ function KanbanBoard() {
                       className="column-container"
                       ref={provided.innerRef}
                       {...provided.draggableProps}
+                      data-testid={`${column.id}`}
                     >
                       <div className="column-header">
                         {isEditingColumnTitle === column.id ? ( // Check if currently editing
@@ -341,6 +346,7 @@ function KanbanBoard() {
                         {(provided) => (
                           <div
                             className="task-list"
+                            data-testid={`task-list-${column.id}`} // Added data-testid
                             ref={provided.innerRef}
                             {...provided.droppableProps}
                           >
@@ -349,6 +355,7 @@ function KanbanBoard() {
                                 {(provided) => (
                                   <div
                                     className={`task ${editingTaskId === task.id ? 'editing' : ''}`}
+                                    data-testid={`${task.id}`} 
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
                                     ref={provided.innerRef}

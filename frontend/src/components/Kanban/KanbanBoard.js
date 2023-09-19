@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getInitialData, updateData } from './initialData';
+import { getInitialData, updateData } from '../../../../server/db/initialData';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import CardOverlay from './CardOverlay';
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import initialData from "./initialData";
 import { SketchPicker } from 'react-color';
+import { getInitialData} from '../../../../server/db/initialData';; // Importing the function
 
 function CardOverlay({
   task,
@@ -15,13 +15,23 @@ function CardOverlay({
   const [labels, setLabels] = useState([]);
   const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
+  const [tasks, setTasks] = useState({}); // New state for tasks fetched
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getInitialData();
+      setTasks(data.tasks);
+    };
+
+    fetchData();
+  }, []);
 
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
   const handleSaveDescription = () => {
-    updateTaskDescription(task.id, description);;
+    updateTaskDescription(task.id, description);
   };
 
   const handleCancelEdit = () => {

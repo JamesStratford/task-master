@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from './mongooseconn.mjs';
 
 const taskSchema = new mongoose.Schema({
   id: String,
@@ -15,3 +15,4 @@ const columnSchema = new mongoose.Schema({
 
 export const Task = mongoose.model('Task', taskSchema);
 export const Column = mongoose.model('Column', columnSchema);
+ 

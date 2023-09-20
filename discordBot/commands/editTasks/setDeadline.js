@@ -26,6 +26,11 @@ module.exports = {
         
         //waiting for mongoDB integration
 
+        axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/updateTask`, {
+            id: interaction.options.getString("TaskID"),
+            due_date: interaction.options.getString("Deadline")
+        })
+
     }
 
 };

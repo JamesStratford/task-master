@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { SketchPicker } from 'react-color';
-import axios from 'axios';
 
 function CardOverlay({
   task,
@@ -25,7 +24,7 @@ function CardOverlay({
 
   // Function to save task description
   const handleSaveDescription = () => {
-    updateTaskDescription(task.id, description);
+    updateTaskDescription(task.taskId, description);
   };
 
   // Function to cancel editing description

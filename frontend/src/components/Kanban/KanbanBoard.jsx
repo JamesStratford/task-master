@@ -5,13 +5,10 @@ import axios from 'axios';
 
 function KanbanBoard() {
   const [editingTaskId, setEditingTaskId] = useState(null);
-  const [editedColumn, setEditedColumn] = useState({ id: null, title: '' });
   const [editedColumnTitle, setEditedColumnTitle] = useState('');
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
-  const [currentColumn, setCurrentColumn] = useState(null);
   const [isEditingColumnTitle, setIsEditingColumnTitle] = useState('');
-  const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
 
@@ -106,10 +103,9 @@ function KanbanBoard() {
     const newState = { ...state, columns: updatedColumns, columnOrder: newColumnOrder };
     setState(newState);
     setNewColumnTitle(''); // Clear the newColumnTitle
-    setIsAddingColumn(false); // Close the "Add Column" input field
   };
 
-  const updateTaskDescription = (taskId, description) => {
+  const updateTaskDescription = async (taskId, description) => {
     const updatedTasks = {
       ...state.tasks,
       [taskId]: {
@@ -117,23 +113,17 @@ function KanbanBoard() {
         description,
       },
     };
-
+    
     setState({
       ...state,
       tasks: updatedTasks,
     });
-
     // Update the task description in the database
-    axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task-description`, {
+    await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task-description`, {
       taskId,
       description
     })
-      .then(response => {
-        console.log("Successfully updated task description")
-      })
-      .catch(error => {
-        console.log(error.message);
-      });
+
   };
 
   const deleteColumn = (columnId) => {

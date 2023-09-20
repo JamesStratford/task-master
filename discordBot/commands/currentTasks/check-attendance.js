@@ -10,7 +10,7 @@ module.exports = {
         const member = interaction.member;
 
         // Use the guild's voice states to get the voice channel of the member
-        const voiceChannel = interaction.guild.voiceStates.cache.get(member.id)?.channel;
+        const voiceChannel = member.voice.channel;
 
         if (voiceChannel) {
             try {
@@ -18,7 +18,7 @@ module.exports = {
                 const members = voiceChannel.members.filter(m => !m.user.bot);  // Filter out bots
 
                 // Convert members collection to a list of usernames
-                const memberNames = members.map(m => m.user.username).join(', ');
+                const memberNames = members.map(m => m.displayName).join(', ');
 
                 // Send a message with the list of usernames
                 await interaction.reply(`Users in the call: ${memberNames}`);

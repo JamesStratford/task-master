@@ -16,7 +16,6 @@ export const getColumns = async (req, res) => {
 
         // Initialize an empty array to hold the sorted columns
         const sortedColumns = [];
-        
         // Find the starting column (which has no preceding column)
         let currentColumnId = columns.find(col => !columns.some(otherCol => otherCol.nextColumnId === col.id))?.id;
         
@@ -32,7 +31,7 @@ export const getColumns = async (req, res) => {
             }
         }
 
-        return res.status(200).json(sortedColumns);
+        return sortedColumns;
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -65,6 +64,16 @@ export const addColumn = async (req, res) => {
     try {
         await newColumn.save();
         res.status(201).json(newColumn);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const deleteColumn = async (req, res) => {
+    const column = req.body;
+    try {
+        await Column.deleteOne({ id: column.id });
+        res.status(201).json(column);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

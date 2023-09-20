@@ -5,30 +5,18 @@ import axios from 'axios';
 function CardOverlay({
   task,
   onClose,
-  currentColumn,
   updateTaskDescription,
-  taskDescription,
 }) {
 
   // TODO: Add priorities and dates to card overlay
   
   // State to manage task description and labels
-  const [description, setDescription] = useState(taskDescription || "");
+  const [description, setDescription] = useState(task.description || "");
   const [newLabel, setNewLabel] = useState("");
   const [labelColor, setLabelColor] = useState("#ffffff");
-  const [labels, setLabels] = useState([]);
+  const [labels, setLabels] = useState(task.labels || []);
   const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
-  const [tasks, setTasks] = useState({}); // New state for tasks fetched
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await axios.get('/api/kanban/get-kanban-board');
-      setTasks(data.tasks);
-    };
-
-    fetchData();
-  }, []);
 
   // Function to handle description change
   const handleDescriptionChange = (e) => {
@@ -42,7 +30,7 @@ function CardOverlay({
 
   // Function to cancel editing description
   const handleCancelEdit = () => {
-    setDescription(taskDescription || "");
+    setDescription(task.description || "");
   };
 
   // Function to toggle label input visibility
@@ -69,9 +57,6 @@ function CardOverlay({
       <div className="overlay-content">
         <div className="task-details">
           <h4 className="task-name">{task.content}</h4>
-          {currentColumn && (
-            <p className="task-in-column">in column: {currentColumn.title}</p>
-          )}
         </div>
         <div className="labels">
           <h5 className="labels-header">

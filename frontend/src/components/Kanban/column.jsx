@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import React, { useState } from "react";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 
 function Column(props) {
   const [showAddCardForm, setShowAddCardForm] = useState(false);
-  const [newCardContent, setNewCardContent] = useState('');
+  const [newCardContent, setNewCardContent] = useState("");
 
   const toggleAddCardForm = () => {
     setShowAddCardForm(!showAddCardForm);
@@ -20,36 +20,42 @@ function Column(props) {
     props.addCardToColumn(props.column.id, newCard);
 
     // Reset the form and hide it
-    setNewCardContent('');
+    setNewCardContent("");
     setShowAddCardForm(false);
   };
 
   return (
-    <div className="column-container">
-      <h3 className="column-title">{props.column.title}</h3>
-      <Droppable droppableId={props.column.id}>
-        {(provided) => (
-          <div
-            className="task-list"
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
-            {showAddCardForm ? (
-              <div className="add-card-form">
-                <textarea
-                  value={newCardContent}
-                  onChange={(e) => setNewCardContent(e.target.value)}
-                  placeholder="Enter card content"
-                />
-                <button onClick={handleAddCard}>Add a card</button>
+    <Draggable draggableId={this.props.column.id} index={this.props.index}>
+      {(provided) => (
+        <div className="column-container">
+          {...provided.draggableProps}
+          innerRef={provided.innerRef}
+          <h3 {...provided.dragHandleProps} className="column-title">{props.column.title}</h3>
+          <Droppable droppableId={props.column.id} type="task">
+            {(provided) => (
+              <div
+                className="task-list"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {showAddCardForm ? (
+                  <div className="add-card-form">
+                    <textarea
+                      value={newCardContent}
+                      onChange={(e) => setNewCardContent(e.target.value)}
+                      placeholder="Enter card content"
+                    />
+                    <button onClick={handleAddCard}>Add a card</button>
+                  </div>
+                ) : (
+                  <button onClick={toggleAddCardForm}>Add a card</button>
+                )}
               </div>
-            ) : (
-              <button onClick={toggleAddCardForm}>Add a card</button>
             )}
-          </div>
-        )}
-      </Droppable>
-    </div>
+          </Droppable>
+        </div>
+      )}
+    </Draggable>
   );
 }
 

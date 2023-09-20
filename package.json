@@ -6,7 +6,7 @@
         "server": "cd server && npm start",
         "discordBot": "cd discordBot && npm start",
         "start": "concurrently \"npm run server\" \"npm run frontend\" \"npm run discordBot\"",
-        "test": "cd server && npm test",
+        "test": "npm --prefix ./frontend test && npm --prefix ./server test && npm --prefix ./discordBot test",
         "install_all": "cd server && npm install && cd ../frontend && npm install && cd ../discordBot && npm install"
     },
     "dependencies": {

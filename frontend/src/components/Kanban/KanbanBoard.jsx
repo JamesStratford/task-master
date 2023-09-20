@@ -146,23 +146,27 @@ function KanbanBoard() {
 
   };
 
-  const deleteColumn = (columnId) => {
-    const { [columnId]: deletedColumn, ...updatedColumns } = state.columns;
-    const newColumnOrder = state.columnOrder.filter((id) => id !== columnId);
-
-    // Remove tasks associated with the deleted column
-    const updatedTasks = { ...state.tasks };
-    deletedColumn.taskIds.forEach((taskId) => {
-      delete updatedTasks[taskId];
-    });
-
-    setState({
-      ...state,
-      columns: updatedColumns,
-      columnOrder: newColumnOrder,
-      tasks: updatedTasks,
-    });
-  };
+  const deleteColumn = async (columnId) => {
+    try {
+      // Send a DELETE request to delete the column in the database
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/delete-column`, {
+        data: {
+          columnId: columnId, // Pass the columnId in the request body
+        },
+      });
+  
+      // Remove the column from the local state
+      const updatedColumns = state.columns.filter(column => column.id !== columnId);
+  
+      // Set the updated state
+      setState({
+        ...state,
+        columns: updatedColumns,
+      });
+    } catch (error) {
+      console.error("Failed to delete column:", error);
+    }
+  };  
 
   const openDropdown = (columnId) => {
     setOpenDropdownColumnId(columnId);
@@ -280,7 +284,6 @@ function KanbanBoard() {
         break;
       }
     }
-
 
     // Set the updated state
     setState({

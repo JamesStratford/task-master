@@ -36,14 +36,16 @@ router.get('/add-column', async (req, res) => {
     }
 });
 
-router.get('/delete-column', async (req, res) => {
-    const column = req.query.column;
+router.delete('/delete-column', async (req, res) => {
+    const { columnId } = req.body; 
     try {
-        await deleteColumn({ body: { column } }, res);
+      await deleteColumn({ body: { id: columnId } }, res);
+      res.status(200).json({ message: 'Column deleted successfully' });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
-});
+  });
+  
 
 router.get('/get-columns', async (req, res) => {
     try {

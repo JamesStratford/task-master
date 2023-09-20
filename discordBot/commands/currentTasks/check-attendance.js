@@ -9,25 +9,21 @@ module.exports = {
         // Get the member who executed the command
         const member = interaction.member;
 
-        // Check if the member is in a voice channel
-        if (member.voice.channel) {
-            try {
-                // Join the voice channel (Optional. Remove if you don't want the bot to join)
-                const connection = await member.voice.channel.join();
+        // Use the guild's voice states to get the voice channel of the member
+        const voiceChannel = interaction.guild.voiceStates.cache.get(member.id)?.channel;
 
+        if (voiceChannel) {
+            try {
                 // Fetch all members in the voice channel
-                const members = member.voice.channel.members.filter(m => !m.user.bot);  // Filter out bots
+                const members = voiceChannel.members.filter(m => !m.user.bot);  // Filter out bots
 
                 // Convert members collection to a list of usernames
                 const memberNames = members.map(m => m.user.username).join(', ');
 
                 // Send a message with the list of usernames
                 await interaction.reply(`Users in the call: ${memberNames}`);
-
-                // Leave the voice channel (Optional. Remove if you don't want the bot to leave)
-                connection.disconnect();
             } catch (err) {
-                console.error("Error joining the voice channel or fetching members:", err);
+                console.error("Error fetching members:", err);
                 await interaction.reply('There was an error checking attendance.');
             }
         } else {

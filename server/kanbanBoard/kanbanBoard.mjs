@@ -118,6 +118,28 @@ export const deleteColumn = async (req, res) => {
     }
 };
 
+export const updateTask = async (req, res) => {
+    const task = req.body;
+    try {
+        console.log(task)
+        await Task.updateOne({ taskId: task.taskId }, { ...task });
+        res.status(201).json(task);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const deleteTask = async (req, res) => {
+    const taskId = req.body.taskId;
+    try {
+        await Task.deleteOne({ taskId });
+        res.status(201).json({ taskId });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+
 export const updateTaskDescription = async (req, res) => {
     const taskId = req.body.taskId;
     const description = req.body.description;

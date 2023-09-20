@@ -3,17 +3,17 @@ import Column from '../models/kanbanBoard/column.mjs';
 
 export const getTasks = async (req, res) => {
     try {
-      const tasksArray = await Task.find({}).exec();
-      const tasksObject = tasksArray.reduce((acc, task) => {
-        acc[task.taskId] = task;
-        return acc;
-      }, {});
-      return tasksObject;
+        const tasksArray = await Task.find({}).exec();
+        const tasksObject = tasksArray.reduce((acc, task) => {
+            acc[task.taskId] = task;
+            return acc;
+        }, {});
+        return tasksObject;
     } catch (error) {
-      res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
-  };
-  
+};
+
 
 export const getColumns = async (req, res) => {
     try {
@@ -64,22 +64,42 @@ export const addTask = async (req, res) => {
 };
 
 export const removeTaskFromColumn = async (req, res) => {
-    const { taskId, columnId } = req.body;
+    const { taskId, changedColumnId } = req.body;
     try {
-      const column = await Column.findOne({ id: columnId });
-      if (column) {
-        // Remove task from column array
-        column.taskIds = column.taskIds.filter(id => id !== taskId);
-        await column.save();
-        res.status(200).json({ message: 'Task removed successfully' });
-      } else {
-        res.status(404).json({ message: 'Column not found' });
-      }
+        const column = await Column.findOne({ id: changedColumnId });
+        if (column) {
+            // Remove task from column array
+            column.taskIds = column.taskIds.filter(id => id !== taskId);
+            await column.save();
+        }
     } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const updateColumnTaskIds = async (req, res) => {
+    const { taskId, newColumnId, newColumnTaskIds } = req.body;
+    try {
+      const column = await Column.findOne({ id: newColumnId });
+      if (!column) {
+        return res.status(404).json({ message: "Column not found" });
+      }
+  
+      column.taskIds = newColumnTaskIds;
+  
+      const savedColumn = await column.save();
+      if (!savedColumn) {
+        return res.status(500).json({ message: "Failed to save column" });
+      }
+  
+      res.status(200).json({ message: "Column updated successfully" });
+    } catch (error) {
+      console.error("Error updating column:", error);
       res.status(400).json({ message: error.message });
     }
   };
   
+
 
 export const assignTaskToColumn = async (req, res) => {
     const taskId = req.body.taskId;
@@ -121,7 +141,6 @@ export const deleteColumn = async (req, res) => {
 export const updateTask = async (req, res) => {
     const task = req.body;
     try {
-        console.log(task)
         await Task.updateOne({ taskId: task.taskId }, { ...task });
         res.status(201).json(task);
     } catch (error) {
@@ -133,7 +152,6 @@ export const deleteTask = async (req, res) => {
     const taskId = req.body.taskId;
     try {
         await Task.deleteOne({ taskId });
-        res.status(201).json({ taskId });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

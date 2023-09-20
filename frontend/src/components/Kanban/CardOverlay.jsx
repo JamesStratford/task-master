@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SketchPicker } from 'react-color';
-import { getInitialData} from '../../../../server/db/initialData';; // Importing the function
+import axios from 'axios';
 
 function CardOverlay({
   task,
@@ -23,7 +23,7 @@ function CardOverlay({
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getInitialData();
+      const data = await axios.get('/api/kanban/get-kanban-board');
       setTasks(data.tasks);
     };
 

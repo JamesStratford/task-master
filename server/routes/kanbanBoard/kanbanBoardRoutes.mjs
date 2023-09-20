@@ -1,5 +1,4 @@
-import { createTask, createColumn, getTasks, getColumns } from "../../kanbanBoard/kanbanBoard.mjs";
-import axios from 'axios';
+import { createTask, addColumn, getTasks, getColumns, getColumnOrder } from "../../kanbanBoard/kanbanBoard.mjs";
 import express from 'express';
 
 const router = express.Router();
@@ -7,7 +6,7 @@ const router = express.Router();
 router.get('/create-column', async (req, res) => {
     const column = req.query.column;
     try {
-        await createColumn({ body: { column } }, res);
+        await addColumn({ body: { column } }, res);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -21,6 +20,15 @@ router.get('/create-task', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+router.get('/add-column', async (req, res) => {
+    const column = req.query.column;
+    try {
+        await addColumn({ body: { column } }, res);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}); 
 
 router.get('/get-columns', async (req, res) => {
     try {
@@ -45,39 +53,10 @@ router.get('/get-kanban-board', async (req, res) => {
     try {
         const columns = await getColumns();
         const tasks = await getTasks();
-        res.json({ columns, tasks });
+        const startColumnId = columns[0].id;
+        res.json({ columns, tasks, startColumnId });
     } catch (error) {
         res.status(500).json({ message: error.message });
-    }
-});
-
-router.get('/update-task', async (req, res) => {
-    const { id, content, column, description } = req.query;
-    try {
-        await axios.put(`${process.env.DISCORD_BOT_API_URL}/api/kanban/update-task`, { id, content, column, description });
-        res.status(200).json({ message: `Updating task ${id}` });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
-
-router.get('/delete-task', async (req, res) => {
-    const { id } = req.query;
-    try {
-        await axios.delete(`${process.env.DISCORD_BOT_API_URL}/api/kanban/delete-task`, { data: { id } });
-        res.status(200).json({ message: `Deleting task ${id}` });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    } 
-});
-
-router.get('/delete-column', async (req, res) => {
-    const { column } = req.query;
-    try {
-        await axios.delete(`${process.env.DISCORD_BOT_API_URL}/api/kanban/delete-column`, { data: { column } });
-        res.status(200).json({ message: `Deleting column ${column}` });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
     }
 });
 

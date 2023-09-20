@@ -20,7 +20,7 @@ async function exchangeCodeForToken(code) {
             client_secret: process.env.DISCORD_CLIENT_SECRET,
             grant_type: 'authorization_code',
             code,
-            redirect_uri: `http://localhost:${process.env.DISCORD_PORT}`
+            redirect_uri: `${process.env.FRONTEND_ORIGIN}:${process.env.FRONTEND_PORT}`
         }), {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -56,14 +56,13 @@ router.get('/add-to-whitelist', async (req, res) => {
 router.get('/check-auth', async (req, res) => {
     if (req.session.userId) {
         const userDocument = await db.collection('whitelist').findOne({ discordId: req.session.userId });
-        if (userDocument.isWhitelisted) {
+        if (userDocument && userDocument.isWhitelisted) {
             // User is authenticated
             res.json({ isAuthenticated: true });
 
             return
         }
     }
-
     // User is not authenticated
     res.json({ isAuthenticated: false });
 });
@@ -110,7 +109,7 @@ router.get('/exchange', async (req, res) => {
 
 
         const userDocument = await db.collection('whitelist').findOne({ discordId: req.session.userId });
-        if (userDocument.isWhitelisted) {
+        if (userDocument && userDocument.isWhitelisted) {
             res.json({ isAuthenticated: true })
         } else {
             res.json({ isAuthenticated: false })

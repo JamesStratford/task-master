@@ -3,7 +3,7 @@ import cors from "cors";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import discordRoutes from "./routes/discordAuth.mjs"
-import discordBotKanbanRoutes from "./routes/discord-bot/kanban.mjs";
+import discordBotKanbanRoutes from "./routes/kanbanBoard/kanbanBoardRoutes.mjs";
 import "./loadEnvironment.mjs";
 
 const PORT = process.env.PORT || 5050;
@@ -30,7 +30,7 @@ app.use(session({
 }))
 
 app.use("/api/discordAuth", discordRoutes);
-app.use('/api/discord-bot/kanban', discordBotKanbanRoutes);
+app.use("/api/kanban", discordBotKanbanRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

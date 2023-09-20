@@ -1,11 +1,10 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import session from "express-session";
-import discordRoutes from "./routes/discordAuth.mjs"
 import MongoStore from "connect-mongo";
-
-dotenv.config();
+import discordRoutes from "./routes/discordAuth.mjs"
+import discordBotKanbanRoutes from "./routes/discord-bot/kanban.mjs";
+import "./loadEnvironment.mjs";
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -31,6 +30,7 @@ app.use(session({
 }))
 
 app.use("/api/discordAuth", discordRoutes);
+app.use('/api/discord-bot/kanban', discordBotKanbanRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

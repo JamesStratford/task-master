@@ -23,35 +23,8 @@ module.exports = {
         const userId = interaction.user.id;
 
         // Set deadline to task in web server
-        try {
-            const response = await axios.post(
-                `${process.env.SERVER_ORIGIN}/api/discord-bot/kanban/getTasks?userId=${userId}`, 
-                {
-                    userId,
-                    interaction.options.getString("Deadline"),
-                },
-                {
-                    headers: {
-                        "Authorization": `Bearer ${process.env.SERVER_AUTH_TOKEN}`,
-                    },
-                });
-
-                if (response.data.success) {
-
-                    await interaction.reply("Deadline set!");
-
-                } else {
-
-                    await interaction.reply("Sorry, something went wrong while setting your deadline.");
-
-                }
-
-            } catch (error) {
-
-                console.error("Error setting deadline: ", error.message);
-                await interaction.reply("Sorry, something went wrong while setting your deadline.");
-
-            }
+        
+        //waiting for mongoDB integration
 
     }
 

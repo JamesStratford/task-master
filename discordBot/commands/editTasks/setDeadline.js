@@ -5,17 +5,19 @@ module.exports = {
 
     data: new SlashCommandBuilder()
         .setName("set-deadline")
-        .setDescription("Sets the deadline for a task"),
+        .setDescription("Sets the deadline for a task")
         .addStringOption(option =>
             option
-                .setName("TaskID")
+                .setName("task_id")
                 .setDescription("The ID of the task you want to set the deadline for")
-                .setRequired(true)),
+                .setRequired(true)
+                )
         .addStringOption(option =>
             option
-                .setName("Deadline")
+                .setName("due_date")
                 .setDescription("The deadline you want to set for the task")
-                .setRequired(true)),
+                .setRequired(true)
+                ),
     
     async execute(interaction) {
 
@@ -27,8 +29,8 @@ module.exports = {
         //waiting for mongoDB integration
 
         axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/updateTask`, {
-            id: interaction.options.getString("TaskID"),
-            due_date: interaction.options.getString("Deadline")
+            id: interaction.options.getString("task_id"),
+            due_date: interaction.options.getString("due_date")
         })
 
     }

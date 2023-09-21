@@ -128,8 +128,6 @@ function KanbanBoard() {
   };
 
   const addColumn = async (newColumnTitle) => {
-    console.log("Adding column");
-
     if (newColumnTitle.trim() === "") {
       // Don't add an empty column
       console.log("Empty column");
@@ -371,8 +369,6 @@ function KanbanBoard() {
       }
     );
   };
-
-
 
   const ColumnHeader = ({ isEditing, column, provided }) => {
     const [editedColumnTitle, setEditedColumnTitle] = useState("");

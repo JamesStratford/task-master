@@ -118,9 +118,25 @@ export const assignTaskToColumn = async (req, res) => {
 };
 
 export const addColumn = async (req, res) => {
-    const column = req.body;
-    const newColumn = new Column(column);
+    const columnData = req.body; // Assuming columnData contains the necessary properties
+
     try {
+        // Find the last column in the linked list to update its nextColumnId
+        const lastColumn = await Column.findOne({ nextColumnId: null }).exec();
+
+        // Create a new column
+        const newColumn = new Column(columnData);
+
+        // Update the nextColumnId of the last column and the new column
+        if (lastColumn) {
+            lastColumn.nextColumnId = newColumn._id;
+            await lastColumn.save();
+            newColumn.nextColumnId = null;
+        } else {
+            // If there are no columns, set the new column as the first column
+            newColumn.nextColumnId = null; // Assuming it's the first column
+        }
+
         await newColumn.save();
         res.status(201).json(newColumn);
     } catch (error) {

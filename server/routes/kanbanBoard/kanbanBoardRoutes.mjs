@@ -28,9 +28,9 @@ router.delete('/delete-task', async (req, res) => {
 
 
 router.post('/add-column', async (req, res) => {
-    const column = req.query.column;
+    const columnData = req.body; // Retrieve the column data from the request body
     try {
-        await addColumn({ body: { column } }, res);
+        await addColumn(columnData, res); // Pass the column data directly to addColumn
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

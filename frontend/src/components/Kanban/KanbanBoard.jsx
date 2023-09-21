@@ -150,34 +150,39 @@ function KanbanBoard() {
   
       console.log("Title", newColumnTitle);
       console.log("data: ", response.data);
+      //console.log("id:", newColumnData.id); 
   
       if (response.status === 201) {
         // Column was successfully added to the server
         console.log("Successfully added column to the database.");
         const newColumnData = response.data; // This should include the new column's data, including its ID
-  
+        console.log("id:", newColumnData.id); 
+        
         // Create a new column object for your React state
         const newColumn = {
-          id: newColumnData._id, // Use the actual ID property from your server data
+          id: newColumnData.id, // You may need to set this based on your logic
           title: newColumnTitle,
           taskIds: [],
+          nextColumnId: newColumnData.nextColumnId, // Use the actual nextColumnId property from your server data
         };
   
-        // Add the new column to the existing columns
-        const updatedColumns = [...state.columns, newColumn];
-  
-        // Update the React state with the new column
-        setState({
+        // Update your React state with the new column
+        const updatedColumns = [...state.columns, newColumn]; // Add the new column to the existing columns
+        const newColumnOrder = [...state.columnOrder, newColumn._id]; // Add the new column's _id to the columnOrder array
+        const newState = {
           ...state,
           columns: updatedColumns,
-        });
+          columnOrder: newColumnOrder,
+        };
   
+        setState(newState);
         setNewColumnTitle(""); // Clear the newColumnTitle
       }
     } catch (error) {
       console.error("Failed to add column:", error);
     }
-  };  
+  };
+  
 
   const updateTaskDescription = async (taskId, description) => {
     const updatedTasks = {

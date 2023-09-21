@@ -376,7 +376,6 @@ function KanbanBoard() {
       );
       setState({ ...state, columns: updatedColumns });
       const newColumn = updatedColumns.find((col) => col.id === column.id);
-
       // Update the column in the database
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-column`,

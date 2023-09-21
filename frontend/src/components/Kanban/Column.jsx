@@ -18,9 +18,10 @@ const Column = ({ column, handleColumnUpdate, provided }) => {
 
     const handleColumnTitleKeyPress = useCallback(async (e) => {
       if (e.key === "Enter") {
-        handleColumnUpdate();
+        handleColumnUpdate(column, editedColumnTitle);
+        setIsEditing("");
       }
-    }, []);
+    }, [column, editedColumnTitle, handleColumnUpdate]);
 
     return isEditing === column.id ? (
       <input

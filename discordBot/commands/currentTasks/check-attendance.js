@@ -15,7 +15,7 @@ module.exports = {
                 const memberNames = members.map(m => m.displayName).join(', ');
 
                 // Display "Meeting Start:" before displaying the users in the call
-                await interaction.reply(`Meeting Start: Users in the call: ${memberNames}`);
+                await interaction.reply(`Meeting Start...\n\nUsers in the call: ${memberNames}`);
 
                 // Step 1: Define a Set to track members
                 const initialMembers = new Set(members.keys());
@@ -30,7 +30,7 @@ module.exports = {
                     // Step 3: Check if the voice channel becomes empty
                     if (initialMembers.size === 0) {
                         // Update the "Meeting adjourned" message to include the usernames
-                        interaction.channel.send(`Meeting adjourned, attendance for ${memberNames} has been marked.`);
+                        interaction.channel.send(`Meeting adjourned\n\n Attendance for ${memberNames} has been marked.`);
 
                         // Cleanup: Remove the event listener after sending the message
                         interaction.client.removeListener('voiceStateUpdate', voiceStateUpdateHandler);

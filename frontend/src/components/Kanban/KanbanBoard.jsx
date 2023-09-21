@@ -174,6 +174,7 @@ function KanbanBoard() {
     }
   };
 
+
   const updateTaskDescription = async (taskId, description) => {
     const updatedTasks = {
       ...state.tasks,
@@ -377,12 +378,12 @@ function KanbanBoard() {
     const [editedColumnTitle, setEditedColumnTitle] = useState("");
 
     useEffect(() => {
-      setEditedColumnTitle(column.content);
-    }, [column.content]);
+      setEditedColumnTitle(column.title); // assuming column.title is correct
+    }, [column.title]);
 
     const handleColumnTitleDoubleClick = useCallback(() => {
-      setEditedColumnTitle(column.content);
-    }, [column.content]);
+      setEditedColumnTitle(column.title);
+    }, [column.title]);
 
     const handleEditedColumnTitleChange = useCallback((e) => {
       setEditedColumnTitle(e.target.value);
@@ -413,7 +414,7 @@ function KanbanBoard() {
         {...provided.dragHandleProps}
         onDoubleClick={handleColumnTitleDoubleClick}
       >
-        {column.content}
+        {column.title}
       </h3>
     );
   };

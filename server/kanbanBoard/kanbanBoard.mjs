@@ -157,7 +157,6 @@ export const deleteTask = async (req, res) => {
     }
 };
 
-
 export const updateTaskDescription = async (req, res) => {
     const taskId = req.body.taskId;
     const description = req.body.description;

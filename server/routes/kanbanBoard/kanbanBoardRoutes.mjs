@@ -149,4 +149,14 @@ router.put('/update-task', async (req, res) => {
     }
 });
 
+router.put('/reorder-columns', async (req, res) => {
+    try {
+        const updatedColumns = req.body;
+        await updateColumns(updatedColumns);
+        res.status(200).json({ message: 'Columns updated successfully' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}); 
+
 export default router;

@@ -141,6 +141,38 @@ function KanbanBoard() {
     );
   };
 
+  const updateColumns = async (columns) => {
+    try {
+      const updatedColumns = [];
+  
+      // Iterate through the columns and update their nextColumnId
+      for (let i = 0; i < columns.length; i++) {
+        const column = columns[i];
+        const nextColumnId = i === columns.length - 1 ? null : columns[i + 1].id; // Set the nextColumnId to null for the last column
+        column.nextColumnId = nextColumnId; // Update the nextColumnId property of the column
+        updatedColumns.push(column);
+      }
+      
+      console.log("Updated columns: ", updatedColumns);
+      
+      // Update the local state with the updated columns
+      setState({
+        ...state,
+        columns: updatedColumns,
+      });
+  
+      // Update the database to reflect the changes
+      await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/reorder-columns`,
+        {
+          updatedColumns,
+        }
+      );
+    } catch (error) {
+      console.error("Failed to update column order in the database:", error);
+    }
+  };  
+
   const addColumn = async (newColumnTitle) => {
     if (newColumnTitle.trim() === "") {
       // Don't add an empty column
@@ -222,7 +254,7 @@ function KanbanBoard() {
     setOpenDropdownColumnId(null);
   };
 
-  const onDragEnd = (result) => {
+  const onDragEnd = async (result) => {
     const { destination, source, draggableId, type } = result;
 
     if (!destination) return; // If not dropped on a valid droppable, do nothing
@@ -239,6 +271,7 @@ function KanbanBoard() {
         columns: newColumns,
       };
 
+      await updateColumns(newColumns);
       setState(newState);
     } else {
       // Task dragging logic

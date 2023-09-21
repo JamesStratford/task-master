@@ -15,6 +15,7 @@ function KanbanBoard() {
   const [state, setState] = useState({
     tasks: {},
     columns: [],
+    columnOrder: [],
   });
 
   // Load task descriptions from the database on component mount
@@ -162,16 +163,15 @@ function KanbanBoard() {
           taskIds: [],
         };
   
-        // Update your React state with the new column
-        const updatedColumns = { ...state.columns, [newColumn.id]: newColumn };
-        const newColumnOrder = [...state.columnOrder, newColumn.id];
-        const newState = {
+        // Add the new column to the existing columns
+        const updatedColumns = [...state.columns, newColumn];
+  
+        // Update the React state with the new column
+        setState({
           ...state,
           columns: updatedColumns,
-          columnOrder: newColumnOrder,
-        };
+        });
   
-        setState(newState);
         setNewColumnTitle(""); // Clear the newColumnTitle
       }
     } catch (error) {

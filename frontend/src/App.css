@@ -96,7 +96,19 @@ body {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 8px;
+  cursor: pointer;
+  width:80%;
 }
+
+.column-title-input {
+  width: 50%;
+  padding: 5px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+
 
 /* Styling for tasks (resembling cards) */
 .task {
@@ -109,7 +121,7 @@ body {
 }
 
 .task:hover {
-  background-color: #e0e0e0;
+  background-color: #e0e0e0d0;
 }
 
 /* Text styling for inside the tasks (cards) */
@@ -133,3 +145,286 @@ body {
 .add-card-button:hover {
   background-color:#2a60b7;
 }
+
+/* Dim the background when editing a card */
+.dim-background {
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust opacity as needed */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999; /* Ensure it appears above other elements */
+}
+
+/* Style for the card buttons */
+.card-buttons {
+  position: absolute;
+  top: 10px; /* Adjust positioning as needed */
+  right: 10px; /* Adjust positioning as needed */
+}
+
+.card-buttons button {
+  margin-right: 10px; /* Adjust spacing as needed */
+}
+
+.open-button {
+  background-color: #303030cf; 
+  color: #ffffff;
+  border: none;
+  margin-top: 10px;
+  margin-right: 5px;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-button {
+  background-color:  #303030cf; 
+  color: #ffffff;
+  border: none;
+  margin-top: 10px;
+  margin-right: 5px;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-button {
+  border: none;
+  float: right;
+  padding-top: 3px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.remove-button {
+  background-color: #303030cf; 
+  color: #ffffff;
+  border: none;
+  margin-top: 10px;
+  margin-right: 5px;
+  padding: 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.card-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px; 
+  position: relative;
+  top: -40px;
+}
+
+.close-button-overlay {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  overflow: hidden;
+  transition: background-color 0.3s ease;
+  position: absolute;
+  top: 10px; 
+  right: 10px; 
+}
+
+.close-button-overlay:hover {
+  background-color: #ccc;
+}
+
+.close-button-overlay img {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+
+.card-overlay .overlay-content h4 {
+  color: black;
+}
+
+.task-name {
+  margin-top: auto;
+}
+
+.task-details {
+  color: black;
+}
+
+.task-in-column {
+  color: black;
+  position: relative;
+  top: -40px;
+  left: 3px;
+  font-size: 16px;
+}
+
+.labels-header {
+  color: black;
+  font-size: 20px;
+  margin-top: auto;
+  margin-bottom: 0px; 
+}
+
+.labels {
+  color: black;
+}
+
+.labels-list {
+  align-self: flex-start;
+  margin-bottom: 20px;
+}
+
+.add-labels-btn {
+  background-color: #3273dc; 
+  color: #ffffff;
+  border: none;
+  margin-left: 7px;
+  position: relative;
+  top: -2px;
+  padding-right: 7px;
+  padding-left: 7px;
+  padding-top: 3px;
+  padding-bottom: 2px;
+  font-size: 16px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.create-label-input {
+  width: 50%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.change-color-btn {
+  background-color: rgb(238, 238, 238);
+  width: 8%;
+  border: none;
+  padding: 3px 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 5px;
+  position: relative;
+  top: 3px;
+}
+
+.change-color-btn:hover {
+  background-color:rgb(228, 228, 228);
+}
+
+.create-label-btn {
+  width: 24%;
+  background-color: #3273dc;
+  color: #ffffff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
+  position: relative;
+  top: -1px;
+}
+
+/* Add hover effect for better user experience */
+.create-label-btn:hover {
+  background-color: #2759b2;
+}
+
+.label-text {
+  color: black;
+  font-size: 16px;
+  margin-top: 10px;
+  margin-left: 10px;
+  background-color: #3273dc;
+  color: #ffffff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 5px;
+}
+
+.description {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.description-header {
+  color: black;
+  font-size: 20px;
+  margin: 0; /* Remove the margin to eliminate the gap */
+}
+
+.description-input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.save-description-btn {
+  background-color: #3273dc;
+  color: #ffffff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* Add hover effect for better user experience */
+.save-description-btn:hover {
+  background-color: #2759b2;
+}
+
+.cancel-description-btn {
+  background-color: #9c9c9c;
+  color: #ffffff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 3px;
+}
+
+/* Add hover effect for better user experience */
+.cancel-description-btn:hover {
+  background-color: #848484;
+}
+
+
+.add-column-button {
+    background-color: rgba(183, 183, 183, 0.316); /* Adjust the last value (alpha) as needed */
+    color: #ffffff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 5px;
+  }

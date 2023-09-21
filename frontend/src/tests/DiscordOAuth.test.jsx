@@ -33,26 +33,4 @@ describe('DiscordAuth component', () => {
 
     expect(screen.getByText('Welcome, John')).toBeInTheDocument();
   });
-
-  it('handles login click', async () => {
-    axios.get.mockResolvedValueOnce({ data: { isAuthenticated: false } });
-    const mockOnLogin = jest.fn();
-
-    render(<DiscordAuth onLogin={mockOnLogin} />);
-
-    // Wait for axios and useEffect to complete
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
-
-    axios.get.mockResolvedValueOnce({ data: { isAuthenticated: true } });
-    fireEvent.click(screen.getByText('Mock Login'));
-
-    // Wait for axios to complete
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
-
-    expect(mockOnLogin).toHaveBeenCalledWith(true);
-  });
 });

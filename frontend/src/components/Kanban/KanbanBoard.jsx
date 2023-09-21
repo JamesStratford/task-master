@@ -7,13 +7,11 @@ function KanbanBoard() {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
-
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
 
   const [state, setState] = useState({
     tasks: {},
     columns: [],
-    columnOrder: [],
   });
 
   // Load task descriptions from the database on component mount
@@ -26,7 +24,6 @@ function KanbanBoard() {
     };
 
     fetchData();
-    console.log(state);
   }, []);
 
   const openOverlay = (taskId) => {
@@ -370,29 +367,39 @@ function KanbanBoard() {
     );
   };
 
-  const ColumnHeader = ({ isEditing, column, provided }) => {
+  const ColumnHeader = ({ column, provided }) => {
     const [editedColumnTitle, setEditedColumnTitle] = useState("");
-
+    const [isEditing, setIsEditing] = useState("");
     useEffect(() => {
       setEditedColumnTitle(column.title); // assuming column.title is correct
     }, [column.title]);
 
     const handleColumnTitleDoubleClick = useCallback(() => {
       setEditedColumnTitle(column.title);
-    }, [column.title]);
+      setIsEditing(column.id);
+    }, [column.id, column.title]);
 
     const handleEditedColumnTitleChange = useCallback((e) => {
       setEditedColumnTitle(e.target.value);
     }, []);
 
-    const handleColumnTitleKeyPress = useCallback((e) => {
+    const handleColumnTitleKeyPress = useCallback(async (e) => {
       if (e.key === "Enter") {
         const updatedColumns = state.columns.map((col) =>
           col.id === column.id ? { ...col, title: editedColumnTitle } : col
         );
         setState({ ...state, columns: updatedColumns });
+        const newColumn = updatedColumns.find((col) => col.id === column.id);
+        
+        // Update the column in the database
+        await axios.put(
+          `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-column`,
+          {
+            newColumn
+          }
+        );
       }
-    }, []);
+    }, [column, editedColumnTitle]);
 
     return isEditing === column.id ? (
       <input

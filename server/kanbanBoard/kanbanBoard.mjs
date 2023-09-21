@@ -109,7 +109,6 @@ export const deleteColumn = async (req, res) => {
 */
 export const updateColumn = async (req, res) => {
     const column = req.body;
-    console.log("updateColumn", column);
     try {
         await Column.updateOne({ id: column.id }, { ...column });
     } catch (error) {

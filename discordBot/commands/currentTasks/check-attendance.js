@@ -30,7 +30,7 @@ module.exports = {
                     // Step 3: Check if the voice channel becomes empty
                     if (initialMembers.size === 0) {
                         // Update the "Meeting adjourned" message to include the usernames
-                        interaction.channel.send(`Meeting adjourned\n\n Attendance for ${memberNames} has been marked.`);
+                        interaction.channel.send(`Meeting Ended...\n\n Attendance for ${memberNames} has been marked.`);
 
                         // Cleanup: Remove the event listener after sending the message
                         interaction.client.removeListener('voiceStateUpdate', voiceStateUpdateHandler);

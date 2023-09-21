@@ -153,8 +153,6 @@ function KanbanBoard() {
         updatedColumns.push(column);
       }
       
-      console.log("Updated columns: ", updatedColumns);
-      
       // Update the local state with the updated columns
       setState({
         ...state,

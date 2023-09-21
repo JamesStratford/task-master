@@ -1,7 +1,7 @@
 import Task from '../models/kanbanBoard/task.mjs';
 import Column from '../models/kanbanBoard/column.mjs';
 
-/*
+/**
 *   Add a task to the database
 *   @param {string} task - The task to be added
 */
@@ -16,10 +16,7 @@ export const addTask = async (req, res) => {
     }
 };
 
-
-
-
-/*
+/**
 *   Update a task in the database
 *   @param {string} taskId - The ID of the task to be updated
 */
@@ -33,7 +30,7 @@ export const updateTask = async (req, res) => {
     }
 };
 
-/*
+/**
 *   Delete a task from the database
 *   @param {string} taskId - The ID of the task to be deleted
 */
@@ -46,7 +43,7 @@ export const deleteTask = async (req, res) => {
     }
 };
 
-/*
+/**
 *   Get the all tasks unordered
 *   @returns {Task[]}
 */
@@ -63,7 +60,7 @@ export const getTasks = async (req, res) => {
     }
 };
 
-/*
+/**
 *   Add a column to the database
 *   @param {string} column - The name of the column to be added
 */
@@ -96,7 +93,7 @@ export const addColumn = async (req, res) => {
     }
 };
 
-/*
+/**
 *   Delete a column
 *   @param {string} id - The ID of the column to be deleted
 */
@@ -109,8 +106,7 @@ export const deleteColumn = async (req, res) => {
     }
 };
 
-
-/*
+/**
 *   Update a column's content
 *   @param {string} id - The ID of the column to be updated
 */
@@ -123,7 +119,7 @@ export const updateColumn = async (req, res) => {
     }
 };
 
-/*
+/**
 *   Get the columns in the order they should be displayed
 *   @returns {Column[]} - The columns in the order they should be displayed
 */
@@ -154,7 +150,7 @@ export const getColumns = async (req, res) => {
     }
 };
 
-/*
+/**
 *   Add a task to a column's taskIds array
 *   @param {string} taskId - The ID of the task to be added
 *   @param {string} columnId - The ID of the column the task was added to
@@ -175,7 +171,7 @@ export const assignTaskToColumn = async (req, res) => {
     }
 };
 
-/*
+/**
 *   Remove a task from a column's taskIds array
 *   @param {string} taskId - The ID of the task to be removed
 *   @param {string} changedColumnId - The ID of the column the task was removed from
@@ -194,7 +190,7 @@ export const removeTaskFromColumn = async (req, res) => {
     }
 };
 
-/*
+/**
 *   Update the taskIds array of a column
 *   @param {string} taskId - The ID of the task to be moved
 *   @param {string} newColumnId - The ID of the column to move the task to
@@ -223,7 +219,7 @@ export const updateColumnTaskIds = async (req, res) => {
  * @param {object} res - The HTTP response object.
  * @returns {void}
  */
-export const updateColumns = async (req, res) => {
+export const reorderColumns = async (req, res) => {
     const columns = req.updatedColumns; // Assuming req.body contains an array of columns in the desired order
     
     try {

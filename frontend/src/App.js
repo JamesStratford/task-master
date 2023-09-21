@@ -5,7 +5,7 @@ import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
 import KanbanBoard from './components/Kanban/KanbanBoard';
-import MeetingMinutes from './components/MeetingMinutes';
+import MeetingMinutes from './components/Kanban/MeetingMinutes';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

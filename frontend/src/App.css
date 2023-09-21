@@ -426,3 +426,12 @@ body {
     cursor: pointer;
     margin-left: 5px;
   }
+
+  .meetingMinute {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;  /* Optional padding for some space */
+    border: 1px solid #ccc;  /* Optional border */
+    margin-bottom: 5px;  /* Optional margin for spacing between tasks */
+}

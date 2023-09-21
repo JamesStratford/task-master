@@ -171,30 +171,6 @@ function KanbanBoard() {
     }
   };
 
-
-  const updateTaskDescription = async (taskId, description) => {
-    const updatedTasks = {
-      ...state.tasks,
-      [taskId]: {
-        ...state.tasks[taskId],
-        description,
-      },
-    };
-
-    setState({
-      ...state,
-      tasks: updatedTasks,
-    });
-    const newTask = state.tasks[taskId];
-    // Update the task description in the database
-    await axios.put(
-      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
-      {
-        newTask
-      }
-    );
-  };
-
   const deleteColumn = async (columnId) => {
     try {
       // Send a DELETE request to delete the column in the database
@@ -549,7 +525,29 @@ function KanbanBoard() {
               <CardOverlay
                 task={currentTask}
                 onClose={toggleOverlay}
-                updateTaskDescription={updateTaskDescription}
+                updateTaskDescription={async (taskId, description) => {
+                  const updatedTasks = {
+                    ...state.tasks,
+                    [taskId]: {
+                      ...state.tasks[taskId],
+                      description,
+                    },
+                  };
+
+                  setState({
+                    ...state,
+                    tasks: updatedTasks,
+                  });
+                  const newTask = state.tasks[taskId];
+                  // Update the task description in the database
+                  await axios.put(
+                    `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
+                    {
+                      newTask
+                    }
+                  );
+                }
+                }
               />
             )}
             {provided.placeholder}

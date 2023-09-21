@@ -5,6 +5,7 @@ import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
 import KanbanBoard from './components/Kanban/KanbanBoard';
+import Attendance from './components/Attendance';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -37,6 +38,7 @@ function App() {
               <Tab>Gantt Chart</Tab>
               <Tab>Calendar</Tab>
               <Tab>Discord</Tab>
+              <Tab>Attendance</Tab> 
             </TabList>
 
             <TabPanel>
@@ -50,6 +52,10 @@ function App() {
 
             <TabPanel>
               <h2>Calendar</h2>
+            </TabPanel>
+
+            <TabPanel>
+              <Attendance />
             </TabPanel>
 
             <TabPanel>

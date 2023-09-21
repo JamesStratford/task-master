@@ -38,9 +38,9 @@ module.exports = {
 
         let columnName = interaction.options.getString("column_name")
 
-        const columns = axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-columns`)
+        const columns = axios.get(`${process.env.SERVER_ORIGIN}/api/kanban/get-columns`)
 
-        const columnId = columns.find(column => column.name === columnName).columnId
+        const columnId = columns.find(column => column.title === columnName).id
         
         let task = {
             taskId: "1",
@@ -55,7 +55,7 @@ module.exports = {
 
         // Waiting for MongoDB integration
 
-        axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/add-task`, {
+        axios.post(`${process.env.SERVER_ORIGIN}/api/kanban/add-task`, {
             columnId,
             task
         })

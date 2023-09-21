@@ -4,6 +4,7 @@ import {
     getTasks,
     getColumns,
     updateColumn,
+    updateColumns,
     deleteColumn,
     assignTaskToColumn,
     updateColumnTaskIds,

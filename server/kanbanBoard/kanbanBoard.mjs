@@ -22,7 +22,6 @@ export const updateTask = async (req, res) => {
     try {
         await Task.updateOne({ taskId: task.taskId }, { ...task });
         io.emit('updateTask', task);
-        console.log(task)
         res.status(201).json(task);
     } catch (error) {
         res.status(400).json({ message: error.message });

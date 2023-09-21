@@ -56,30 +56,33 @@ export const getTasks = async (req, res) => {
     }
 };
 
+
 /*
 *   Add a column to the database
 *   @param {string} column - The name of the column to be added
 */
 export const addColumn = async (req, res) => {
-    const column = req.body;
-    const newColumn = new Column(column);
+    const columnData = req.body; // Assuming columnData contains the necessary properties
+
     try {
+        // Find the last column in the linked list to update its nextColumnId
+        const lastColumn = await Column.findOne({ nextColumnId: null }).exec();
+
+        // Create a new column
+        const newColumn = new Column(columnData);
+
+        // Update the nextColumnId of the last column and the new column
+        if (lastColumn) {
+            lastColumn.nextColumnId = newColumn.id;
+            await lastColumn.save();
+            newColumn.nextColumnId = null;
+        } else {
+            // If there are no columns, set the new column as the first column
+            newColumn.nextColumnId = null; // Assuming it's the first column
+        }
+
         await newColumn.save();
         res.status(201).json(newColumn);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-/*
-*   Update a column's content
-*   @param {string} id - The ID of the column to be updated
-*/
-export const updateColumn = async (req, res) => {
-    const column = req.body;
-    try {
-        await Column.updateOne({ ...column });
-        res.status(201).json(column);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -98,6 +101,22 @@ export const deleteColumn = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+
+/*
+*   Update a column's content
+*   @param {string} id - The ID of the column to be updated
+*/
+export const updateColumn = async (req, res) => {
+    const column = req.body;
+    try {
+        await Column.updateOne({ ...column });
+        res.status(201).json(column);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
 
 /*
 *   Get the columns in the order they should be displayed

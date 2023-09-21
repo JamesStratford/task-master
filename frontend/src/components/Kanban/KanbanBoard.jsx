@@ -148,17 +148,16 @@ function KanbanBoard() {
 
       console.log("Title", newColumnTitle);
       console.log("data: ", response.data);
-
       if (response.status === 201) {
         // Column was successfully added to the server
         console.log("Successfully added column to the database.");
         const newColumnData = response.data; // This should include the new column's data, including its ID
-
         // Create a new column object for your React state
         const newColumn = {
-          id: newColumnData._id, // Use the actual ID property from your server data
+          id: newColumnData.id, // You may need to set this based on your logic
           title: newColumnTitle,
           taskIds: [],
+          nextColumnId: newColumnData.nextColumnId, // Use the actual nextColumnId property from your server data
         };
 
         // Add the new column to the existing columns
@@ -378,12 +377,12 @@ function KanbanBoard() {
     const [editedColumnTitle, setEditedColumnTitle] = useState("");
 
     useEffect(() => {
-      setEditedColumnTitle(column.title); // assuming column.title is correct
-    }, [column.title]);
+      setEditedColumnTitle(column.content);
+    }, [column.content]);
 
     const handleColumnTitleDoubleClick = useCallback(() => {
-      setEditedColumnTitle(column.title);
-    }, [column.id, column.title]);
+      setEditedColumnTitle(column.content);
+    }, [column.content]);
 
     const handleEditedColumnTitleChange = useCallback((e) => {
       setEditedColumnTitle(e.target.value);
@@ -414,7 +413,7 @@ function KanbanBoard() {
         {...provided.dragHandleProps}
         onDoubleClick={handleColumnTitleDoubleClick}
       >
-        {column.title}
+        {column.content}
       </h3>
     );
   };

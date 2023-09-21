@@ -1,3 +1,5 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url); // Initialize createRequire
 import express from "express";
 import cors from "cors";
 import session from "express-session";
@@ -5,8 +7,6 @@ import MongoStore from "connect-mongo";
 import discordRoutes from "./routes/discordAuth.mjs"
 import discordBotKanbanRoutes from "./routes/kanbanBoard/kanbanBoardRoutes.mjs";
 import "./loadEnvironment.mjs";
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url); // Initialize createRequire
 const socketIo = require('socket.io');
 import { createServer } from 'http';
 

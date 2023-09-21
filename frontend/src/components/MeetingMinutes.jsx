@@ -1,12 +1,12 @@
 import React from 'react';
 
-function Attendance() {
+function MeetingMinutes() {
   return (
     <div>
-      <h2>Attendance</h2>
+      <h2>Meeting Minutes</h2>
       <p>Here you can check and manage attendance.</p>
     </div>
   );
 }
 
-export default Attendance;
+export default MeetingMinutes;

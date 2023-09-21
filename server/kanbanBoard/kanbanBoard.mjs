@@ -1,7 +1,10 @@
 import Task from '../models/kanbanBoard/task.mjs';
 import Column from '../models/kanbanBoard/column.mjs';
-import {io} from '../server.mjs';
 
+/*
+*   Add a task to the database
+*   @param {string} task - The task to be added
+*/
 export const addTask = async (req, res) => {
     const task = req.body;
     const newTask = new Task(task);
@@ -13,6 +16,9 @@ export const addTask = async (req, res) => {
     }
 };
 
+
+
+
 /*
 *   Update a task in the database
 *   @param {string} taskId - The ID of the task to be updated
@@ -21,7 +27,6 @@ export const updateTask = async (req, res) => {
     const task = req.body;
     try {
         await Task.updateOne({ taskId: task.taskId }, { ...task });
-        io.emit('updateTask', task);
         res.status(201).json(task);
     } catch (error) {
         res.status(400).json({ message: error.message });

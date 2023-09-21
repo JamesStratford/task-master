@@ -1,13 +1,39 @@
-import { addTask, addColumn, getTasks, getColumns, updateColumn, deleteColumn, assignTaskToColumn, updateColumnTaskIds, removeTaskFromColumn, updateTask, deleteTask } from "../../kanbanBoard/kanbanBoard.mjs";
+import {
+    addTask,
+    addColumn,
+    getTasks,
+    getColumns,
+    updateColumn,
+    deleteColumn,
+    assignTaskToColumn,
+    updateColumnTaskIds,
+    removeTaskFromColumn,
+    updateTask,
+    deleteTask
+} from "../../kanbanBoard/kanbanBoard.mjs";
 import express from 'express';
+import { io } from '../../server.mjs';
 
 const router = express.Router();
+
+/*
+*   Update the board
+*   @param {SocketIO.Server} io - The Socket.IO server
+*/
+export const boardUpdatedHook = async (io) => {
+    const tasks = await getTasks();
+    const columns = await getColumns();
+    io.emit('updateBoard', { tasks, columns });
+};
 
 router.post('/add-task', async (req, res) => {
     const { columnId, newCard } = req.body;
     try {
-        await addTask({ body: { ...newCard } }, res);
-        await assignTaskToColumn({ body: { taskId: newCard.taskId, columnId } }, res);
+        await addTask({ body: { ...newCard } }, res).then(async () => {
+            await assignTaskToColumn({ body: { taskId: newCard.taskId, columnId } }, res);
+        }).then(() => {
+            boardUpdatedHook(io)
+        });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -16,11 +42,14 @@ router.post('/add-task', async (req, res) => {
 router.delete('/delete-task', async (req, res) => {
     const { taskId, changedColumnId } = req.body;
     try {
-        await deleteTask({ body: { taskId } }, res);
-        if (changedColumnId) {
-            await removeTaskFromColumn({ body: { taskId, changedColumnId } }, res);
-        }
-        res.status(200).json({ message: 'Task and column updated successfully' });
+        await deleteTask({ body: { taskId } }, res).then(async () => {
+            if (changedColumnId) {
+                await removeTaskFromColumn({ body: { taskId, changedColumnId } }, res);
+            }
+            res.status(200).json({ message: 'Task and column updated successfully' });
+        }).then(() => {
+            boardUpdatedHook(io)
+        });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -30,7 +59,9 @@ router.delete('/delete-task', async (req, res) => {
 router.post('/add-column', async (req, res) => {
     const columnData = req.body; // Retrieve the column data from the request body
     try {
-        await addColumn(columnData, res); // Pass the column data directly to addColumn
+        await addColumn(columnData, res).then(() => {
+            boardUpdatedHook(io)
+        });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -39,23 +70,27 @@ router.post('/add-column', async (req, res) => {
 router.delete('/delete-column', async (req, res) => {
     const { columnId } = req.body;
     try {
-      await deleteColumn({ body: { id: columnId } }, res);
-      res.status(200).json({ message: 'Column deleted successfully' });
+        await deleteColumn({ body: { id: columnId } }, res).then(() => {
+            boardUpdatedHook(io)
+        });
+        res.status(200).json({ message: 'Column deleted successfully' });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
-  });
+});
 
 router.put('/update-column', async (req, res) => {
     const { newColumn } = req.body;
     try {
-        await updateColumn({ body: { ...newColumn } }, res);
+        await updateColumn({ body: { ...newColumn } }, res).then(() => {
+            boardUpdatedHook(io)
+        });
         res.status(200).json({ message: 'Column updated successfully' });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
-  
+
 
 router.get('/get-columns', async (req, res) => {
     try {
@@ -91,10 +126,13 @@ router.put('/update-task-column', async (req, res) => {
     const newColumnId = req.body.newColumnId;
     const newColumnTaskIds = req.body.newColumnTaskIds;
     try {
-        await updateColumnTaskIds({ body: { taskId, newColumnId, newColumnTaskIds } }, res);
-        if (columnId !== newColumnId) {
-            await removeTaskFromColumn({ body: { taskId, changedColumnId: columnId } }, res);
-        }
+        await updateColumnTaskIds({ body: { taskId, newColumnId, newColumnTaskIds } }, res).then(async () => {
+            if (columnId !== newColumnId) {
+                await removeTaskFromColumn({ body: { taskId, changedColumnId: columnId } }, res);
+            }
+        }).then(() => {
+            boardUpdatedHook(io)
+        });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -103,7 +141,9 @@ router.put('/update-task-column', async (req, res) => {
 router.put('/update-task', async (req, res) => {
     const task = req.body.newTask;
     try {
-        await updateTask({ body: { ...task } }, res);
+        await updateTask({ body: { ...task } }, res).then(() => {
+            boardUpdatedHook(io)
+        });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

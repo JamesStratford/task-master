@@ -35,15 +35,10 @@ function KanbanBoard() {
 
     setSocket(newSocket);
 
-    newSocket.on('updateTask', (updatedTask) => {
-      setState(prevState => ({
-        ...prevState,
-        tasks: {
-          ...prevState.tasks,
-          [updatedTask.taskId]: updatedTask,
-        }
-      }));
-    });
+    // Board updated
+    newSocket.on('updateBoard', (updatedBoard) => {
+      setState(updatedBoard);
+    });   
 
     return () => newSocket.disconnect();
   }, []);

@@ -28,14 +28,14 @@ function KanbanBoard() {
     fetchData();
   }, []);
 
-  const openOverlay = (taskId) => {
-    const task = state.tasks[taskId];
-    setCurrentTask(task);
-    setIsOverlayOpen(true);
-  };
-
-  const closeOverlay = () => {
-    setIsOverlayOpen(false); // Only close the overlay, no need to modify currentTask
+  const toggleOverlay = (taskId) => {
+    if (isOverlayOpen) {
+      setIsOverlayOpen(false);
+    } else {
+      const task = state.tasks[taskId];
+      setCurrentTask(task);
+      setIsOverlayOpen(true);
+    }
   };
 
   const moveTaskWithinSameColumn = async (
@@ -372,25 +372,22 @@ function KanbanBoard() {
   const handleColumnUpdate = async (column, editedColumnTitle) => {
     try {
       const updatedColumns = state.columns.map((col) =>
-          col.id === column.id ? { ...col, title: editedColumnTitle } : col
-        );
-        setState({ ...state, columns: updatedColumns });
-        const newColumn = updatedColumns.find((col) => col.id === column.id);
-        
-        // Update the column in the database
-        await axios.put(
-          `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-column`,
-          {
-            newColumn
-          }
-        );
+        col.id === column.id ? { ...col, title: editedColumnTitle } : col
+      );
+      setState({ ...state, columns: updatedColumns });
+      const newColumn = updatedColumns.find((col) => col.id === column.id);
+
+      // Update the column in the database
+      await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-column`,
+        {
+          newColumn
+        }
+      );
     } catch (error) {
       console.error("Failed to update column title:", error);
     }
   };
-
-
-
 
   // Dropdown Component
   const DropdownMenu = ({ isOpen, column, deleteColumn, closeDropdown }) => {
@@ -516,7 +513,7 @@ function KanbanBoard() {
                                         task={task}
                                         isEditing={editingTaskId}
                                         removeCard={removeCard}
-                                        openOverlay={openOverlay}
+                                        openOverlay={toggleOverlay}
                                         updateCardContent={updateCardContent}
                                         setEditingTaskId={setEditingTaskId}
                                         provided={provided}
@@ -552,7 +549,7 @@ function KanbanBoard() {
             {isOverlayOpen && (
               <CardOverlay
                 task={currentTask}
-                onClose={closeOverlay}
+                onClose={toggleOverlay}
                 updateTaskDescription={updateTaskDescription}
               />
             )}

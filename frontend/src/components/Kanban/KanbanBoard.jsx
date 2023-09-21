@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CardOverlay from "./CardOverlay";
 import axios from "axios";
+import Task from "./Task";
 
 function KanbanBoard() {
   const [editingTaskId, setEditingTaskId] = useState(null);
@@ -367,7 +368,7 @@ function KanbanBoard() {
     );
   };
 
-  const ColumnHeader = ({ column, provided }) => {
+  const Column = ({ column, provided }) => {
     const [editedColumnTitle, setEditedColumnTitle] = useState("");
     const [isEditing, setIsEditing] = useState("");
     useEffect(() => {
@@ -448,72 +449,7 @@ function KanbanBoard() {
   };
 
   // Task Component
-  const TaskItem = ({
-    task,
-    isEditing,
-    updateCardContent,
-    setEditingTaskId,
-    provided,
-  }) => {
-    const [localContent, setLocalContent] = useState(task.content);
-
-    return (
-      <div
-        className={`task ${isEditing === task.taskId ? "editing" : ""}`}
-        ref={provided.innerRef}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
-        onDoubleClick={() => setEditingTaskId(task.taskId)}
-      >
-        {isEditing === task.taskId ? (
-          <div className="task-content">
-            <input
-              type="text"
-              value={localContent}
-              onChange={(e) => setLocalContent(e.target.value)}
-              onBlur={() => updateCardContent(task.taskId, localContent)}
-            />
-            <div className="button-container">
-              <button
-                className="open-button"
-                onClick={() => openOverlay(task.taskId)}
-              >
-                Open Card
-              </button>
-              <button
-                className="remove-button"
-                onClick={() => removeCard(task.taskId)}
-              >
-                Remove Card
-              </button>
-              <button
-                className="save-button"
-                onClick={() => {
-                  setEditingTaskId(null);
-                }}
-              >
-                Save Card
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="task-content">
-            {task.content}
-            <button
-              className="edit-button"
-              onClick={() => setEditingTaskId(task.taskId)}
-            >
-              <img
-                src={require("./edit.png")}
-                alt="Edit"
-                style={{ width: "15px", height: "15px" }}
-              />
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  };
+  
 
   // AddColumn Component
   const AddColumnButton = ({ addColumn }) => {
@@ -584,7 +520,7 @@ function KanbanBoard() {
                         {...provided.draggableProps}
                       >
                         <div className="column-header">
-                          <ColumnHeader
+                          <Column
                             column={column}
                             provided={provided}
                           />
@@ -610,9 +546,11 @@ function KanbanBoard() {
                                     key={String(task.taskId)}
                                   >
                                     {(provided) => (
-                                      <TaskItem
+                                      <Task
                                         task={task}
                                         isEditing={editingTaskId}
+                                        removeCard={removeCard}
+                                        openOverlay={openOverlay}
                                         updateCardContent={updateCardContent}
                                         setEditingTaskId={setEditingTaskId}
                                         provided={provided}

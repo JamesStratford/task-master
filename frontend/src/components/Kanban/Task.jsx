@@ -1,22 +1,72 @@
-import React from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import React, { useState } from "react";
 
-function Task(props) {
-  return (
-    // Wrapping the task in a Draggable component
-    <Draggable draggableId={props.task.id} index={props.index} type="task">
-      {(provided) => (
-        // The provided props are used to make the element draggable
+const Task = ({
+    task,
+    isEditing,
+    updateCardContent,
+    setEditingTaskId,
+    removeCard,
+    openOverlay,
+    provided,
+}) => {
+    const [localContent, setLocalContent] = useState(task.content);
+    
+    return (
         <div
-          {...provided.draggableProps} // Props for the draggable behavior
-          {...provided.dragHandleProps} // Props for the drag handle
-          ref={provided.innerRef} // Reference to the inner element
+            className={`task ${isEditing === task.taskId ? "editing" : ""}`}
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            onDoubleClick={() => setEditingTaskId(task.taskId)}
         >
-          {props.task.content} {/* Displaying the task content */}
+            {isEditing === task.taskId ? (
+                <div className="task-content">
+                    <input
+                        type="text"
+                        value={localContent}
+                        onChange={(e) => setLocalContent(e.target.value)}
+                        onBlur={() => updateCardContent(task.taskId, localContent)}
+                    />
+                    <div className="button-container">
+                        <button
+                            className="open-button"
+                            onClick={() => openOverlay(task.taskId)}
+                        >
+                            Open Card
+                        </button>
+                        <button
+                            className="remove-button"
+                            onClick={() => removeCard(task.taskId)}
+                        >
+                            Remove Card
+                        </button>
+                        <button
+                            className="save-button"
+                            onClick={() => {
+                                setEditingTaskId(null);
+                            }}
+                        >
+                            Save Card
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className="task-content">
+                    {task.content}
+                    <button
+                        className="edit-button"
+                        onClick={() => setEditingTaskId(task.taskId)}
+                    >
+                        <img
+                            src={require("./edit.png")}
+                            alt="Edit"
+                            style={{ width: "15px", height: "15px" }}
+                        />
+                    </button>
+                </div>
+            )}
         </div>
-      )}
-    </Draggable>
-  );
-}
+    );
+};
 
 export default Task;

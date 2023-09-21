@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CardOverlay from "./CardOverlay";
 import axios from "axios";
 import Task from "./Task";
+import Column from "./Column";
 
 function KanbanBoard() {
   const [editingTaskId, setEditingTaskId] = useState(null);
@@ -368,25 +369,9 @@ function KanbanBoard() {
     );
   };
 
-  const Column = ({ column, provided }) => {
-    const [editedColumnTitle, setEditedColumnTitle] = useState("");
-    const [isEditing, setIsEditing] = useState("");
-    useEffect(() => {
-      setEditedColumnTitle(column.title); // assuming column.title is correct
-    }, [column.title]);
-
-    const handleColumnTitleDoubleClick = useCallback(() => {
-      setEditedColumnTitle(column.title);
-      setIsEditing(column.id);
-    }, [column.id, column.title]);
-
-    const handleEditedColumnTitleChange = useCallback((e) => {
-      setEditedColumnTitle(e.target.value);
-    }, []);
-
-    const handleColumnTitleKeyPress = useCallback(async (e) => {
-      if (e.key === "Enter") {
-        const updatedColumns = state.columns.map((col) =>
+  const handleColumnUpdate = async (column, editedColumnTitle) => {
+    try {
+      const updatedColumns = state.columns.map((col) =>
           col.id === column.id ? { ...col, title: editedColumnTitle } : col
         );
         setState({ ...state, columns: updatedColumns });
@@ -399,29 +384,12 @@ function KanbanBoard() {
             newColumn
           }
         );
-      }
-    }, [column, editedColumnTitle]);
-
-    return isEditing === column.id ? (
-      <input
-        type="text"
-        className="column-title-input"
-        value={editedColumnTitle}
-        onChange={handleEditedColumnTitleChange}
-        onKeyPress={handleColumnTitleKeyPress}
-        autoFocus
-        {...provided.dragHandleProps}
-      />
-    ) : (
-      <h3
-        className="column-title"
-        {...provided.dragHandleProps}
-        onDoubleClick={handleColumnTitleDoubleClick}
-      >
-        {column.title}
-      </h3>
-    );
+    } catch (error) {
+      console.error("Failed to update column title:", error);
+    }
   };
+
+
 
 
   // Dropdown Component
@@ -447,9 +415,6 @@ function KanbanBoard() {
       </button>
     );
   };
-
-  // Task Component
-  
 
   // AddColumn Component
   const AddColumnButton = ({ addColumn }) => {
@@ -522,6 +487,7 @@ function KanbanBoard() {
                         <div className="column-header">
                           <Column
                             column={column}
+                            handleColumnUpdate={handleColumnUpdate}
                             provided={provided}
                           />
                           <DropdownMenu

@@ -5,7 +5,7 @@ import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
 import KanbanBoard from './components/Kanban/KanbanBoard';
-import Attendance from './components/Attendance';
+import Attendance from './components/MeetingMinutes';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -38,7 +38,7 @@ function App() {
               <Tab>Gantt Chart</Tab>
               <Tab>Calendar</Tab>
               <Tab>Discord</Tab>
-              <Tab>Attendance</Tab> 
+              <Tab>Meeting Minutes</Tab> 
             </TabList>
 
             <TabPanel>
@@ -54,12 +54,14 @@ function App() {
               <h2>Calendar</h2>
             </TabPanel>
 
-            <TabPanel>
-              <Attendance />
-            </TabPanel>
 
             <TabPanel>
             </TabPanel>
+
+            <TabPanel>
+              Meeting Minutes
+            </TabPanel>
+            
             {/* Always render DiscordWidget but hide it when the tab is not active */}
             <DiscordWidget
               server={discordServerId}

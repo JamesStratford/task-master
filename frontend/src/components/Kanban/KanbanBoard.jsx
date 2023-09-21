@@ -130,47 +130,54 @@ function KanbanBoard() {
 
   const addColumn = async (newColumnTitle) => {
     console.log("Adding column");
-
+  
     if (newColumnTitle.trim() === "") {
       // Don't add an empty column
       console.log("Empty column");
       return;
     }
-
+  
     try {
       // Send a POST request to add the column to the database
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/add-column`,
         {
-          title: newColumnTitle, // Send the new column title to the backend
+          title: newColumnTitle,
+          // You can add any other necessary properties here
         }
       );
-
-      // Check if the column was successfully added to the database
-      if (response.status === 200) {
-        const newColumnData = response.data; // This should include the new column's ID and other details
-
-        // Update the React state with the new column
-        const newColumnId = newColumnData.id;
+  
+      console.log("Title", newColumnTitle);
+      console.log("data: ", response.data);
+  
+      if (response.status === 201) {
+        // Column was successfully added to the server
+        console.log("Successfully added column to the database.");
+        const newColumnData = response.data; // This should include the new column's data, including its ID
+  
+        // Create a new column object for your React state
         const newColumn = {
-          id: newColumnId,
+          id: newColumnData._id, // Use the actual ID property from your server data
           title: newColumnTitle,
           taskIds: [],
         };
-        const updatedColumns = { ...state.columns, [newColumnId]: newColumn };
-        const newColumnOrder = [...state.columnOrder, newColumnId];
+  
+        // Update your React state with the new column
+        const updatedColumns = { ...state.columns, [newColumn.id]: newColumn };
+        const newColumnOrder = [...state.columnOrder, newColumn.id];
         const newState = {
           ...state,
           columns: updatedColumns,
           columnOrder: newColumnOrder,
         };
+  
         setState(newState);
         setNewColumnTitle(""); // Clear the newColumnTitle
       }
     } catch (error) {
       console.error("Failed to add column:", error);
     }
-  };
+  };  
 
   const updateTaskDescription = async (taskId, description) => {
     const updatedTasks = {

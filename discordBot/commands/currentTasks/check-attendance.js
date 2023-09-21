@@ -6,28 +6,41 @@ module.exports = {
         .setDescription('Checks and lists all users in the voice call'),
 
     async execute(interaction) {
-        // Get the member who executed the command
         const member = interaction.member;
-
-        // Use the guild's voice states to get the voice channel of the member
         const voiceChannel = member.voice.channel;
 
         if (voiceChannel) {
             try {
-                // Fetch all members in the voice channel
-                const members = voiceChannel.members.filter(m => !m.user.bot);  // Filter out bots
-
-                // Convert members collection to a list of usernames
+                const members = voiceChannel.members.filter(m => !m.user.bot);
                 const memberNames = members.map(m => m.displayName).join(', ');
 
-                // Send a message with the list of usernames
                 await interaction.reply(`Users in the call: ${memberNames}`);
+
+                // Step 1: Define a Set to track members
+                const initialMembers = new Set(members.keys());
+
+                // Step 2: Add event listener for the voiceStateUpdate event
+                const voiceStateUpdateHandler = (oldState, newState) => {
+                    // If the member left the voice channel
+                    if (oldState.channelId === voiceChannel.id && !newState.channelId) {
+                        initialMembers.delete(oldState.id);
+                    }
+
+                    // Step 3: Check if the voice channel becomes empty
+                    if (initialMembers.size === 0) {
+                        interaction.channel.send('Meeting adjourned, attendance has been marked.');
+
+                        // Cleanup: Remove the event listener after sending the message
+                        interaction.client.removeListener('voiceStateUpdate', voiceStateUpdateHandler);
+                    }
+                };
+
+                interaction.client.on('voiceStateUpdate', voiceStateUpdateHandler);
             } catch (err) {
                 console.error("Error fetching members:", err);
                 await interaction.reply('There was an error checking attendance.');
             }
         } else {
-            // If the member is not in a voice channel, send an error message
             await interaction.reply('You need to be in a voice channel for me to check attendance.');
         }
     }

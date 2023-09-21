@@ -20,6 +20,11 @@ module.exports = {
         )
         .addStringOption(option =>
             option
+                .setName("due_date")
+                .setDescription("Enter the due date of the task you want to create")
+            )
+        .addStringOption(option =>
+            option
                 .setName("task_description")
                 .setDescription("Enter the description of the task you want to create")
             ),
@@ -40,8 +45,8 @@ module.exports = {
         let task = {
             taskId: "1",
             content: interaction.options.getString("task_name"),
-            due_date: "",
-            description: interaction.options.getString("task_description"),
+            due_date: interaction.options.getString("due_date") ?? "",
+            description: interaction.options.getString("task_description") ?? "",
             labels: [],
             nextTaskId: ""
         }

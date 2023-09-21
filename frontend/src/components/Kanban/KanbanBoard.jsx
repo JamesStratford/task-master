@@ -4,12 +4,14 @@ import CardOverlay from "./CardOverlay";
 import axios from "axios";
 import Task from "./Task";
 import Column from "./Column";
+import { io } from "socket.io-client";
 
 function KanbanBoard() {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
+  const [socket, setSocket] = useState(null);
 
   const [state, setState] = useState({
     tasks: {},
@@ -26,6 +28,24 @@ function KanbanBoard() {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const newSocket = io(process.env.REACT_APP_BACKEND_URL);
+
+    setSocket(newSocket);
+
+    newSocket.on('updateTask', (updatedTask) => {
+      setState(prevState => ({
+        ...prevState,
+        tasks: {
+          ...prevState.tasks,
+          [updatedTask.taskId]: updatedTask,
+        }
+      }));
+    });
+
+    return () => newSocket.disconnect();
   }, []);
 
   const toggleOverlay = (taskId) => {

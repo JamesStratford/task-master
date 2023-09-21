@@ -1,5 +1,6 @@
 import Task from '../models/kanbanBoard/task.mjs';
 import Column from '../models/kanbanBoard/column.mjs';
+import {io} from '../server.mjs';
 
 export const addTask = async (req, res) => {
     const task = req.body;
@@ -20,6 +21,8 @@ export const updateTask = async (req, res) => {
     const task = req.body;
     try {
         await Task.updateOne({ taskId: task.taskId }, { ...task });
+        io.emit('updateTask', task);
+        console.log(task)
         res.status(201).json(task);
     } catch (error) {
         res.status(400).json({ message: error.message });

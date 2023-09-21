@@ -5,11 +5,18 @@ import MongoStore from "connect-mongo";
 import discordRoutes from "./routes/discordAuth.mjs"
 import discordBotKanbanRoutes from "./routes/kanbanBoard/kanbanBoardRoutes.mjs";
 import "./loadEnvironment.mjs";
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url); // Initialize createRequire
+const socketIo = require('socket.io');
+import { createServer } from 'http';
 
 const PORT = process.env.PORT || 5050;
 const app = express();
+const server = createServer(app);
+
 
 app.use(express.json());
+
 
 app.use(cors({
   origin: `${process.env.ORIGIN}:${process.env.FRONTEND_PORT}`,
@@ -32,8 +39,16 @@ app.use(session({
 app.use("/api/discordAuth", discordRoutes);
 app.use("/api/kanban", discordBotKanbanRoutes);
 
-app.listen(PORT, () => {
+const io = socketIo(server, {
+  cors: {
+    origin: `${process.env.ORIGIN}:${process.env.FRONTEND_PORT}`,
+    methods: ["GET", "POST"],
+  },
+});
+
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+export { io };
 export default app

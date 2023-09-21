@@ -10,7 +10,7 @@ const Task = ({
     provided,
 }) => {
     const [localContent, setLocalContent] = useState(task.content);
-    
+
     return (
         <div
             className={`task ${isEditing === task.taskId ? "editing" : ""}`}

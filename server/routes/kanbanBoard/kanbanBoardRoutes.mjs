@@ -1,4 +1,4 @@
-import { addTask, addColumn, getTasks, getColumns, updateColumn, deleteColumn, assignTaskToColumn, updateColumnTaskIds, removeTaskFromColumn, updateTask, deleteTask } from "../../kanbanBoard/kanbanBoard.mjs";
+import { addTask, addColumn, getTasks, getColumns, updateColumns, deleteColumn, assignTaskToColumn, updateColumnTaskIds, removeTaskFromColumn, updateTask, deleteTask } from "../../kanbanBoard/kanbanBoard.mjs";
 import express from 'express';
 
 const router = express.Router();
@@ -108,5 +108,15 @@ router.put('/update-task', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+router.put('/reorder-columns', async (req, res) => {
+    try {
+        const updatedColumns = req.body;
+        await updateColumns(updatedColumns);
+        res.status(200).json({ message: 'Columns updated successfully' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}); 
 
 export default router;

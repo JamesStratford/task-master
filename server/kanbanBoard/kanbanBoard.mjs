@@ -209,3 +209,25 @@ export const updateColumnTaskIds = async (req, res) => {
     }
 };
 
+/**
+ * Update columns in the database based on the provided data.
+ *
+ * @param {object} req - The HTTP request object containing updated columns.
+ * @param {object} res - The HTTP response object.
+ * @returns {void}
+ */
+export const updateColumns = async (req, res) => {
+    const columns = req.updatedColumns; // Assuming req.body contains an array of columns in the desired order
+    
+    try {
+        // Iterate through the columns and update them in the database
+        for (let i = 0; i < columns.length; i++) {
+            const column = columns[i];
+            await Column.updateOne({ id: column.id }, { ...column });
+        }
+        console.log("Successfully updated columns in the database.");
+    } catch (error) {
+        console.error("Error updating columns:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};

@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CardOverlay from "./CardOverlay";
 import axios from "axios";
 
 function KanbanBoard() {
   const [editingTaskId, setEditingTaskId] = useState(null);
-  const [editedColumnTitle, setEditedColumnTitle] = useState("");
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
-  const [isEditingColumnTitle, setIsEditingColumnTitle] = useState("");
-  const [newColumnTitle, setNewColumnTitle] = useState("");
+
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
 
   const [state, setState] = useState({
@@ -131,13 +129,13 @@ function KanbanBoard() {
 
   const addColumn = async (newColumnTitle) => {
     console.log("Adding column");
-  
+
     if (newColumnTitle.trim() === "") {
       // Don't add an empty column
       console.log("Empty column");
       return;
     }
-  
+
     try {
       // Send a POST request to add the column to the database
       const response = await axios.post(
@@ -147,37 +145,35 @@ function KanbanBoard() {
           // You can add any other necessary properties here
         }
       );
-  
+
       console.log("Title", newColumnTitle);
       console.log("data: ", response.data);
-  
+
       if (response.status === 201) {
         // Column was successfully added to the server
         console.log("Successfully added column to the database.");
         const newColumnData = response.data; // This should include the new column's data, including its ID
-  
+
         // Create a new column object for your React state
         const newColumn = {
           id: newColumnData._id, // Use the actual ID property from your server data
           title: newColumnTitle,
           taskIds: [],
         };
-  
+
         // Add the new column to the existing columns
         const updatedColumns = [...state.columns, newColumn];
-  
+
         // Update the React state with the new column
         setState({
           ...state,
           columns: updatedColumns,
         });
-  
-        setNewColumnTitle(""); // Clear the newColumnTitle
       }
     } catch (error) {
       console.error("Failed to add column:", error);
     }
-  };  
+  };
 
   const updateTaskDescription = async (taskId, description) => {
     const updatedTasks = {
@@ -192,12 +188,12 @@ function KanbanBoard() {
       ...state,
       tasks: updatedTasks,
     });
+    const newTask = state.tasks[taskId];
     // Update the task description in the database
     await axios.put(
-      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task-description`,
+      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
       {
-        taskId,
-        description,
+        newTask
       }
     );
   };
@@ -376,62 +372,53 @@ function KanbanBoard() {
     );
   };
 
-  const handleColumnTitleDoubleClick = (columnId) => {
-    // Set the edited column title when double-clicking
-    const column = state.columns[columnId];
-    setEditedColumnTitle(column.title);
-    setIsEditingColumnTitle(columnId);
-  };
 
-  const handleEditedColumnTitleChange = (e) => {
-    // Update the edited column title
-    setEditedColumnTitle(e.target.value);
-  };
 
-  const handleColumnTitleKeyPress = (e, columnId) => {
-    if (e.key === "Enter") {
-      // Save the edited column title when Enter key is pressed
-      const updatedColumns = {
-        ...state.columns,
-        [columnId]: {
-          ...state.columns[columnId],
-          title: editedColumnTitle,
-        },
-      };
-      setState({ ...state, columns: updatedColumns });
-      setIsEditingColumnTitle(""); // Clear the editing state
-    }
-  };
+  const ColumnHeader = ({ isEditing, column, provided }) => {
+    const [editedColumnTitle, setEditedColumnTitle] = useState("");
 
-  // Column Header Component
-  const ColumnHeader = ({
-    isEditing,
-    column,
-    handleColumnTitleDoubleClick,
-    editedColumnTitle,
-    handleEditedColumnTitleChange,
-    handleColumnTitleKeyPress,
-    provided, // New prop
-  }) => {
+    useEffect(() => {
+      setEditedColumnTitle(column.title); // assuming column.title is correct
+    }, [column.title]);
+
+    const handleColumnTitleDoubleClick = useCallback(() => {
+      setEditedColumnTitle(column.title);
+    }, [column.id, column.title]);
+
+    const handleEditedColumnTitleChange = useCallback((e) => {
+      setEditedColumnTitle(e.target.value);
+    }, []);
+
+    const handleColumnTitleKeyPress = useCallback((e) => {
+      if (e.key === "Enter") {
+        const updatedColumns = state.columns.map((col) =>
+          col.id === column.id ? { ...col, title: editedColumnTitle } : col
+        );
+        setState({ ...state, columns: updatedColumns });
+      }
+    }, []);
+
     return isEditing === column.id ? (
       <input
         type="text"
         className="column-title-input"
         value={editedColumnTitle}
         onChange={handleEditedColumnTitleChange}
-        onKeyPress={(e) => handleColumnTitleKeyPress(e, column.id)}
+        onKeyPress={handleColumnTitleKeyPress}
         autoFocus
+        {...provided.dragHandleProps}
       />
     ) : (
       <h3
         className="column-title"
-        {...provided.dragHandleProps} // Make this the drag handle
-        onDoubleClick={() => handleColumnTitleDoubleClick(column.id)}
+        {...provided.dragHandleProps}
+        onDoubleClick={handleColumnTitleDoubleClick}
       >
         {column.title}
       </h3>
     );
   };
+
 
   // Dropdown Component
   const DropdownMenu = ({ isOpen, column, deleteColumn, closeDropdown }) => {
@@ -595,18 +582,7 @@ function KanbanBoard() {
                       >
                         <div className="column-header">
                           <ColumnHeader
-                            isEditing={isEditingColumnTitle}
                             column={column}
-                            handleColumnTitleDoubleClick={
-                              handleColumnTitleDoubleClick
-                            }
-                            editedColumnTitle={editedColumnTitle}
-                            handleEditedColumnTitleChange={
-                              handleEditedColumnTitleChange
-                            }
-                            handleColumnTitleKeyPress={
-                              handleColumnTitleKeyPress
-                            }
                             provided={provided}
                           />
                           <DropdownMenu

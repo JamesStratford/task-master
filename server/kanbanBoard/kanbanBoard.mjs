@@ -1,6 +1,48 @@
 import Task from '../models/kanbanBoard/task.mjs';
 import Column from '../models/kanbanBoard/column.mjs';
 
+export const addTask = async (req, res) => {
+    const task = req.body;
+    const newTask = new Task(task);
+    try {
+        await newTask.save();
+        res.status(201).json(newTask);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+/*
+*   Update a task in the database
+*   @param {string} taskId - The ID of the task to be updated
+*/
+export const updateTask = async (req, res) => {
+    const task = req.body;
+    try {
+        await Task.updateOne({ taskId: task.taskId }, { ...task });
+        res.status(201).json(task);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+/*
+*   Delete a task from the database
+*   @param {string} taskId - The ID of the task to be deleted
+*/
+export const deleteTask = async (req, res) => {
+    const taskId = req.body.taskId;
+    try {
+        await Task.deleteOne({ taskId });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+/*
+*   Get the all tasks unordered
+*   @returns {Task[]}
+*/
 export const getTasks = async (req, res) => {
     try {
         const tasksArray = await Task.find({}).exec();
@@ -14,7 +56,53 @@ export const getTasks = async (req, res) => {
     }
 };
 
+/*
+*   Add a column to the database
+*   @param {string} column - The name of the column to be added
+*/
+export const addColumn = async (req, res) => {
+    const column = req.body;
+    const newColumn = new Column(column);
+    try {
+        await newColumn.save();
+        res.status(201).json(newColumn);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
 
+/*
+*   Update a column's content
+*   @param {string} id - The ID of the column to be updated
+*/
+export const updateColumn = async (req, res) => {
+    const column = req.body;
+    try {
+        await Column.updateOne({ ...column });
+        res.status(201).json(column);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+/*
+*   Delete a column
+*   @param {string} id - The ID of the column to be deleted
+*/
+export const deleteColumn = async (req, res) => {
+    const column = req.body;
+    try {
+        await Column.deleteOne({ id: column.id });
+        res.status(201).json(column);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+/*
+*   Get the columns in the order they should be displayed
+*   @returns {Column[]} - The columns in the order they should be displayed
+*/
 export const getColumns = async (req, res) => {
     try {
         const columns = await Column.find({});
@@ -42,65 +130,11 @@ export const getColumns = async (req, res) => {
     }
 };
 
-export const getColumnOrder = async (req, res) => {
-    try {
-        const columns = await Column.find({});
-        const columnOrder = columns.map(column => column.id);
-        return columnOrder;
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-export const addTask = async (req, res) => {
-    const task = req.body;
-    const newTask = new Task(task);
-    try {
-        await newTask.save();
-        res.status(201).json(newTask);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-export const removeTaskFromColumn = async (req, res) => {
-    const { taskId, changedColumnId } = req.body;
-    try {
-        const column = await Column.findOne({ id: changedColumnId });
-        if (column) {
-            // Remove task from column array
-            column.taskIds = column.taskIds.filter(id => id !== taskId);
-            await column.save();
-        }
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-export const updateColumnTaskIds = async (req, res) => {
-    const { taskId, newColumnId, newColumnTaskIds } = req.body;
-    try {
-      const column = await Column.findOne({ id: newColumnId });
-      if (!column) {
-        return res.status(404).json({ message: "Column not found" });
-      }
-  
-      column.taskIds = newColumnTaskIds;
-  
-      const savedColumn = await column.save();
-      if (!savedColumn) {
-        return res.status(500).json({ message: "Failed to save column" });
-      }
-  
-      res.status(200).json({ message: "Column updated successfully" });
-    } catch (error) {
-      console.error("Error updating column:", error);
-      res.status(400).json({ message: error.message });
-    }
-  };
-  
-
-
+/*
+*   Add a task to a column's taskIds array
+*   @param {string} taskId - The ID of the task to be added
+*   @param {string} columnId - The ID of the column the task was added to
+*/
 export const assignTaskToColumn = async (req, res) => {
     const taskId = req.body.taskId;
     const columnId = req.body.columnId;
@@ -117,63 +151,44 @@ export const assignTaskToColumn = async (req, res) => {
     }
 };
 
-export const addColumn = async (req, res) => {
-    const column = req.body;
-    const newColumn = new Column(column);
+/*
+*   Remove a task from a column's taskIds array
+*   @param {string} taskId - The ID of the task to be removed
+*   @param {string} changedColumnId - The ID of the column the task was removed from
+*/
+export const removeTaskFromColumn = async (req, res) => {
+    const { taskId, changedColumnId } = req.body;
     try {
-        await newColumn.save();
-        res.status(201).json(newColumn);
+        const column = await Column.findOne({ id: changedColumnId });
+        if (column) {
+            // Remove task from column array
+            column.taskIds = column.taskIds.filter(id => id !== taskId);
+            await column.save();
+        }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
 
-export const deleteColumn = async (req, res) => {
-    const column = req.body;
+/*
+*   Update the taskIds array of a column
+*   @param {string} taskId - The ID of the task to be moved
+*   @param {string} newColumnId - The ID of the column to move the task to
+*   @param {string[]} newColumnTaskIds - The new array of task IDs for the column
+*/
+export const updateColumnTaskIds = async (req, res) => {
+    const { taskId, newColumnId, newColumnTaskIds } = req.body;
     try {
-        await Column.deleteOne({ id: column.id });
-        res.status(201).json(column);
+        const column = await Column.findOne({ id: newColumnId });
+        if (!column) {
+            return
+        }
+
+        column.taskIds = newColumnTaskIds;
+
+        const savedColumn = await column.save();
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        console.error("Error updating column:", error);
     }
 };
 
-export const updateTask = async (req, res) => {
-    const task = req.body;
-    try {
-        await Task.updateOne({ taskId: task.taskId }, { ...task });
-        res.status(201).json(task);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-export const deleteTask = async (req, res) => {
-    const taskId = req.body.taskId;
-    try {
-        await Task.deleteOne({ taskId });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-export const updateTaskDescription = async (req, res) => {
-    const taskId = req.body.taskId;
-    const description = req.body.description;
-    try {
-        await Task.updateOne({ taskId }, { description });
-        res.status(201).json({ taskId, description });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-export const updateColumn = async (req, res) => {
-    const column = req.body;
-    try {
-        await Column.updateOne({ ...column }, { title: column.title });
-        res.status(201).json(column);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};

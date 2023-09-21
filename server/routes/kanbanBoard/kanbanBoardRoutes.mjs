@@ -1,4 +1,4 @@
-import { addTask, addColumn, getTasks, getColumns, deleteColumn, updateTaskDescription, assignTaskToColumn, updateColumnTaskIds, removeTaskFromColumn, updateTask, deleteTask } from "../../kanbanBoard/kanbanBoard.mjs";
+import { addTask, addColumn, getTasks, getColumns, deleteColumn, assignTaskToColumn, updateColumnTaskIds, removeTaskFromColumn, updateTask, deleteTask } from "../../kanbanBoard/kanbanBoard.mjs";
 import express from 'express';
 
 const router = express.Router();
@@ -94,17 +94,6 @@ router.put('/update-task', async (req, res) => {
     const task = req.body.newTask;
     try {
         await updateTask({ body: { ...task } }, res);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
-
-
-router.put('/update-task-description', async (req, res) => {
-    const taskId = req.body.taskId;
-    const description = req.body.description;
-    try {
-        await updateTaskDescription({ body: { taskId, description } }, res);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

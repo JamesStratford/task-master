@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from "react";
-import initialData from "./initialData";
 import { SketchPicker } from 'react-color';
 
 function CardOverlay({
   task,
   onClose,
-  currentColumn,
   updateTaskDescription,
-  taskDescription,
 }) {
 
   // TODO: Add priorities and dates to card overlay
   
   // State to manage task description and labels
-  const [description, setDescription] = useState(taskDescription || "");
+  const [description, setDescription] = useState(task.description || "");
   const [newLabel, setNewLabel] = useState("");
   const [labelColor, setLabelColor] = useState("#ffffff");
-  const [labels, setLabels] = useState([]);
+  const [labels, setLabels] = useState(task.labels || []);
   const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
 
@@ -27,12 +24,12 @@ function CardOverlay({
 
   // Function to save task description
   const handleSaveDescription = () => {
-    updateTaskDescription(task.id, description);
+    updateTaskDescription(task.taskId, description);
   };
 
   // Function to cancel editing description
   const handleCancelEdit = () => {
-    setDescription(taskDescription || "");
+    setDescription(task.description || "");
   };
 
   // Function to toggle label input visibility
@@ -59,9 +56,6 @@ function CardOverlay({
       <div className="overlay-content">
         <div className="task-details">
           <h4 className="task-name">{task.content}</h4>
-          {currentColumn && (
-            <p className="task-in-column">in column: {currentColumn.title}</p>
-          )}
         </div>
         <div className="labels">
           <h5 className="labels-header">

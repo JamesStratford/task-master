@@ -5,7 +5,8 @@ import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
 import KanbanBoard from './components/Kanban/KanbanBoard';
-import Multiplayer from './components/Multiplayer';
+import Multiplayer from './components/Kanban/Multiplayer/Multiplayer';
+import KanbanParent from './components/Kanban/KanbanParent';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -47,7 +48,7 @@ function App() {
               <Multiplayer userInfo={user} />
 
               <h2>Kanban</h2>
-              <KanbanBoard />
+              <KanbanParent />
             </TabPanel>
 
             <TabPanel>

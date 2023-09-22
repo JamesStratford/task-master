@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
 
 require("dotenv").config();

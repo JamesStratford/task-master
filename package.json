@@ -10,12 +10,8 @@
         "install_all": "cd server && npm install && cd ../frontend && npm install && cd ../discordBot && npm install"
     },
     "dependencies": {
-        "dotenv": "^16.3.1",
-        "mongoose": "^7.5.2",
-        "react-color": "^2.19.3"
     },
     "devDependencies": {
-        "concurrently": "^6.2.0",
-        "nodemon": "^3.0.1"
+        "concurrently": "^6.2.0"
     }
 }

@@ -16,6 +16,14 @@ const Multiplayer = ({ userInfo, parentRef }) => {
             }));
         });
 
+        socketRef.current.on('cursorRemove', (data) => {
+            setCursors((prevCursors) => {
+                const updatedCursors = { ...prevCursors };
+                delete updatedCursors[data.id];
+                return updatedCursors;
+            });
+        });
+
         return () => {
             socketRef.current.disconnect();
         };
@@ -28,7 +36,7 @@ const Multiplayer = ({ userInfo, parentRef }) => {
             const x = event.clientX - bounds.left;
             const y = event.clientY - bounds.top;
 
-            socketRef.current.emit('cursorMove', { x, y, text: userInfo ? userInfo.global_name : '' });
+            socketRef.current.emit('cursorMove', { x, y, text: userInfo ? userInfo : '' });
         };
 
         const current = parentRef.current;
@@ -48,7 +56,7 @@ const Multiplayer = ({ userInfo, parentRef }) => {
                     zIndex: '10000'
                 }}>
                     <img
-                        src={`https://cdn.discordapp.com/avatars/${userInfo.discordId}/${userInfo.avatar}?size=80`}
+                        src={`https://cdn.discordapp.com/avatars/${pos.text.discordId}/${pos.text.avatar}?size=80`}
                         alt="Cursor"
                         style={{
                             width: '20px', // adjust as needed
@@ -60,7 +68,7 @@ const Multiplayer = ({ userInfo, parentRef }) => {
                     <div style={{
                         fontSize: '10px', // adjust as needed
                         //... other styles for text, if needed
-                    }}>{pos.text}</div>
+                    }}>{pos.text.global_name}</div>
                 </div>
             ))}
 

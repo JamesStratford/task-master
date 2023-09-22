@@ -69,6 +69,10 @@ io.on('connection', (socket) => {
     // Broadcast the cursor position along with the socket ID to other connected clients
     socket.broadcast.emit('cursorMove', { id: socket.id, ...data });
   });
+
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('cursorRemove', { id: socket.id });
+  });
 });
 
 server.listen(PORT, () => {

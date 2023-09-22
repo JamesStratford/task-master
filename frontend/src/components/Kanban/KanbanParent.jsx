@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { io } from "socket.io-client";
 import KanbanBoard from './KanbanBoard';
+import Multiplayer from './Multiplayer/Multiplayer';
 
 const ChildComponent = ({ id, parentPosition }) => {
     const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -13,6 +14,7 @@ const ChildComponent = ({ id, parentPosition }) => {
                 top: parentPosition.y + position.y,
             }}
         >
+            <Multiplayer />
             <KanbanBoard />
         </div>
     );
@@ -33,6 +35,20 @@ const ParentComponent = () => {
 
         loadChildren();
     }, [position]);
+
+    // Bound mousemove event listener to window
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+
+
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []);
 
     return (
         <div style={{ position: 'relative' }}>

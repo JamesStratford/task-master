@@ -25,6 +25,7 @@ const Multiplayer = ({userInfo}) => {
         // Attach mousemove event listener to the document
         const handleMouseMove = (event) => {
             // Emit cursor move event to the server
+            console.log(userInfo)
             socketRef.current.emit('cursorMove', { x: event.clientX, y: event.clientY, text: userInfo.global_name });
         };
 

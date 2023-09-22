@@ -483,6 +483,7 @@ function KanbanBoard() {
             className="kanban-board"
             ref={provided.innerRef}
             {...provided.droppableProps}
+            style={{ overflow: 'hidden'}}
           >
             {state.columns &&
               state.columns.map((column, index) => {

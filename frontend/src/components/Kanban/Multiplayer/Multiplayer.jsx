@@ -43,17 +43,18 @@ const Multiplayer = ({ userInfo, parentRef }) => {
             {Object.entries(cursors).map(([id, pos]) => (
                 <div key={id} style={{
                     position: 'absolute',
-                    top: `${pos.y}px`,
+                    top: `${pos.y - 10}px`,
                     left: `${pos.x}px`,
                     zIndex: '10000'
                 }}>
                     <img
-                        src={`https://cdn.discordapp.com/avatars/${userInfo.userId}/${userInfo.avatar}?size=80`}
+                        src={`https://cdn.discordapp.com/avatars/${userInfo.discordId}/${userInfo.avatar}?size=80`}
                         alt="Cursor"
                         style={{
                             width: '20px', // adjust as needed
                             height: '20px', // adjust as needed
                             boxShadow: '0px 0px 10px 2px #ffffff', // glow effect
+                            borderRadius: '50%', // rounded corners
                         }}
                     />
                     <div style={{

@@ -10,7 +10,8 @@ import {
     updateColumnTaskIds,
     removeTaskFromColumn,
     updateTask,
-    deleteTask
+    deleteTask,
+    addMeeting 
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import express from 'express';
 import { io } from '../../server.mjs';
@@ -161,5 +162,17 @@ router.put('/reorder-columns', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+router.post('/add-meeting', async (req, res) => {
+    try {
+        const meeting = await addMeeting();
+        res.status(201).json(meeting);  // Send back the created meeting object
+        boardUpdatedHook(io);  // Optionally update the board if necessary
+    } catch (error) {
+        console.error('Error in /addMeeting:', error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
 
 export default router;

@@ -7,4 +7,5 @@ const meetingSchema = new mongoose.Schema({
   nextMeetingId: String
 });
 
-export default mongoose.model('Meeting', meetingSchema);
+const Meeting = mongoose.model('Meeting', meetingSchema);
+export default Meeting;

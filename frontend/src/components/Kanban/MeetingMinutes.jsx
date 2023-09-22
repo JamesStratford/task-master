@@ -43,8 +43,6 @@ function MeetingMinutes() {
     };
 
     const onDragEnd = (result) => {
-        // You can add drag-and-drop sorting logic here if required.
-        // For now, I'm assuming tasks within the Meeting Attendance column are draggable but not droppable outside.
     };
 
     return (

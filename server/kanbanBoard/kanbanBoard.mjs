@@ -1,5 +1,6 @@
 import Task from '../models/kanbanBoard/task.mjs';
 import Column from '../models/kanbanBoard/column.mjs';
+import Meeting from './meeting.model.js';
 
 /**
 *   Add a task to the database
@@ -234,3 +235,23 @@ export const reorderColumns = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+export async function addMeeting(attendees) {
+    const now = new Date();
+    const meetingId = now.toISOString().replace(/[-:.]/g, '');  // creating a unique ID based on the current date and time
+  
+    const meeting = new Meeting({
+      meetingId,
+      content: 'Meeting',
+      attendees,
+      nextMeetingId: '',  // assuming you will update this later
+    });
+  
+    try {
+      await meeting.save();
+      return meeting;
+    } catch (error) {
+      console.error('Error adding meeting:', error);
+      throw error;
+    }
+  }

@@ -13,24 +13,23 @@ const DiscordAuth = (props) => {
     const redirectURI = frontendUrl;
     const url = `https://discord.com/api/oauth2/authorize?client_id=${clientID}&redirect_uri=${encodeURIComponent(redirectURI)}&response_type=code&scope=identify`;
 
-    const handleLogin = (popupCode, params) => {
+    const handleLogin = async (popupCode, params) => {
         const code = params.get('code');
 
         if (code) {
-            axios.get(`${backendUrl}/api/discordAuth/exchange`, {
+            await axios.get(`${backendUrl}/api/discordAuth/exchange`, {
                 withCredentials: true,
                 params: {
                     code: code
                 }
             })
-                .then(response => {
+                .then(async (response) => {
                     const data = response.data;
                     if (data) {
                         if (data.isAuthenticated) {
                             console.log('User Authenticated')
                             if (props.onLogin) {
-                                props.onLogin();
-                                getUserInfo();
+                                await getUserInfo();
                                 setHasFailedLogin(false);
                             }
                         } else {
@@ -45,12 +44,13 @@ const DiscordAuth = (props) => {
         }
     }
 
-    const getUserInfo = () => {
-        axios.get(`${backendUrl}/api/discordAuth/get-user`, { withCredentials: true })
+    const getUserInfo = async () => {
+        await axios.get(`${backendUrl}/api/discordAuth/get-user`, { withCredentials: true })
             .then(response => {
                 const data = response.data;
                 if (data) {
                     setUser(data.user);
+                    props.onLogin(data.user);
                 }
             })
             .catch(error => {
@@ -76,7 +76,6 @@ const DiscordAuth = (props) => {
                 .then(response => {
                     const data = response.data;
                     if (data.isAuthenticated) {
-                        props.onLogin()
                         getUserInfo()
 
                         return true

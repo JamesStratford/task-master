@@ -10,6 +10,7 @@ import Multiplayer from './components/Multiplayer';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const [user, setUser] = useState(null);
   const discordServerId = process.env.REACT_APP_DISCORD_SERVER_ID;
   const discordChannelId = process.env.REACT_APP_DISCORD_CHANNEL_ID;
 
@@ -17,22 +18,23 @@ function App() {
     setActiveTabIndex(index);
   };
 
-  const handleLogin = () => {
+  const handleLogin = (user) => {
+    setUser(user);
     setIsAuthenticated(true);
   }
 
   const handleLogout = () => {
+    setUser(null);
     setIsAuthenticated(false);
     setActiveTabIndex(0);
   }
 
   return (
     <div className="App-header">
-      <DiscordAuth onLogin={handleLogin} onLogout={handleLogout} />
+      <DiscordAuth onLogin={handleLogin} onLogout={handleLogout}/>
       {isAuthenticated && (
         <>
-        <Multiplayer />
-
+        <Multiplayer userInfo={user} />
           <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} on={isAuthenticated} />
           <Tabs onSelect={handleTabSelect}>
             <TabList>

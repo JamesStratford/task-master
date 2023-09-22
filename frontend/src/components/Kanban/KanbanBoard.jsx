@@ -584,7 +584,7 @@ function KanbanBoard() {
                     ...state,
                     tasks: updatedTasks,
                   });
-                  const newTask = state.tasks[taskId];
+                  const newTask = updatedTasks[taskId];
                   // Update the task description in the database
                   await axios.put(
                     `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,

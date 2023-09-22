@@ -108,8 +108,6 @@ body {
   font-size: 14px;
 }
 
-
-
 /* Styling for tasks (resembling cards) */
 .task {
   background-color: #f4f5f7;
@@ -144,7 +142,7 @@ body {
 
 .add-card-button:hover {
   background-color:#2a60b7;
-}
+} 
 
 /* Dim the background when editing a card */
 .dim-background {

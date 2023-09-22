@@ -2,6 +2,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import express from 'express';
 import discordBotKanbanRoutes from '../../routes/discord-bot/kanban.mjs';
+import insertDummyTasks from '../../routes/discord-bot/addDummyTasks.mjs';
 import '../../loadEnvironment.mjs';
 
 const { expect } = chai;
@@ -12,25 +13,24 @@ describe('Discord bot - Kanban API', () => {
 
   before(() => {
     app = express();
-    app.use('/api/discord-bot/kanban/getTasks', (req, res, next) => {
-      if (req.query.userId === '1') {
-        return res.status(200).json({
-          tasks: [
-            { description: 'Dummy task 1', priority: '1' },
-            { description: 'Dummy task 2', priority: '2' },
-            { description: 'Dummy task 3', priority: '1' },
-            { description: 'Dummy task 4', priority: '2' },
-          ],
-        });
-      }
-      next();
-    });
-
     app.use('/api/discord-bot/kanban', discordBotKanbanRoutes);
   });
 
   describe('GET /getTasks', () => {
+    it('should return an error if no userId is provided', (done) => {
+      chai.request(app)
+        .get('/api/discord-bot/kanban/getTasks')
+        .set('Authorization', `Bearer ${process.env.BOT_SERVER_AUTH_TOKEN}`)
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body).to.have.property('error', 'User ID is required');
+          done();
+        });
+    });
+
     it('should return tasks based on userId', (done) => {
+      //insertDummyTasks("1");
+
       chai.request(app)
         .get('/api/discord-bot/kanban/getTasks')
         .query({ userId: 1 })
@@ -54,4 +54,3 @@ describe('Discord bot - Kanban API', () => {
     });
   });
 });
-

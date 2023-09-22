@@ -1,39 +1,21 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url); // Initialize createRequire
 import express from "express";
 import cors from "cors";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import discordRoutes from "./routes/discordAuth.mjs"
-import discordKanbanRoutes from "./routes/discord-bot/kanban.mjs";
-import kanbanRoutes from "./routes/kanbanBoard/kanbanBoardRoutes.mjs";
+import discordBotKanbanRoutes from "./routes/kanbanBoard/kanbanBoardRoutes.mjs";
 import "./loadEnvironment.mjs";
-const socketIo = require('socket.io');
-import { createServer } from 'http';
 
 const PORT = process.env.PORT || 5050;
 const app = express();
-const server = createServer(app);
 
 app.use(express.json());
 
-const allowedOrigins = [
-  `${process.env.ORIGIN}`,
-  `${process.env.FRONTEND_ORIGIN}`,
-];
+app.use(cors({
+  origin: `${process.env.ORIGIN}:${process.env.FRONTEND_PORT}`,
+  credentials: true
+}));
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -48,20 +30,10 @@ app.use(session({
 }))
 
 app.use("/api/discordAuth", discordRoutes);
-app.use("/api/discord-bot/kanban", discordKanbanRoutes);
-app.use("/api/kanban", kanbanRoutes);
+app.use("/api/kanban", discordBotKanbanRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-const io = socketIo(server, {
-  cors: corsOptions
-});
-
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-export { io };
 export default app

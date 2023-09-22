@@ -31,10 +31,9 @@ function App() {
 
   return (
     <div className="App-header">
-      <DiscordAuth onLogin={handleLogin} onLogout={handleLogout}/>
+      <DiscordAuth onLogin={handleLogin} onLogout={handleLogout} />
       {isAuthenticated && (
         <>
-        <Multiplayer userInfo={user} />
           <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} on={isAuthenticated} />
           <Tabs onSelect={handleTabSelect}>
             <TabList>
@@ -45,6 +44,8 @@ function App() {
             </TabList>
 
             <TabPanel>
+              <Multiplayer userInfo={user} />
+
               <h2>Kanban</h2>
               <KanbanBoard />
             </TabPanel>

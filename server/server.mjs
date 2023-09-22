@@ -14,15 +14,25 @@ const PORT = process.env.PORT || 5050;
 const app = express();
 const server = createServer(app);
 
-
 app.use(express.json());
 
+const allowedOrigins = [
+  `${process.env.ORIGIN}`,
+  `${process.env.FRONTEND_ORIGIN}`,
+];
 
-app.use(cors({
-  origin: `${process.env.ORIGIN}:${process.env.FRONTEND_PORT}`,
-  credentials: true
-}));
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
 
+app.use(cors(corsOptions));
 
 app.use(session({
   secret: process.env.SESSION_SECRET,
@@ -39,11 +49,12 @@ app.use(session({
 app.use("/api/discordAuth", discordRoutes);
 app.use("/api/kanban", discordBotKanbanRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 const io = socketIo(server, {
-  cors: {
-    origin: `${process.env.ORIGIN}:${process.env.FRONTEND_PORT}`,
-    methods: ["GET", "POST"],
-  },
+  cors: corsOptions
 });
 
 server.listen(PORT, () => {

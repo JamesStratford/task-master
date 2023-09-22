@@ -45,10 +45,7 @@ function App() {
             </TabList>
 
             <TabPanel>
-              <Multiplayer userInfo={user} />
-
-              <h2>Kanban</h2>
-              <KanbanParent />
+              <KanbanParent userInfo={user} />
             </TabPanel>
 
             <TabPanel>

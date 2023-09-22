@@ -13,9 +13,8 @@ describe('Socket.io Server Tests', () => {
   before((done) => {
     const httpServer = require('http').createServer();
     const ioServer = new Server(httpServer);
-    httpServer.listen(() => {
-      const port = httpServer.address().port;
-      clientSocket = io(`${process.env.ORIGIN}:${port}`);
+    httpServer.listen(process.env.PORT || 5050, () => {
+      clientSocket = io(`${process.env.ORIGIN}`);
       ioServer.on('connection', (socket) => {
         serverSocket = socket;
         done();

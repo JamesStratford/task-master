@@ -20,7 +20,6 @@ module.exports = {
                 }
             });
             const tasks = response.data.tasks;
-
             // Sort tasks by priority
             tasks.sort((a, b) => a.priority - b.priority);
 

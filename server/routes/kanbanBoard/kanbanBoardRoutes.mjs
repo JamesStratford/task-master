@@ -27,7 +27,7 @@ router.delete('/delete-task', async (req, res) => {
 });
 
 
-router.get('/add-column', async (req, res) => {
+router.post('/add-column', async (req, res) => {
     const column = req.query.column;
     try {
         await addColumn({ body: { column } }, res);
@@ -37,7 +37,7 @@ router.get('/add-column', async (req, res) => {
 });
 
 router.delete('/delete-column', async (req, res) => {
-    const { columnId } = req.body; 
+    const { columnId } = req.body;
     try {
       await deleteColumn({ body: { id: columnId } }, res);
       res.status(200).json({ message: 'Column deleted successfully' });

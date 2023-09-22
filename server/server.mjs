@@ -17,6 +17,9 @@ const server = createServer(app);
 app.use(express.json());
 
 const allowedOrigins = [
+  'http://localhost:53134',
+  'http://localhost:5050',
+
   `${process.env.ORIGIN}`,
   `${process.env.FRONTEND_ORIGIN}`,
 ];
@@ -55,6 +58,15 @@ app.get("/", (req, res) => {
 
 const io = socketIo(server, {
   cors: corsOptions
+});
+
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('cursorMove', (data) => {
+    // Broadcast the cursor position along with the socket ID to other connected clients
+    socket.broadcast.emit('cursorMove', { id: socket.id, ...data });
+  });
 });
 
 server.listen(PORT, () => {

@@ -5,6 +5,7 @@ import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
 import KanbanBoard from './components/Kanban/KanbanBoard';
+import Multiplayer from './components/Multiplayer';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -30,6 +31,8 @@ function App() {
       <DiscordAuth onLogin={handleLogin} onLogout={handleLogout} />
       {isAuthenticated && (
         <>
+        <Multiplayer />
+
           <DiscordWidgetCrate server={discordServerId} channel={discordChannelId} on={isAuthenticated} />
           <Tabs onSelect={handleTabSelect}>
             <TabList>
@@ -61,6 +64,7 @@ function App() {
               visible={activeTabIndex === 3} // Show only when the Discord tab is active
             />
           </Tabs>
+
         </>
       )}
     </div>

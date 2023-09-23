@@ -23,6 +23,7 @@ const allowedOrigins = [
 
   `${process.env.ORIGIN}`,
   `${process.env.FRONTEND_ORIGIN}`,
+  '*'
 ];
 
 const corsOptions = {

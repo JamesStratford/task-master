@@ -4,8 +4,6 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import React, { useState } from 'react';
 import DiscordAuth from './components/DiscordOAuth';
-import KanbanBoard from './components/Kanban/KanbanBoard';
-import Multiplayer from './components/Kanban/Multiplayer/Multiplayer';
 import KanbanParent from './components/Kanban/KanbanParent';
 
 function App() {
@@ -20,14 +18,14 @@ function App() {
   };
 
   const handleLogin = (user) => {
-    setUser(user);
     setIsAuthenticated(true);
+    setUser(user);
   }
 
   const handleLogout = () => {
-    setUser(null);
     setIsAuthenticated(false);
     setActiveTabIndex(0);
+    setUser(null);
   }
 
   return (

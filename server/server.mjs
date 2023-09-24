@@ -64,8 +64,6 @@ const io = socketIo(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log('New client connected');
-
   socket.on('cursorMove', (data) => {
     // Broadcast the cursor position along with the socket ID to other connected clients
     socket.broadcast.emit('cursorMove', { id: socket.id, ...data });

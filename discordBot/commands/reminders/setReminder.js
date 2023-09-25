@@ -52,11 +52,14 @@ module.exports = {
                 .setColor("Blue")
                 .setDescription(`Reminder for: "${reminder}"  has been triggered!`);
 
-            // Send the embed (optional)
-            await interaction.followUp({ embeds: [embed] });
+            await interaction.followUp({ embeds: [embedTrigger] });
         });
 
         // Reply to the user with confirmation
-        await interaction.reply(`Reminder set: "${reminder}" for ${days} days, ${hours} hours, and ${minutes} minutes from now`);
+        const embedSet = new EmbedBuilder()
+            .setColor("Blue")
+            .setDescription(`Reminder for "${reminder}" has been set to trigger in ${days} days, ${hours} hours, and ${minutes} minutes from now`);
+
+        await interaction.reply({ embeds: [embedSet] });
     },
 };

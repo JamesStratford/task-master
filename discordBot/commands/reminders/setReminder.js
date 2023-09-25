@@ -50,7 +50,7 @@ module.exports = {
 
             const embedTrigger = new EmbedBuilder()
                 .setColor("Blue")
-                .setDescription(`Reminder for: "${reminder}"  has been triggered!`);
+                .setDescription(`Reminder for "${reminder}" has been triggered!`);
 
             await interaction.followUp({ embeds: [embedTrigger] });
         });

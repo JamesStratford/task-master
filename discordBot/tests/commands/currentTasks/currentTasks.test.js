@@ -1,6 +1,6 @@
 const axios = require("axios");
 const MockAdapter = require("axios-mock-adapter");
-const command = require("../../../commands/currentTasks/currentTasks.js");
+const command = require("../../../commands/viewTasks/currentTasks.js");
 
 // Mocking discord.js interaction
 const mockInteraction = {

@@ -1,5 +1,5 @@
 import express from 'express';
-import db from '../../db/conn.mjs';
+import Task from '../../models/kanbanBoard/task.mjs';
 import "../../loadEnvironment.mjs";
 
 const router = express.Router();
@@ -10,7 +10,6 @@ router.get('/getTasks', async (req, res) => {
         return res.status(403).json({ error: 'Unauthorized' });
     }
 
-
     const userId = req.query.userId;
 
     if (!userId) {
@@ -18,8 +17,7 @@ router.get('/getTasks', async (req, res) => {
     }
 
     try {
-        const tasks = await db.collection('tasks').find({ userId }).toArray();
-
+        const tasks = await Task.find({ userId : userId });
         res.status(200).json({ tasks });
     } catch (err) {
         console.error("Error fetching tasks:", err.message);

@@ -47,8 +47,6 @@ module.exports = {
 
     if (!column) {
       // Create an embedded message for the error
-
-      
       const errorEmbed = new EmbedBuilder()
         .setColor("#FF0000")
         .setTitle("Error")

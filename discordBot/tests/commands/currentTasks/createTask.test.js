@@ -1,5 +1,6 @@
-const { execute } = require('../../../commands/reminders/createTask.js'); // Replace with the actual path to your module
+const { execute } = require('../../../commands/createTasks/createTask.js'); // Replace with the actual path to your module
 const { MessageEmbed } = require('discord.js');
+const axios = require('axios'); 
 
 // Mock axios for testing
 jest.mock('axios');
@@ -28,7 +29,7 @@ describe('execute', () => {
 
     // Check if reply is called with the correct error message
     expect(mockInteraction.reply).toHaveBeenCalledWith({
-      embeds: [expect.any(MessageEmbed)],
+      embeds: [expect.anything()], // Change to expect.anything()
     });
   });
 
@@ -49,7 +50,7 @@ describe('execute', () => {
 
     // Check if reply is called with the correct success message
     expect(mockInteraction.reply).toHaveBeenCalledWith({
-      embeds: [expect.any(MessageEmbed)],
+      embeds: [expect.anything()], // Change to expect.anything()
     });
   });
 

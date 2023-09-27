@@ -5,7 +5,9 @@ import cors from "cors";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import discordRoutes from "./routes/discordAuth.mjs"
-import discordBotKanbanRoutes from "./routes/kanbanBoard/kanbanBoardRoutes.mjs";
+import discordKanbanRoutes from "./routes/discord-bot/kanban.mjs";
+import kanbanRoutes from "./routes/kanbanBoard/kanbanBoardRoutes.mjs";
+import discordWidgetRoutes from "./routes/discordWidget.mjs";
 import "./loadEnvironment.mjs";
 const socketIo = require('socket.io');
 import { createServer } from 'http';
@@ -17,8 +19,12 @@ const server = createServer(app);
 app.use(express.json());
 
 const allowedOrigins = [
+  'http://localhost:53134',
+  'http://localhost:5050',
+
   `${process.env.ORIGIN}`,
   `${process.env.FRONTEND_ORIGIN}`,
+  '*'
 ];
 
 const corsOptions = {
@@ -47,7 +53,9 @@ app.use(session({
 }))
 
 app.use("/api/discordAuth", discordRoutes);
-app.use("/api/kanban", discordBotKanbanRoutes);
+app.use("/api/discord-bot/kanban", discordKanbanRoutes);
+app.use("/api/kanban", kanbanRoutes);
+app.use("/api/discordWidget", discordWidgetRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -55,6 +63,17 @@ app.get("/", (req, res) => {
 
 const io = socketIo(server, {
   cors: corsOptions
+});
+
+io.on('connection', (socket) => {
+  socket.on('cursorMove', (data) => {
+    // Broadcast the cursor position along with the socket ID to other connected clients
+    socket.broadcast.emit('cursorMove', { id: socket.id, ...data });
+  });
+
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('cursorRemove', { id: socket.id });
+  });
 });
 
 server.listen(PORT, () => {

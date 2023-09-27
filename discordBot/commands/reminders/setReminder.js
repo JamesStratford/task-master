@@ -47,19 +47,19 @@ module.exports = {
         // Schedule a reminder using node-schedule
         const scheduledTime = new Date(Date.now() + timeInMinutes * 60 * 1000);
         const job = schedule.scheduleJob(scheduledTime, async () => {
-            // Send the reminder message
-            await interaction.followUp(`Reminder: "${reminder}"`);
 
-            // Optionally, you can also send an embed or additional information here
-            const embed = new EmbedBuilder()
+            const embedTrigger = new EmbedBuilder()
                 .setColor("Blue")
-                .setDescription(`Your reminder: "${reminder}"`);
+                .setDescription(`Reminder for "${reminder}" has been triggered!`);
 
-            // Send the embed (optional)
-            await interaction.followUp({ embeds: [embed] });
+            await interaction.followUp({ embeds: [embedTrigger] });
         });
 
         // Reply to the user with confirmation
-        await interaction.reply(`Reminder set: "${reminder}" for ${days} days, ${hours} hours, and ${minutes} minutes from now`);
+        const embedSet = new EmbedBuilder()
+            .setColor("Blue")
+            .setDescription(`Reminder for "${reminder}" has been set to trigger in ${days} days, ${hours} hours, and ${minutes} minutes from now`);
+
+        await interaction.reply({ embeds: [embedSet] });
     },
 };

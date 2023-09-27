@@ -8,46 +8,47 @@ module.exports = {
     .addStringOption((option) =>
       option
         .setName("task_name")
-        .setDescription("Enter the name of the task you want to create")
+        .setDescription("Enter the task title")
         .setRequired(true)
     )
     .addStringOption((option) =>
       option
-        .setName("column_id")
+        .setName("column_name") // Change the option name to "column_name"
         .setDescription(
-          "Enter the id of the column you want to add the task to"
+          "Enter the name of the column you want to add this task to" // Update description
         )
         .setRequired(true)
     )
     .addStringOption((option) =>
       option
         .setName("due_date")
-        .setDescription("Enter the due date of the task you want to create")
+        .setDescription("When will this task be due?")
     )
     .addStringOption((option) =>
       option
         .setName("task_description")
-        .setDescription("Enter the description of the task you want to create")
+        .setDescription("Enter a description for this task")
     ),
 
   async execute(interaction) {
     // Identify user
     const userId = interaction.user.id;
 
-    // To be implemented later...
+    // Get the provided column name
+    const columnName = interaction.options.getString("column_name");
 
-    // let columnName = interaction.options.getString("column_name")
+    // Fetch the columns from your kanban board API (replace with your actual API endpoint)
+    const columns = await axios.get(`${process.env.SERVER_ORIGIN}/api/kanban/get-columns`);
 
-    // const columns = axios.get(`${process.env.SERVER_ORIGIN}/api/kanban/get-columns`)
+    // Find the column by name
+    const column = columns.data.find((col) => col.title === columnName);
 
-    // console.log(`Columns: ${columns}`);
+    if (!column) {
+      await interaction.reply(`Column "${columnName}" not found.`);
+      return;
+    }
 
-    // const columnId = columns.find(column => column.title === columnName).id
-
-
-    
     // Create a new task to be added to the database
-
     let newCard = {
       taskId: `task-${Date.now()}`,
       content: interaction.options.getString("task_name"),
@@ -57,13 +58,12 @@ module.exports = {
       nextTaskId: "",
     };
 
-    // Add task to database
-
+    // Add the task to the specified column
     axios.post(`${process.env.SERVER_ORIGIN}/api/kanban/add-task`, {
-      columnId: interaction.options.getString("column_id"),
+      columnId: column.id,
       newCard: newCard,
     });
 
-    await interaction.reply(`Your task ${newCard.content} has been created!`);
+    await interaction.reply(`Your task ${newCard.content} has been created and added to the "${column.title}" column!`);
   },
 };

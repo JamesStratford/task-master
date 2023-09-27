@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import OauthPopup from 'react-oauth-popup';
 
@@ -8,29 +8,29 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 const DiscordAuth = (props) => {
     const [user, setUser] = useState(null);
     const [hasFailedLogin, setHasFailedLogin] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const clientID = process.env.REACT_APP_DISCORD_APP_CLIENT_ID;
     const redirectURI = frontendUrl;
     const url = `https://discord.com/api/oauth2/authorize?client_id=${clientID}&redirect_uri=${encodeURIComponent(redirectURI)}&response_type=code&scope=identify`;
 
-    const handleLogin = (popupCode, params) => {
+    const handleLogin = async (popupCode, params) => {
         const code = params.get('code');
 
         if (code) {
-            axios.get(`${backendUrl}/api/discordAuth/exchange`, {
+            await axios.get(`${backendUrl}/api/discordAuth/exchange`, {
                 withCredentials: true,
                 params: {
                     code: code
                 }
             })
-                .then(response => {
+                .then(async (response) => {
                     const data = response.data;
                     if (data) {
                         if (data.isAuthenticated) {
                             console.log('User Authenticated')
                             if (props.onLogin) {
-                                props.onLogin();
-                                getUserInfo();
+                                await getUserInfo();
                                 setHasFailedLogin(false);
                             }
                         } else {
@@ -45,30 +45,31 @@ const DiscordAuth = (props) => {
         }
     }
 
-    const getUserInfo = () => {
-        axios.get(`${backendUrl}/api/discordAuth/get-user`, { withCredentials: true })
-            .then(response => {
-                const data = response.data;
-                if (data) {
-                    setUser(data.user);
-                }
-            })
-            .catch(error => {
-                console.error('Failed to fetch user data:', error);
-            });
-    }
+    const getUserInfo = useCallback(async () => {
+        try {
+            const response = await axios.get(`${backendUrl}/api/discordAuth/get-user`, { withCredentials: true });
+            const data = response.data;
+            if (data) {
+                setUser(data.user);
+                props.onLogin(data.user);
+            }
+        } catch (error) {
+            console.error('Failed to fetch user data:', error);
+        }
+    }, [setUser, props]);
+    
 
     const handleLogout = () => {
         axios.get(`${backendUrl}/api/discordAuth/logout`, { withCredentials: true })
             .then(response => {
                 setUser(null);
                 props.onLogout();
+                setIsAuthenticated(false);
             })
             .catch(error => {
                 console.error('Failed to log out:', error);
             });
     };
-
 
     useEffect(() => {
         const checkAuth = () => {
@@ -76,8 +77,8 @@ const DiscordAuth = (props) => {
                 .then(response => {
                     const data = response.data;
                     if (data.isAuthenticated) {
-                        props.onLogin()
                         getUserInfo()
+                        setIsAuthenticated(true);
 
                         return true
                     }
@@ -87,8 +88,10 @@ const DiscordAuth = (props) => {
                 });
         }
 
-        checkAuth()
-    }, [props]);
+        if (!isAuthenticated) {
+            checkAuth();
+        }
+    }, [isAuthenticated, getUserInfo]);
 
     return (
         <div>

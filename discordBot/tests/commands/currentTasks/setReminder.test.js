@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 const schedule = require("node-schedule");
 const { execute } = require("../../../commands/reminders/setReminder.js");
 

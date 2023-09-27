@@ -13,11 +13,11 @@ module.exports = {
     )
     .addStringOption((option) =>
       option
-        .setName("column_name") // Change the option name to "column_name"
+        .setName("column_name")
         .setDescription(
-          "Enter the name of the column you want to add this task to" // Update description
+          "Enter the name of the column you want to add this task to"
         )
-        .setRequired(true)
+        .setRequired(false)
     )
     .addStringOption((option) =>
       option
@@ -34,17 +34,19 @@ module.exports = {
     // Identify user
     const userId = interaction.user.id;
 
-    // Get the provided column name
+    // Get the provided column name or use a default value (e.g., the first column name)
     const columnName = interaction.options.getString("column_name");
 
     // Fetch the columns from your kanban board API (replace with your actual API endpoint)
     const columns = await axios.get(`${process.env.SERVER_ORIGIN}/api/kanban/get-columns`);
 
-    // Find the column by name
-    const column = columns.data.find((col) => col.title === columnName);
+    // Find the column by name or use the first column if not found
+    const column = columnName
+      ? columns.data.find((col) => col.title === columnName)
+      : columns.data[0];
 
     if (!column) {
-      await interaction.reply(`Column "${columnName}" not found.`);
+      await interaction.reply(`Column "${columnName}" not found. Task will be added to the first column.`);
       return;
     }
 

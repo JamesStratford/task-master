@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const axios = require("axios");
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
       option
         .setName("column_name")
         .setDescription(
-          "Enter the name of the column you want to add this task to"
+          "Enter the column you want to add this task to"
         )
         .setRequired(false)
     )
@@ -46,7 +46,15 @@ module.exports = {
       : columns.data[0];
 
     if (!column) {
-      await interaction.reply(`Column "${columnName}" not found. Task will be added to the first column.`);
+      // Create an embedded message for the error
+
+      
+      const errorEmbed = new EmbedBuilder()
+        .setColor("#FF0000")
+        .setTitle("Error")
+        .setDescription(`Column "${columnName}" not found. Task will be added to the first column.`);
+
+      await interaction.reply({ embeds: [errorEmbed] });
       return;
     }
 
@@ -66,6 +74,12 @@ module.exports = {
       newCard: newCard,
     });
 
-    await interaction.reply(`Your task ${newCard.content} has been created and added to the "${column.title}" column!`);
+    // Create an embedded message for the success
+    const successEmbed = new EmbedBuilder()
+      .setColor("#00FF00")
+      .setTitle("Task Created")
+      .setDescription(`Your task "${newCard.content}" has been created and added to the "${column.title}" column!`);
+
+    await interaction.reply({ embeds: [successEmbed] });
   },
 };

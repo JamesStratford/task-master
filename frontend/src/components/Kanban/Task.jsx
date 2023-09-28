@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { MultiplayerContext } from "./Multiplayer/MultiplayerContext";
 
 const Task = ({
@@ -15,8 +15,14 @@ const Task = ({
     const { remoteDrags, cursors } = useContext(MultiplayerContext);  // Access both state variables in one useContext call
     const isBeingDraggedRemotely = remoteDrags.hasOwnProperty(task.taskId);
     const remoteDrag = isBeingDraggedRemotely ? remoteDrags[task.taskId] : null;
-    const cursor = cursors[remoteDrag?.user.discordId];
+    const cursor = cursors[remoteDrag?.user];
     const cursorPosition = cursor;
+
+    useEffect(() => {
+        console.log(remoteDrag)
+        console.log(cursors)
+        console.log(cursor)
+    }, [cursor, remoteDrag])
 
     const modifiedStyle = isBeingDraggedRemotely && cursorPosition
         ? {

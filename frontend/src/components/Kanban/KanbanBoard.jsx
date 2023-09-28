@@ -4,15 +4,15 @@ import CardOverlay from "./CardOverlay";
 import axios from "axios";
 import Task from "./Task";
 import Column from "./Column";
-import { io } from "socket.io-client";
+import { SocketContext } from "./Multiplayer/SocketContext";
 import { MultiplayerContext } from "./Multiplayer/MultiplayerContext";
 
-function KanbanBoard() {
+function KanbanBoard({userInfo}) {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
-  const [socket, setSocket] = useState(null);
+  const socket = useContext(SocketContext);
   const { remoteDrags } = useContext(MultiplayerContext);
 
   const [state, setState] = useState({
@@ -33,17 +33,11 @@ function KanbanBoard() {
   }, []);
 
   useEffect(() => {
-    const newSocket = io(process.env.REACT_APP_BACKEND_URL);
-
-    setSocket(newSocket);
-
     // Board updated
-    newSocket.on('updateBoard', (updatedBoard) => {
+    socket.on('updateBoard', (updatedBoard) => {
       setState(updatedBoard);
     });
-
-    return () => newSocket.disconnect();
-  }, []);
+  }, [socket]);
 
   const toggleOverlay = (taskId) => {
     if (isOverlayOpen) {
@@ -480,17 +474,17 @@ function KanbanBoard() {
     <DragDropContext
       onDragStart={(start) => {
         // Emit socket.io event for drag start
-        socket.emit('dragStart', { ...start });
+        socket.emit('dragStart', { ...start, userInfo });
       }}
       onDragUpdate={(update) => {
         // Emit socket.io event for drag update
-        socket.emit('dragUpdate', { ...update });
+        socket.emit('dragUpdate', { ...update, userInfo : userInfo });
       }}
       onDragEnd={(result) => {
         onDragEnd(result);
 
         // Emit socket.io event for drag end
-        socket.emit('dragEnd', { ...result });
+        socket.emit('dragEnd', { ...result, userInfo : userInfo });
       }}
     >
       <Droppable droppableId="all-columns" direction="horizontal" type="column">

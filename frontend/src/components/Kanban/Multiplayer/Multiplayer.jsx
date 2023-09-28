@@ -12,7 +12,7 @@ const Cursor = ({ id, pos }) => (
         zIndex: '10000'
     }}>
         <img
-            src={`https://cdn.discordapp.com/avatars/${pos.text.discordId}/${pos.text.avatar}?size=80`}
+            src={`https://cdn.discordapp.com/avatars/${pos.discordId}/${pos.avatar}?size=80`}
             alt="Cursor"
             style={{
                 width: '20px',
@@ -22,7 +22,7 @@ const Cursor = ({ id, pos }) => (
             }}
         />
         <div style={{ fontSize: '10px' }}>
-            {pos.text.global_name}
+            {pos.text}
         </div>
     </div>
 );
@@ -32,20 +32,27 @@ const Multiplayer = ({ userInfo, parentRef }) => {
     const myCursor = useRef(null);
     const socket = useContext(SocketContext);
     const { setRemoteDrags, cursors, setCursors } = useContext(MultiplayerContext);
+    const cursorsRef = useRef(cursors);
+
+    useEffect(() => {
+        cursorsRef.current = cursors;
+    }, [cursors]);
 
     useEffect(() => {
         if (!socket) return;
 
         const handleDragStart = (data) => {
-            if (myCursor.current) {
-                setRemoteDrags(prevRemoteDrags => ({
-                    ...prevRemoteDrags,
-                    [data.draggableId]: {
-                        user: userInfo,  // Mark this item as being dragged remotely
-                        cursor: {x:myCursor.current.x, y:myCursor.current.y}
+            setRemoteDrags(prevRemoteDrags => {
+                const updatedRemoteDrags = { ...prevRemoteDrags };
+                updatedRemoteDrags[data.draggableId] = {
+                    user: data.id,
+                    cursor: {
+                        x: cursorsRef.current[data.id]?.x,
+                        y: cursorsRef.current[data.id]?.y
                     }
-                }));
-            }
+                };
+                return updatedRemoteDrags;
+            });
         };
 
         const handleDragEnd = (data) => {
@@ -66,31 +73,32 @@ const Multiplayer = ({ userInfo, parentRef }) => {
     }, [socket, setRemoteDrags, userInfo]);
 
     // Socket Event Handlers
-    const handleSocketEvents = () => {
-        if (!socket) return;
-        socket.on('cursorMove', handleCursorMove);
-        socket.on('cursorRemove', handleCursorRemove);
-        return () => {
-            socket.disconnect();
+    useEffect(() => {
+        const handleSocketEvents = () => {
+            if (!socket) return;
+            socket.on('cursorMove', handleCursorMove);
+            socket.on('cursorRemove', handleCursorRemove);
+            return () => {
+                socket.disconnect();
+            };
         };
-    };
-
-    const handleCursorMove = (data) => {
-        setCursors((prevCursors) => ({
-            ...prevCursors,
-            [data.discordId]: { x: data.x, y: data.y, text: data.text }  // Use data.discordId as the key
-        }));
-    };
-
-    const handleCursorRemove = (data) => {
-        setCursors((prevCursors) => {
-            const updatedCursors = { ...prevCursors };
-            delete updatedCursors[data.discordId];  // Use data.discordId as the key
-            return updatedCursors;
-        });
-    };
-
-    useEffect(handleSocketEvents, [socket]);
+    
+        const handleCursorMove = (data) => {
+            setCursors((prevCursors) => ({
+                ...prevCursors,
+                [data.id]: { x: data.x, y: data.y, discordId: data.discordId, avatar: data.avatar, text: data.text }
+            }));
+        };
+    
+        const handleCursorRemove = (data) => {
+            setCursors((prevCursors) => {
+                const updatedCursors = { ...prevCursors };
+                delete updatedCursors[data.id];
+                return updatedCursors;
+            });
+        };
+        handleSocketEvents();
+    }, [socket]);
 
 
     useEffect(() => {
@@ -100,7 +108,7 @@ const Multiplayer = ({ userInfo, parentRef }) => {
             const x = event.clientX - bounds.left;
             const y = event.clientY - bounds.top;
             myCursor.current = { x, y };  // Update cursor position
-            socket.emit('cursorMove', { x, y, discordId: userInfo.discordId, text: userInfo ? userInfo : '' });  // Include discordId
+            socket.emit('cursorMove', { x, y, discordId: userInfo.discordId, avatar : userInfo.avatar, text: userInfo ? userInfo.global_name : ''});  // Include discordId
         };
 
         if (!parentRef.current) return;

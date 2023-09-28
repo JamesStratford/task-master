@@ -6,11 +6,6 @@ export const MultiplayerProvider = ({ children, parentRef }) => {
     const [cursors, setCursors] = useState({});
     const [remoteDrags, setRemoteDrags] = useState({});
 
-    useEffect(() => {
-        console.log("Remote Drags", remoteDrags)
-    }
-    , [remoteDrags]);
-
     return (
         <MultiplayerContext.Provider
             value={{

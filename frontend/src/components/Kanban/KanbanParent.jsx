@@ -4,7 +4,7 @@ import Multiplayer from './Multiplayer/Multiplayer';
 import { SocketProvider } from './Multiplayer/SocketContext';
 import { MultiplayerProvider } from './Multiplayer/MultiplayerContext';
 
-const ChildComponent = ({ id, parentPosition }) => {
+const ChildComponent = ({ id, userInfo, parentPosition }) => {
     const [position, setPosition] = useState({ x: 0, y: 0 });
 
     return (
@@ -15,7 +15,7 @@ const ChildComponent = ({ id, parentPosition }) => {
                 top: parentPosition.y + position.y,
             }}
         >
-            <KanbanBoard />
+            <KanbanBoard userInfo={userInfo}/>
         </div>
     );
 };
@@ -56,7 +56,7 @@ const ParentComponent = ({ userInfo }) => {
                 >
                     <div style={{ position: 'relative' }}>
                         {children.map(child =>
-                            <ChildComponent key={child.id} {...child} />
+                            <ChildComponent userInfo={userInfo} key={child.id} {...child} />
                         )}
                         <Multiplayer userInfo={userInfo} parentRef={parentRef} />
                     </div>

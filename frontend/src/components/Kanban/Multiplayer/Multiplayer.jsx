@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { SocketContext } from './SocketContext';
+import { MultiplayerContext } from './MultiplayerContext';
 
 // Sub-component to render each cursor
 const Cursor = ({ id, pos }) => (
@@ -30,6 +31,33 @@ const Cursor = ({ id, pos }) => (
 const Multiplayer = ({ userInfo, parentRef }) => {
     const [cursors, setCursors] = useState({});
     const socket = useContext(SocketContext);
+    const { setRemoteDrags } = useContext(MultiplayerContext);
+    useEffect(() => {
+        if (!socket) return;
+    
+        const handleDragStart = (data) => {
+          setRemoteDrags(prevRemoteDrags => ({
+            ...prevRemoteDrags,
+            [data.draggableId]: true  // Mark this item as being dragged remotely
+          }));
+        };
+    
+        const handleDragEnd = (data) => {
+          setRemoteDrags(prevRemoteDrags => {
+            const updatedRemoteDrags = { ...prevRemoteDrags };
+            delete updatedRemoteDrags[data.draggableId];  // Mark this item as no longer being dragged remotely
+            return updatedRemoteDrags;
+          });
+        };
+    
+        socket.on('dragStart', handleDragStart);
+        socket.on('dragEnd', handleDragEnd);
+    
+        return () => {
+          socket.off('dragStart', handleDragStart);
+          socket.off('dragEnd', handleDragEnd);
+        };
+      }, [socket, setRemoteDrags]);
 
     // Socket Event Handlers
     const handleSocketEvents = () => {

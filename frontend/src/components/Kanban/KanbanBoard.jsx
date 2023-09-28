@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CardOverlay from "./CardOverlay";
 import axios from "axios";
 import Task from "./Task";
 import Column from "./Column";
 import { io } from "socket.io-client";
+import { MultiplayerContext } from "./Multiplayer/MultiplayerContext";
 
 function KanbanBoard() {
   const [editingTaskId, setEditingTaskId] = useState(null);
@@ -12,6 +13,7 @@ function KanbanBoard() {
   const [currentTask, setCurrentTask] = useState(null);
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
   const [socket, setSocket] = useState(null);
+  const { remoteDrags } = useContext(MultiplayerContext);
 
   const [state, setState] = useState({
     tasks: {},
@@ -38,7 +40,7 @@ function KanbanBoard() {
     // Board updated
     newSocket.on('updateBoard', (updatedBoard) => {
       setState(updatedBoard);
-    });   
+    });
 
     return () => newSocket.disconnect();
   }, []);
@@ -144,7 +146,7 @@ function KanbanBoard() {
   const updateColumns = async (columns) => {
     try {
       const updatedColumns = [];
-  
+
       // Iterate through the columns and update their nextColumnId
       for (let i = 0; i < columns.length; i++) {
         const column = columns[i];
@@ -152,13 +154,13 @@ function KanbanBoard() {
         column.nextColumnId = nextColumnId; // Update the nextColumnId property of the column
         updatedColumns.push(column);
       }
-      
+
       // Update the local state with the updated columns
       setState({
         ...state,
         columns: updatedColumns,
       });
-  
+
       // Update the database to reflect the changes
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/reorder-columns`,
@@ -169,7 +171,7 @@ function KanbanBoard() {
     } catch (error) {
       console.error("Failed to update column order in the database:", error);
     }
-  };  
+  };
 
   const addColumn = async (newColumnTitle) => {
     if (newColumnTitle.trim() === "") {
@@ -476,14 +478,29 @@ function KanbanBoard() {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext
+      onDragStart={(start) => {
+        // Emit socket.io event for drag start
+        socket.emit('dragStart', { ...start });
+      }}
+      onDragUpdate={(update) => {
+        // Emit socket.io event for drag update
+        socket.emit('dragUpdate', { ...update });
+      }}
+      onDragEnd={(result) => {
+        onDragEnd(result);
+
+        // Emit socket.io event for drag end
+        socket.emit('dragEnd', { ...result });
+      }}
+    >
       <Droppable droppableId="all-columns" direction="horizontal" type="column">
         {(provided) => (
           <div
             className="kanban-board"
             ref={provided.innerRef}
             {...provided.droppableProps}
-            style={{ overflow: 'hidden'}}
+            style={{ overflow: 'hidden' }}
           >
             {state.columns &&
               state.columns.map((column, index) => {
@@ -539,6 +556,10 @@ function KanbanBoard() {
                                         updateCardContent={updateCardContent}
                                         setEditingTaskId={setEditingTaskId}
                                         provided={provided}
+                                        style={{
+                                          ...provided.draggableProps.style,
+                                          backgroundColor: remoteDrags[String(task.taskId)] ? 'red' : 'white', // Change background color if being dragged remotely
+                                        }}
                                       />
                                     )}
                                   </Draggable>

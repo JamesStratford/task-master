@@ -8,6 +8,7 @@ const Task = ({
     removeCard,
     openOverlay,
     provided,
+    style
 }) => {
     const [localContent, setLocalContent] = useState(task.content);
 
@@ -18,6 +19,7 @@ const Task = ({
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             onDoubleClick={() => setEditingTaskId(task.taskId)}
+            style={{ ...style }}
         >
             {isEditing === task.taskId ? (
                 <div className="task-content">

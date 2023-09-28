@@ -70,9 +70,22 @@ io.on('connection', (socket) => {
     // Broadcast the cursor position along with the socket ID to other connected clients
     socket.broadcast.emit('cursorMove', { id: socket.id, ...data });
   });
-
+  
   socket.on('disconnect', () => {
     socket.broadcast.emit('cursorRemove', { id: socket.id });
+  });
+
+  socket.on('dragStart', (data) => {
+    console.log('dragStart', data);
+    socket.broadcast.emit('dragStart', { id: socket.id, ...data });
+  });
+
+  socket.on('dragUpdate', (data) => {
+    socket.broadcast.emit('dragUpdate', { id: socket.id, ...data });
+  });
+
+  socket.on('dragEnd', (data) => {
+    socket.broadcast.emit('dragEnd', { id: socket.id, ...data });
   });
 });
 

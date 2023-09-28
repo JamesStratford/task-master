@@ -143,7 +143,7 @@ router.put('/update-task', async (req, res) => {
     const task = req.body.newTask;
     try {
         await updateTask({ body: { ...task } }, res).then(() => {
-            boardUpdatedHook(io)
+            boardUpdatedHook(io);
         });
     } catch (error) {
         res.status(400).json({ message: error.message });

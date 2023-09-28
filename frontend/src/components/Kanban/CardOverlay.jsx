@@ -4,11 +4,9 @@ import { SketchPicker } from 'react-color';
 function CardOverlay({
   task,
   onClose,
-  updateTaskDescription,
+  updateTaskContents,
 }) {
 
-  // TODO: Add priorities and dates to card overlay
-  
   // State to manage task description and labels
   const [description, setDescription] = useState(task.description || "");
   const [newLabel, setNewLabel] = useState("");
@@ -22,9 +20,14 @@ function CardOverlay({
     setDescription(e.target.value);
   };
 
-  // Function to save task description
-  const handleSaveDescription = () => {
-    updateTaskDescription(task.taskId, description);
+  // Function to save task description and labels
+  const handleUpdateTask = () => {
+    const updatedTask = {
+      ...task, // Keep the existing task data
+      description: description, // Update the description
+      labels: labels, // Update the labels
+    };
+    updateTaskContents(updatedTask);
   };
 
   // Function to cancel editing description
@@ -120,7 +123,7 @@ function CardOverlay({
           <div className="input-button-container">  
             <button
               className="save-description-btn"
-              onClick={handleSaveDescription}
+              onClick={handleUpdateTask}
             >
               Save
             </button>

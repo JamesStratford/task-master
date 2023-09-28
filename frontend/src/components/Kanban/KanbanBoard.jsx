@@ -475,6 +475,30 @@ function KanbanBoard() {
     );
   };
 
+  // Update all contents within a task
+  const updateTaskContents = async (updatedTask) => {
+    try {
+      // Update the task in the local state
+      setState((prevState) => ({
+        ...prevState,
+        tasks: {
+          ...prevState.tasks,
+          [updatedTask.taskId]: updatedTask,
+        },
+      }));
+  
+      // Update the task in the database
+      await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
+        {
+          newTask: updatedTask,
+        }
+      );
+    } catch (error) {
+      console.error("Failed to update task:", error);
+    }
+  };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="all-columns" direction="horizontal" type="column">
@@ -572,29 +596,7 @@ function KanbanBoard() {
               <CardOverlay
                 task={currentTask}
                 onClose={toggleOverlay}
-                updateTaskDescription={async (taskId, description) => {
-                  const updatedTasks = {
-                    ...state.tasks,
-                    [taskId]: {
-                      ...state.tasks[taskId],
-                      description,
-                    },
-                  };
-
-                  setState({
-                    ...state,
-                    tasks: updatedTasks,
-                  });
-                  const newTask = updatedTasks[taskId];
-                  // Update the task description in the database
-                  await axios.put(
-                    `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
-                    {
-                      newTask
-                    }
-                  );
-                }
-                }
+                updateTaskContents={updateTaskContents}
               />
             )}
             {provided.placeholder}

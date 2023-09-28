@@ -328,31 +328,6 @@ function KanbanBoard() {
     }
   };
 
-  /*const updateCardContent = async (taskId, newContent) => {
-    try {
-      const newTask = state.tasks[taskId];
-      newTask.content = newContent;
-      const updatedTasks = {
-        ...state.tasks,
-        [taskId]: newTask,
-      };
-
-      setState({
-        ...state,
-        tasks: updatedTasks,
-      });
-
-      await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
-        {
-          newTask,
-        }
-      );
-    } catch (error) {
-      console.error("Failed to update card content:", error);
-    }
-  };*/
-
   const removeCard = async (taskId) => {
     // Filter out the task with the specified taskId to remove it
     const updatedTasks = { ...state.tasks };
@@ -498,30 +473,6 @@ function KanbanBoard() {
       console.error("Failed to update task:", error);
     }
   };
-  
-
-  /*try {
-    const newTask = state.tasks[taskId];
-    newTask.content = newContent;
-    const updatedTasks = {
-      ...state.tasks,
-      [taskId]: newTask,
-    };
-
-    setState({
-      ...state,
-      tasks: updatedTasks,
-    });
-
-    await axios.put(
-      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
-      {
-        newTask,
-      }
-    );
-  } catch (error) {
-    console.error("Failed to update card content:", error);
-  }*/
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

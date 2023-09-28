@@ -76,7 +76,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('dragStart', (data) => {
-    console.log('dragStart', data);
     socket.broadcast.emit('dragStart', { id: socket.id, ...data });
   });
 

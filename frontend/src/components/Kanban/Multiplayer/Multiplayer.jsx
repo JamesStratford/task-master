@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { SocketContext } from './SocketContext';
 import { MultiplayerContext } from './MultiplayerContext';
@@ -29,35 +29,41 @@ const Cursor = ({ id, pos }) => (
 
 // Main Multiplayer component
 const Multiplayer = ({ userInfo, parentRef }) => {
-    const [cursors, setCursors] = useState({});
+    const myCursor = useRef(null);
     const socket = useContext(SocketContext);
-    const { setRemoteDrags } = useContext(MultiplayerContext);
+    const { setRemoteDrags, cursors, setCursors } = useContext(MultiplayerContext);
+
     useEffect(() => {
         if (!socket) return;
-    
+
         const handleDragStart = (data) => {
-          setRemoteDrags(prevRemoteDrags => ({
-            ...prevRemoteDrags,
-            [data.draggableId]: true  // Mark this item as being dragged remotely
-          }));
+            if (myCursor.current) {
+                setRemoteDrags(prevRemoteDrags => ({
+                    ...prevRemoteDrags,
+                    [data.draggableId]: {
+                        user: userInfo,  // Mark this item as being dragged remotely
+                        cursor: {x:myCursor.current.x, y:myCursor.current.y}
+                    }
+                }));
+            }
         };
-    
+
         const handleDragEnd = (data) => {
-          setRemoteDrags(prevRemoteDrags => {
-            const updatedRemoteDrags = { ...prevRemoteDrags };
-            delete updatedRemoteDrags[data.draggableId];  // Mark this item as no longer being dragged remotely
-            return updatedRemoteDrags;
-          });
+            setRemoteDrags(prevRemoteDrags => {
+                const updatedRemoteDrags = { ...prevRemoteDrags };
+                delete updatedRemoteDrags[data.draggableId];  // Mark this item as no longer being dragged remotely
+                return updatedRemoteDrags;
+            });
         };
-    
+
         socket.on('dragStart', handleDragStart);
         socket.on('dragEnd', handleDragEnd);
-    
+
         return () => {
-          socket.off('dragStart', handleDragStart);
-          socket.off('dragEnd', handleDragEnd);
+            socket.off('dragStart', handleDragStart);
+            socket.off('dragEnd', handleDragEnd);
         };
-      }, [socket, setRemoteDrags]);
+    }, [socket, setRemoteDrags, userInfo]);
 
     // Socket Event Handlers
     const handleSocketEvents = () => {
@@ -72,14 +78,14 @@ const Multiplayer = ({ userInfo, parentRef }) => {
     const handleCursorMove = (data) => {
         setCursors((prevCursors) => ({
             ...prevCursors,
-            [data.id]: { x: data.x, y: data.y, text: data.text }
+            [data.discordId]: { x: data.x, y: data.y, text: data.text }  // Use data.discordId as the key
         }));
     };
 
     const handleCursorRemove = (data) => {
         setCursors((prevCursors) => {
             const updatedCursors = { ...prevCursors };
-            delete updatedCursors[data.id];
+            delete updatedCursors[data.discordId];  // Use data.discordId as the key
             return updatedCursors;
         });
     };
@@ -93,7 +99,8 @@ const Multiplayer = ({ userInfo, parentRef }) => {
             const bounds = parentRef.current.getBoundingClientRect();
             const x = event.clientX - bounds.left;
             const y = event.clientY - bounds.top;
-            socket.emit('cursorMove', { x, y, text: userInfo ? userInfo : '' });
+            myCursor.current = { x, y };  // Update cursor position
+            socket.emit('cursorMove', { x, y, discordId: userInfo.discordId, text: userInfo ? userInfo : '' });  // Include discordId
         };
 
         if (!parentRef.current) return;
@@ -101,6 +108,7 @@ const Multiplayer = ({ userInfo, parentRef }) => {
         current.addEventListener('mousemove', handleMouseMove);
         return () => current.removeEventListener('mousemove', handleMouseMove);
     }, [parentRef, userInfo, socket]);
+
 
     return (
         <>

@@ -303,7 +303,6 @@ function KanbanBoard() {
           newCard,
         }
       );
-      console.log(newCard);
 
       // Then update the local state
       setState((prevState) => {

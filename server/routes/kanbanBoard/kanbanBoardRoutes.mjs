@@ -10,6 +10,7 @@ import {
     updateColumnTaskIds,
     removeTaskFromColumn,
     updateTask,
+    saveLabel,
     deleteTask
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import Label from '../../models/kanbanBoard/label.mjs';
@@ -164,15 +165,11 @@ router.put('/reorder-columns', async (req, res) => {
 });
 
 router.post('/save-label', async (req, res) => {
-    const labelData = req.body;
-    
     try {
-        const newLabel = await Label.create(labelData); // Use the create method with your model
-        res.status(201).json(newLabel);
+        await saveLabel(req, res); // Call the saveLabel function to handle the request
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
-
 
 export default router;

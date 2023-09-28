@@ -3,11 +3,11 @@ import mongoose from '../../db/mongooseConn.mjs';
 const labelSchema = new mongoose.Schema({
   text: {
     type: String,
-    required: true,
+    required: false,
   },
   color: {
     type: String,
-    required: true,
+    required: false,
     default: '#ff0000', // Red by default
   },
 });

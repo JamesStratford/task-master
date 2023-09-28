@@ -5,7 +5,7 @@ import axios from "axios";
 function CardOverlay({ task, onClose, updateTaskContents }) {
   // State to manage task description and labels
   const [description, setDescription] = useState(task.description || "");
-  const [newLabel, setNewLabel] = useState("");
+  const [newLabel, setNewLabel] = useState(false);
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [labels, setLabels] = useState(task.labels || []);
   const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
@@ -44,20 +44,41 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
 
   // Function to create a new label
   const createNewLabel = async () => {
+    // Check if the newLabel is empty or contains only whitespace
+    if (!newLabel.trim()) {
+      console.error("Label text is required."); 
+      return;
+    }
+
+    console.log(
+      "Making API request to:",
+      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`
+    );
+
     try {
+      // Create a new label object using the text from the input field and the selected color
+      const newLabelObject = { text: newLabel.trim(), color: labelColor };
+
       // Update the task in the local state
-      const newLabelObject = { text: newLabel, color: labelColor };
       setLabels([...labels, newLabelObject]);
 
       // Update the task in the database
-      await axios.put(
+      await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`,
         {
           label: newLabelObject,
         }
       );
+
+      // If successful, log a success message
+      console.log("Label successfully created:", newLabelObject);
     } catch (error) {
-      console.error("Failed to update task:", error);
+      console.error("Failed to create label:", error);
+
+      // Log the response data if available
+      if (error.response) {
+        console.error("Response Data:", error.response.data);
+      }
     }
     toggleLabelInput();
   };

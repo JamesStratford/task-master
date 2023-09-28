@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const Task = ({
     task,
     isEditing,
-    updateCardContent,
+    updateTaskContents,
     setEditingTaskId,
     removeCard,
     openOverlay,
@@ -25,7 +25,7 @@ const Task = ({
                         type="text"
                         value={localContent}
                         onChange={(e) => setLocalContent(e.target.value)}
-                        onBlur={() => updateCardContent(task.taskId, localContent)}
+                        onBlur={() => updateTaskContents({ ...task, content: localContent })}
                     />
                     <div className="button-container">
                         <button

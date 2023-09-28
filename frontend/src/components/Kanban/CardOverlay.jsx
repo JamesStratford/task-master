@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { SketchPicker } from 'react-color';
+import { SketchPicker } from "react-color";
+import axios from "axios";
 
-function CardOverlay({
-  task,
-  onClose,
-  updateTaskContents,
-}) {
-
+function CardOverlay({ task, onClose, updateTaskContents }) {
   // State to manage task description and labels
   const [description, setDescription] = useState(task.description || "");
   const [newLabel, setNewLabel] = useState("");
@@ -47,9 +43,21 @@ function CardOverlay({
   };
 
   // Function to create a new label
-  const createNewLabel = () => {
-    if (newLabel) {
-      setLabels([...labels, { text: newLabel, color: labelColor }]);
+  const createNewLabel = async () => {
+    try {
+      // Update the task in the local state
+      const newLabelObject = { text: newLabel, color: labelColor };
+      setLabels([...labels, newLabelObject]);
+
+      // Update the task in the database
+      await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`,
+        {
+          label: newLabelObject,
+        }
+      );
+    } catch (error) {
+      console.error("Failed to update task:", error);
     }
     toggleLabelInput();
   };
@@ -76,11 +84,15 @@ function CardOverlay({
                   className="change-color-btn"
                   onClick={toggleColorPicker}
                 >
-                  <img src={require('./pick-color.png')} alt="Edit" style={{ width: '18px', height: '18px' }} />
+                  <img
+                    src={require("./pick-color.png")}
+                    alt="Edit"
+                    style={{ width: "18px", height: "18px" }}
+                  />
                 </button>
                 <button onClick={createNewLabel} className="create-label-btn">
                   Create Label
-                </button>   
+                </button>
                 <div className="color-picker-container">
                   {isColorPickerVisible && (
                     <div className="color-picker-popover">
@@ -120,11 +132,8 @@ function CardOverlay({
             onChange={handleDescriptionChange}
             className="description-input"
           />
-          <div className="input-button-container">  
-            <button
-              className="save-description-btn"
-              onClick={handleUpdateTask}
-            >
+          <div className="input-button-container">
+            <button className="save-description-btn" onClick={handleUpdateTask}>
               Save
             </button>
             <button

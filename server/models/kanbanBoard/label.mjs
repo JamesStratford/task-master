@@ -1,10 +1,15 @@
 import mongoose from '../../db/mongooseConn.mjs';
 
 const labelSchema = new mongoose.Schema({
-  labelId: String,
-  labelName: String,
-  labelColour: String,
+  text: {
+    type: String,
+    required: true,
+  },
+  color: {
+    type: String,
+    required: true,
+    default: '#ff0000', // Red by default
+  },
 });
 
 export default mongoose.model('Label', labelSchema);
- 

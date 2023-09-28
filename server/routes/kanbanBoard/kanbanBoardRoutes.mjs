@@ -12,6 +12,7 @@ import {
     updateTask,
     deleteTask
 } from "../../kanbanBoard/kanbanBoard.mjs";
+import Label from '../../models/kanbanBoard/label.mjs';
 import express from 'express';
 import { io } from '../../server.mjs';
 
@@ -58,7 +59,7 @@ router.delete('/delete-task', async (req, res) => {
 
 
 router.post('/add-column', async (req, res) => {
-    const columnData = req.body; // Retrieve the column data from the request body
+    const columnData = req.body;
     try {
         await addColumn(columnData, res).then(() => {
             boardUpdatedHook(io)
@@ -161,5 +162,17 @@ router.put('/reorder-columns', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+router.post('/save-label', async (req, res) => {
+    const labelData = req.body;
+    
+    try {
+        const newLabel = await Label.create(labelData); // Use the create method with your model
+        res.status(201).json(newLabel);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
 
 export default router;

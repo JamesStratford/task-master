@@ -234,3 +234,22 @@ export const reorderColumns = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+/**
+ * Save the created label to the labels database.
+ *
+ * @param {object} label - The HTTP request object containing saved label.
+ * @param {object} res - The HTTP response object.
+ * @returns {void}
+ */
+export const saveLabel = async (newLabelObject) => {
+    try {
+        const response = await axios.post('/save-label', newLabelObject);
+        return response.data;
+    } catch (error) {
+        console.error("Error adding label:", error);
+        throw error;
+    }
+};
+
+

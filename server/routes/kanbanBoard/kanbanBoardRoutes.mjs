@@ -4,7 +4,6 @@ import {
     getTasks,
     getColumns,
     updateColumn,
-    reorderColumns,
     updateBoard,
     deleteColumn,
     assignTaskToColumn,
@@ -155,22 +154,10 @@ router.put('/update-task', async (req, res) => {
     }
 });
 
-router.put('/reorder-columns', async (req, res) => {
-    try {
-        const updatedColumns = req.body.columns;
-        await reorderColumns(updatedColumns).then(() => {
-            boardUpdatedHook(io);
-        });
-        res.status(200).json({ message: 'Columns updated successfully' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
 router.put('/update-board', async (req, res) => {
     try {
         const board = req.body;
-        await updateBoard(board).then(() => {
+        await updateBoard(board).then(async () => {
             boardUpdatedHook(io);
         });
 

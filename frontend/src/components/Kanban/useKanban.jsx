@@ -16,14 +16,21 @@ export const useKanban = (socket, setKanbanBoard) => {
     fetchData();
   }, [socket, setKanbanBoard]);
 
-  const updateKanbanBoard = async (updatedColumns) => {
+  const updateKanbanBoard = async (updatedColumns, updatedTasks) => {
     // Update local state
     setKanbanBoard(prevKanbanColumns => {
-      // prevKanbanColumns is a dict of columns : Array, and tasks : dict
       const updatedKanbanColumns = { ...prevKanbanColumns };
+
+      // Update columns
       updatedColumns.forEach(updatedColumn => {
-        updatedKanbanColumns[updatedColumn.id] = updatedColumn;
+        updatedKanbanColumns.columns[updatedColumn.id] = updatedColumn;
       });
+
+      // Update tasks
+      for (const taskId in updatedTasks) {
+        updatedKanbanColumns.tasks[taskId] = updatedTasks[taskId];
+      }
+
       return updatedKanbanColumns;
     });
 
@@ -31,16 +38,16 @@ export const useKanban = (socket, setKanbanBoard) => {
     try {
       const response = await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-board`,
-        { updatedColumns }
+        { updatedColumns, updatedTasks }
       );
       if (response.status !== 200) {
-        console.error('Failed to update columns in the backend:', response.statusText);
+        console.error('Failed to update the board in the backend:', response.statusText);
       }
     } catch (error) {
-      console.error('Failed to update columns in the backend:', error);
+      console.error('Failed to update the board in the backend:', error);
     }
   };
 
-  return [updateKanbanBoard]
+  return [updateKanbanBoard];
 };
 

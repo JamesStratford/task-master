@@ -212,55 +212,50 @@ export const updateColumnTaskIds = async (req, res) => {
     }
 };
 
-/**
- * Update columns in the database based on the provided data.
- *
- * @param {object} req - The HTTP request object containing updated columns.
- * @param {object} res - The HTTP response object.
- * @returns {void}
- */
-export const reorderColumns = async (columns) => {
+export const updateBoard = async (board) => {
     try {
-        // Create an array of update operations
-        const updates = columns.map((column, index) => {
-            const nextColumnId = index === columns.length - 1 ? null : columns[index + 1].id;
+        const { updatedColumns, updatedTasks } = board;
+        
+        // Create an array of update operations for columns
+        const columnUpdates = updatedColumns.map((column, index) => {
+            const nextColumnId = index === updatedColumns.length - 1 ? null : updatedColumns[index + 1].id;
             return {
                 updateOne: {
                     filter: { id: column.id },
-                    update: { $set: { nextColumnId: nextColumnId } }
+                    update: { 
+                        $set: { 
+                            nextColumnId: nextColumnId, 
+                            title: column.title,
+                            taskIds: column.taskIds,
+                        } 
+                    }
                 }
             };
         });
 
-        // Execute all updates in a single batch operation
-        await Column.bulkWrite(updates);
-        console.log("Successfully updated columns in the database.");
+        // Execute all column updates in a single batch operation
+        await Column.bulkWrite(columnUpdates);
+        
+        // Create an array of update operations for tasks
+        const taskUpdates = Object.entries(updatedTasks).map(([id, task]) => {
+            return {
+                updateOne: {
+                    filter: { id: id },
+                    update: { $set: task }
+                }
+            };
+        });
+        
+        // Execute all task updates in a single batch operation
+        await Task.bulkWrite(taskUpdates);
+
     } catch (error) {
-        console.error("Error updating columns:", error.message);
+        console.error("Error updating columns and tasks:", error.message);
         throw error;  // Propagate the error to the caller
     }
 };
 
-export const updateBoard = async (board) => {
-    try {
-        const columns = board['updatedColumns'];
-        const updates = columns.map(column => {
-            return {
-                updateOne: {
-                    filter: { id: column.id },
-                    update: { $set: { title: column.title } }
-                }
-            };
-        });
 
-        // Execute all updates in a single batch operation
-        await Column.bulkWrite(updates);
-    }
-    catch (error) {
-        console.error("Error updating columns:", error.message);
-        throw error;  // Propagate the error to the caller
-    }
-}
 
 
 

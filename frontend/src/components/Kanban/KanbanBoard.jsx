@@ -46,7 +46,7 @@ function KanbanBoard({ userInfo }) {
     setKanbanColumns({
       ...kanbanColumns,
       columns: kanbanColumns.columns.map((col) =>
-        col.id === column.id ? updatedColumn : col
+      col.id === column.id ? updatedColumn : col
       ),
     });
 
@@ -119,28 +119,6 @@ function KanbanBoard({ userInfo }) {
     );
   };
 
-  const updateColumns = async (columns) => {
-    try {
-      // Update local first
-      setKanbanColumns({
-        ...kanbanColumns,
-        columns: columns,
-      });
-
-      // Send the current column order to the server
-      await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/reorder-columns`,
-        {
-          columns,
-        }
-      );
-
-    } catch (error) {
-      console.error("Failed to update column order in the database:", error);
-    }
-  };
-
-
   const addColumn = async (newColumnTitle) => {
     if (newColumnTitle.trim() === "") {
       // Don't add an empty column
@@ -154,32 +132,22 @@ function KanbanBoard({ userInfo }) {
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/add-column`,
         {
           title: newColumnTitle,
-          // You can add any other necessary properties here
         }
       );
-
-      console.log("Title", newColumnTitle);
-      console.log("data: ", response.data);
       if (response.status === 201) {
         // Column was successfully added to the server
-        console.log("Successfully added column to the database.");
-        const newColumnData = response.data; // This should include the new column's data, including its ID
-        // Create a new column object for your React state
+        const newColumnData = response.data;
         const newColumn = {
-          id: newColumnData.id, // You may need to set this based on your logic
+          id: newColumnData.id,
           title: newColumnTitle,
           taskIds: [],
-          nextColumnId: newColumnData.nextColumnId, // Use the actual nextColumnId property from your server data
+          nextColumnId: newColumnData.nextColumnId,
         };
 
-        // Add the new column to the existing columns
         const updatedColumns = [...kanbanColumns.columns, newColumn];
+        const currentTasks = kanbanColumns.tasks || {};
 
-        // Update the React state with the new column
-        setKanbanColumns({
-          ...kanbanColumns,
-          columns: updatedColumns,
-        });
+        await updateKanbanBoard(updatedColumns, currentTasks);
       }
     } catch (error) {
       console.error("Failed to add column:", error);
@@ -189,13 +157,14 @@ function KanbanBoard({ userInfo }) {
   const deleteColumn = async (columnId) => {
     try {
       const updatedColumns = kanbanColumns['columns'].filter(column => column.id !== columnId);
+      const updatedTasks = kanbanColumns['tasks'] || {};
       // Set the updated state
       setKanbanColumns({
         ...kanbanColumns,
         columns: updatedColumns,
       });
 
-      await updateColumns(updatedColumns);
+      await updateKanbanBoard(updatedColumns, updatedTasks);
 
     } catch (error) {
       console.error("Failed to delete column:", error);
@@ -213,14 +182,10 @@ function KanbanBoard({ userInfo }) {
       const [movedColumn] = newColumns.splice(source.index, 1);
       newColumns.splice(destination.index, 0, movedColumn);
 
-      // Create a new state object preserving the previous state
-      const newState = {
-        ...kanbanColumns,
-        columns: newColumns,
-      };
+      const updatedTasks = kanbanColumns.tasks || {};
+      
 
-      await updateColumns(newColumns);
-      setKanbanColumns(newState);
+      await updateKanbanBoard(newColumns, updatedTasks);
     } else {
       // Task dragging logic
       switch (true) {
@@ -243,7 +208,13 @@ function KanbanBoard({ userInfo }) {
 
   const addCardToColumn = async (columnId, newCard) => {
     try {
-      // Add the new card to the database first
+      // Find the column to which the card should be added
+      const columnIndex = kanbanColumns.columns.findIndex((column) => column.id === columnId);
+      if (columnIndex === -1) {
+        console.error('Column not found:', columnId);
+        return; // Column not found
+      }
+
       await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/add-task`,
         {
@@ -252,30 +223,29 @@ function KanbanBoard({ userInfo }) {
         }
       );
 
-      // Then update the local state
-      setKanbanColumns((prevState) => {
-        const columnIndex = prevState.columns.findIndex(
-          (column) => column.id === columnId
-        );
-        if (columnIndex === -1) return prevState; // Column not found
+      // Clone the columns and tasks to avoid mutating state directly
+      const updatedColumns = [...kanbanColumns.columns];
+      const updatedTasks = { ...kanbanColumns.tasks };
 
-        const updatedColumns = [...prevState.columns];
-        const updatedColumn = { ...updatedColumns[columnIndex] };
-        updatedColumn.taskIds = [...updatedColumn.taskIds, newCard.taskId];
-        updatedColumns[columnIndex] = updatedColumn;
-        return {
-          ...prevState,
-          columns: updatedColumns,
-          tasks: {
-            ...prevState.tasks,
-            [newCard.taskId]: newCard,
-          },
-        };
-      });
+      // Prepare the newTask object and add it to updatedTasks
+      const newTask = {
+        ...newCard,
+      };
+      updatedTasks[newTask.id] = newTask;
+
+      // Add the new task's id to the taskIds array of the appropriate column
+      const updatedColumn = { ...updatedColumns[columnIndex] };
+      updatedColumn.taskIds = [...updatedColumn.taskIds, newTask.id];
+      updatedColumns[columnIndex] = updatedColumn;
+
+      // Call updateKanbanBoard to update local state and sync with the backend
+      await updateKanbanBoard(updatedColumns, updatedTasks);
+
     } catch (error) {
       console.error("Failed to add card:", error);
     }
   };
+
 
   const updateCardContent = async (taskId, newContent) => {
     try {
@@ -344,8 +314,9 @@ function KanbanBoard({ userInfo }) {
     const updatedColumns = kanbanColumns.columns.map((col) =>
       col.id === column.id ? { ...col, title: editedColumnTitle } : col
     );
-
-    await updateKanbanBoard(updatedColumns);
+    const updatedTasks = kanbanColumns.tasks;
+    //await updateColumns(updatedColumns);
+    await updateKanbanBoard(updatedColumns, updatedTasks);
   };
 
   return (

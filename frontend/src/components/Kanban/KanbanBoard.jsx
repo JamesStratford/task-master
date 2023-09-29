@@ -4,46 +4,28 @@ import CardOverlay from "./CardOverlay";
 import axios from "axios";
 import Task from "./Task";
 import Column from "./Column";
+import AddColumnButton from "./AddColumnButton";
+import DropdownMenu from "./DropDownMenu";
 import { SocketContext } from "./Multiplayer/SocketContext";
+import { KanbanContext } from "./Multiplayer/KanbanContext";
 import { MultiplayerContext } from "./Multiplayer/MultiplayerContext";
+import { useKanban } from "./useKanban";
 
-function KanbanBoard({userInfo}) {
+function KanbanBoard({ userInfo }) {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
   const socket = useContext(SocketContext);
+  const { kanbanColumns, setKanbanColumns } = useContext(KanbanContext);
   const { remoteDrags } = useContext(MultiplayerContext);
-
-  const [state, setState] = useState({
-    tasks: {},
-    columns: [],
-  });
-
-  // Load task descriptions from the database on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-kanban-board`
-      );
-      setState(data.data);
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    // Board updated
-    socket.on('updateBoard', (updatedBoard) => {
-      setState(updatedBoard);
-    });
-  }, [socket]);
+  const [updateKanbanBoard] = useKanban(socket, setKanbanColumns);
 
   const toggleOverlay = (taskId) => {
     if (isOverlayOpen) {
       setIsOverlayOpen(false);
     } else {
-      const task = state.tasks[taskId];
+      const task = kanbanColumns.tasks[taskId];
       setCurrentTask(task);
       setIsOverlayOpen(true);
     }
@@ -61,9 +43,9 @@ function KanbanBoard({userInfo}) {
     // Update the column object with the new taskIds
     const updatedColumn = { ...column, taskIds: newTaskIds };
 
-    setState({
-      ...state,
-      columns: state.columns.map((col) =>
+    setKanbanColumns({
+      ...kanbanColumns,
+      columns: kanbanColumns.columns.map((col) =>
         col.id === column.id ? updatedColumn : col
       ),
     });
@@ -125,7 +107,7 @@ function KanbanBoard({userInfo}) {
       columns: updatedColumns,
     };
 
-    setState(newState);
+    setKanbanColumns(newState);
     await axios.put(
       `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task-column`,
       {
@@ -139,33 +121,25 @@ function KanbanBoard({userInfo}) {
 
   const updateColumns = async (columns) => {
     try {
-      const updatedColumns = [];
-
-      // Iterate through the columns and update their nextColumnId
-      for (let i = 0; i < columns.length; i++) {
-        const column = columns[i];
-        const nextColumnId = i === columns.length - 1 ? null : columns[i + 1].id; // Set the nextColumnId to null for the last column
-        column.nextColumnId = nextColumnId; // Update the nextColumnId property of the column
-        updatedColumns.push(column);
-      }
-
-      // Update the local state with the updated columns
-      setState({
-        ...state,
-        columns: updatedColumns,
+      // Update local first
+      setKanbanColumns({
+        ...kanbanColumns,
+        columns: columns,
       });
 
-      // Update the database to reflect the changes
+      // Send the current column order to the server
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/reorder-columns`,
         {
-          updatedColumns,
+          columns,
         }
       );
+
     } catch (error) {
       console.error("Failed to update column order in the database:", error);
     }
   };
+
 
   const addColumn = async (newColumnTitle) => {
     if (newColumnTitle.trim() === "") {
@@ -199,11 +173,11 @@ function KanbanBoard({userInfo}) {
         };
 
         // Add the new column to the existing columns
-        const updatedColumns = [...state.columns, newColumn];
+        const updatedColumns = [...kanbanColumns.columns, newColumn];
 
         // Update the React state with the new column
-        setState({
-          ...state,
+        setKanbanColumns({
+          ...kanbanColumns,
           columns: updatedColumns,
         });
       }
@@ -214,38 +188,18 @@ function KanbanBoard({userInfo}) {
 
   const deleteColumn = async (columnId) => {
     try {
-      // Send a DELETE request to delete the column in the database
-      await axios.delete(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/delete-column`,
-        {
-          data: {
-            columnId: columnId, // Pass the columnId in the request body
-          },
-        }
-      );
-
-      // Remove the column from the local state
-      const updatedColumns = state.columns.filter(
-        (column) => column.id !== columnId
-      );
-
+      const updatedColumns = kanbanColumns['columns'].filter(column => column.id !== columnId);
       // Set the updated state
-      setState({
-        ...state,
+      setKanbanColumns({
+        ...kanbanColumns,
         columns: updatedColumns,
       });
+
+      await updateColumns(updatedColumns);
+
     } catch (error) {
       console.error("Failed to delete column:", error);
     }
-  };
-
-  const openDropdown = (columnId) => {
-    setOpenDropdownColumnId(columnId);
-  };
-
-  // Function to close the dropdown menu for a column
-  const closeDropdown = () => {
-    setOpenDropdownColumnId(null);
   };
 
   const onDragEnd = async (result) => {
@@ -255,18 +209,18 @@ function KanbanBoard({userInfo}) {
 
     if (type === "column") {
       // Column dragging logic
-      const newColumns = Array.from(state.columns);
+      const newColumns = Array.from(kanbanColumns.columns);
       const [movedColumn] = newColumns.splice(source.index, 1);
       newColumns.splice(destination.index, 0, movedColumn);
 
       // Create a new state object preserving the previous state
       const newState = {
-        ...state,
+        ...kanbanColumns,
         columns: newColumns,
       };
 
       await updateColumns(newColumns);
-      setState(newState);
+      setKanbanColumns(newState);
     } else {
       // Task dragging logic
       switch (true) {
@@ -275,13 +229,13 @@ function KanbanBoard({userInfo}) {
           return;
         case destination.droppableId === source.droppableId &&
           destination.index !== source.index:
-          const column = state.columns.find(
+          const column = kanbanColumns.columns.find(
             (col) => col.id === source.droppableId
           );
           moveTaskWithinSameColumn(column, source.index, destination.index);
           return;
         default:
-          moveTaskToDifferentColumn(state, source, destination, draggableId);
+          moveTaskToDifferentColumn(kanbanColumns, source, destination, draggableId);
           return;
       }
     }
@@ -299,7 +253,7 @@ function KanbanBoard({userInfo}) {
       );
 
       // Then update the local state
-      setState((prevState) => {
+      setKanbanColumns((prevState) => {
         const columnIndex = prevState.columns.findIndex(
           (column) => column.id === columnId
         );
@@ -325,15 +279,15 @@ function KanbanBoard({userInfo}) {
 
   const updateCardContent = async (taskId, newContent) => {
     try {
-      const newTask = state.tasks[taskId];
+      const newTask = kanbanColumns.tasks[taskId];
       newTask.content = newContent;
       const updatedTasks = {
-        ...state.tasks,
+        ...kanbanColumns.tasks,
         [taskId]: newTask,
       };
 
-      setState({
-        ...state,
+      setKanbanColumns({
+        ...kanbanColumns,
         tasks: updatedTasks,
       });
 
@@ -350,11 +304,11 @@ function KanbanBoard({userInfo}) {
 
   const removeCard = async (taskId) => {
     // Filter out the task with the specified taskId to remove it
-    const updatedTasks = { ...state.tasks };
+    const updatedTasks = { ...kanbanColumns.tasks };
     delete updatedTasks[taskId];
 
     // Update the columns to remove the taskId from its taskIds array
-    const updatedColumns = [...state.columns];
+    const updatedColumns = [...kanbanColumns.columns];
     let changedColumnId = null;
     for (let i = 0; i < updatedColumns.length; i++) {
       const column = updatedColumns[i];
@@ -368,8 +322,8 @@ function KanbanBoard({userInfo}) {
     }
 
     // Set the updated state
-    setState({
-      ...state,
+    setKanbanColumns({
+      ...kanbanColumns,
       tasks: updatedTasks,
       columns: updatedColumns,
     });
@@ -386,88 +340,12 @@ function KanbanBoard({userInfo}) {
     );
   };
 
-  const handleColumnUpdate = async (column, editedColumnTitle) => {
-    try {
-      const updatedColumns = state.columns.map((col) =>
-        col.id === column.id ? { ...col, title: editedColumnTitle } : col
-      );
-      setState({ ...state, columns: updatedColumns });
-      const newColumn = updatedColumns.find((col) => col.id === column.id);
-      // Update the column in the database
-      await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-column`,
-        {
-          newColumn
-        }
-      );
-    } catch (error) {
-      console.error("Failed to update column title:", error);
-    }
-  };
-
-  // Dropdown Component
-  const DropdownMenu = ({ isOpen, column, deleteColumn, closeDropdown }) => {
-    return isOpen === column.id ? (
-      <div className="dropdown-content">
-        <button
-          className="delete-column-button"
-          onClick={() => deleteColumn(column.id)}
-        >
-          Delete Column
-        </button>
-        <button className="close-dropdown-button" onClick={closeDropdown}>
-          Close
-        </button>
-      </div>
-    ) : (
-      <button
-        className="dropdown-button"
-        onClick={() => openDropdown(column.id)}
-      >
-        ...
-      </button>
+  const handleUpdateColumn = async (column, editedColumnTitle) => {
+    const updatedColumns = kanbanColumns.columns.map((col) =>
+      col.id === column.id ? { ...col, title: editedColumnTitle } : col
     );
-  };
 
-  // AddColumn Component
-  const AddColumnButton = ({ addColumn }) => {
-    const [newColumnTitle, setNewColumnTitle] = useState("");
-    const [isAdding, setIsAdding] = useState(false);
-
-    const handleAddColumn = () => {
-      if (newColumnTitle.trim() === "") {
-        // Don't add an empty column
-        console.log("Empty column");
-        return;
-      }
-
-      // Call the addColumn function with the title
-      addColumn(newColumnTitle);
-
-      // Clear the input field and reset the state
-      setNewColumnTitle("");
-      setIsAdding(false);
-    };
-
-    return (
-      <div className="add-column-container">
-        {isAdding ? (
-          <div>
-            <input
-              type="text"
-              placeholder="Enter column title"
-              value={newColumnTitle}
-              onChange={(e) => setNewColumnTitle(e.target.value)}
-            />
-            <button onClick={handleAddColumn}>Add Column</button>
-          </div>
-        ) : (
-          <button className="add-column-button" onClick={() => setIsAdding(true)}>
-            + Add Column
-          </button>
-        )}
-      </div>
-    );
+    await updateKanbanBoard(updatedColumns);
   };
 
   return (
@@ -478,13 +356,13 @@ function KanbanBoard({userInfo}) {
       }}
       onDragUpdate={(update) => {
         // Emit socket.io event for drag update
-        socket.emit('dragUpdate', { ...update, userInfo : userInfo });
+        socket.emit('dragUpdate', { ...update, userInfo: userInfo });
       }}
       onDragEnd={(result) => {
         onDragEnd(result);
 
         // Emit socket.io event for drag end
-        socket.emit('dragEnd', { ...result, userInfo : userInfo });
+        socket.emit('dragEnd', { ...result, userInfo: userInfo });
       }}
     >
       <Droppable droppableId="all-columns" direction="horizontal" type="column">
@@ -495,12 +373,12 @@ function KanbanBoard({userInfo}) {
             {...provided.droppableProps}
             style={{ overflow: 'hidden' }}
           >
-            {state.columns &&
-              state.columns.map((column, index) => {
+            {kanbanColumns.columns &&
+              kanbanColumns.columns.map((column, index) => {
                 const validTaskIds = column.taskIds.filter((taskId) =>
-                  state.tasks.hasOwnProperty(taskId)
+                  kanbanColumns.tasks.hasOwnProperty(taskId)
                 );
-                const tasks = validTaskIds.map((taskId) => state.tasks[taskId]);
+                const tasks = validTaskIds.map((taskId) => kanbanColumns.tasks[taskId]);
                 return (
                   <Draggable
                     draggableId={String(column.id)}
@@ -516,14 +394,14 @@ function KanbanBoard({userInfo}) {
                         <div className="column-header">
                           <Column
                             column={column}
-                            handleColumnUpdate={handleColumnUpdate}
+                            handleUpdateColumn={handleUpdateColumn}
                             provided={provided}
                           />
                           <DropdownMenu
                             isOpen={openDropdownColumnId}
                             column={column}
                             deleteColumn={deleteColumn}
-                            closeDropdown={closeDropdown}
+                            setOpenDropdownColumnId={setOpenDropdownColumnId}
                           />
                         </div>
                         <Droppable droppableId={column.id} direction="vertical">
@@ -588,15 +466,15 @@ function KanbanBoard({userInfo}) {
                 onClose={toggleOverlay}
                 updateTaskDescription={async (taskId, description) => {
                   const updatedTasks = {
-                    ...state.tasks,
+                    ...kanbanColumns.tasks,
                     [taskId]: {
-                      ...state.tasks[taskId],
+                      ...kanbanColumns.tasks[taskId],
                       description,
                     },
                   };
 
-                  setState({
-                    ...state,
+                  setKanbanColumns({
+                    ...kanbanColumns,
                     tasks: updatedTasks,
                   });
                   const newTask = updatedTasks[taskId];

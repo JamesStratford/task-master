@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import KanbanBoard from './KanbanBoard';
 import Multiplayer from './Multiplayer/Multiplayer';
 import { SocketProvider } from './Multiplayer/SocketContext';
+import { KanbanProvider } from './Multiplayer/KanbanContext';
 import { MultiplayerProvider } from './Multiplayer/MultiplayerContext';
 
 const ChildComponent = ({ id, userInfo, parentPosition }) => {
@@ -15,7 +16,7 @@ const ChildComponent = ({ id, userInfo, parentPosition }) => {
                 top: parentPosition.y + position.y,
             }}
         >
-            <KanbanBoard userInfo={userInfo}/>
+            <KanbanBoard userInfo={userInfo} />
         </div>
     );
 };
@@ -42,26 +43,28 @@ const ParentComponent = ({ userInfo }) => {
 
     return (
         <SocketProvider>
-            <MultiplayerProvider parentRef={parentRef}>
-                <div 
-                    ref={parentRef} 
-                    id="parent" 
-                    style={{ 
-                        position: 'relative', 
-                        width, 
-                        height, 
-                        backgroundColor: 'black', 
-                        overflow: 'hidden' 
-                    }}
-                >
-                    <div style={{ position: 'relative' }}>
-                        {children.map(child =>
-                            <ChildComponent userInfo={userInfo} key={child.id} {...child} />
-                        )}
-                        <Multiplayer userInfo={userInfo} parentRef={parentRef} />
+            <KanbanProvider>
+                <MultiplayerProvider parentRef={parentRef}>
+                    <div
+                        ref={parentRef}
+                        id="parent"
+                        style={{
+                            position: 'relative',
+                            width,
+                            height,
+                            backgroundColor: 'black',
+                            overflow: 'hidden'
+                        }}
+                    >
+                        <div style={{ position: 'relative' }}>
+                            {children.map(child =>
+                                <ChildComponent userInfo={userInfo} key={child.id} {...child} />
+                            )}
+                            <Multiplayer userInfo={userInfo} parentRef={parentRef} />
+                        </div>
                     </div>
-                </div>
-            </MultiplayerProvider>
+                </MultiplayerProvider>
+            </KanbanProvider>
         </SocketProvider>
     );
 };

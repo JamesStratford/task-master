@@ -219,18 +219,48 @@ export const updateColumnTaskIds = async (req, res) => {
  * @param {object} res - The HTTP response object.
  * @returns {void}
  */
-export const reorderColumns = async (req, res) => {
-    const columns = req.updatedColumns; // Assuming req.body contains an array of columns in the desired order
-    
+export const reorderColumns = async (columns) => {
     try {
-        // Iterate through the columns and update them in the database
-        for (let i = 0; i < columns.length; i++) {
-            const column = columns[i];
-            await Column.updateOne({ id: column.id }, { ...column });
-        }
+        // Create an array of update operations
+        const updates = columns.map((column, index) => {
+            const nextColumnId = index === columns.length - 1 ? null : columns[index + 1].id;
+            return {
+                updateOne: {
+                    filter: { id: column.id },
+                    update: { $set: { nextColumnId: nextColumnId } }
+                }
+            };
+        });
+
+        // Execute all updates in a single batch operation
+        await Column.bulkWrite(updates);
         console.log("Successfully updated columns in the database.");
     } catch (error) {
         console.error("Error updating columns:", error.message);
-        res.status(400).json({ message: error.message });
+        throw error;  // Propagate the error to the caller
     }
 };
+
+export const updateBoard = async (board) => {
+    try {
+        const columns = board['updatedColumns'];
+        const updates = columns.map(column => {
+            return {
+                updateOne: {
+                    filter: { id: column.id },
+                    update: { $set: { title: column.title } }
+                }
+            };
+        });
+
+        // Execute all updates in a single batch operation
+        await Column.bulkWrite(updates);
+    }
+    catch (error) {
+        console.error("Error updating columns:", error.message);
+        throw error;  // Propagate the error to the caller
+    }
+}
+
+
+

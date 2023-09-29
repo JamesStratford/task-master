@@ -5,6 +5,7 @@ import {
     getColumns,
     updateColumn,
     reorderColumns,
+    updateBoard,
     deleteColumn,
     assignTaskToColumn,
     updateColumnTaskIds,
@@ -21,10 +22,14 @@ const router = express.Router();
 *   Update the board
 *   @param {SocketIO.Server} io - The Socket.IO server
 */
+// export const boardUpdatedHook = async (io) => {
+//     const tasks = await getTasks();
+//     const columns = await getColumns();
+//     io.emit('updateBoard', { tasks, columns });
+// };
+
 export const boardUpdatedHook = async (io) => {
-    const tasks = await getTasks();
-    const columns = await getColumns();
-    io.emit('updateBoard', { tasks, columns });
+    io.emit('updateBoard');
 };
 
 router.post('/add-task', async (req, res) => {
@@ -152,13 +157,28 @@ router.put('/update-task', async (req, res) => {
 
 router.put('/reorder-columns', async (req, res) => {
     try {
-        const updatedColumns = req.body;
+        const updatedColumns = req.body.columns;
         await reorderColumns(updatedColumns).then(() => {
-            boardUpdatedHook(io)
+            boardUpdatedHook(io);
         });
         res.status(200).json({ message: 'Columns updated successfully' });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.put('/update-board', async (req, res) => {
+    try {
+        const board = req.body;
+        await updateBoard(board).then(() => {
+            boardUpdatedHook(io);
+        });
+
+        // Respond with a success message
+        res.status(200).json({ message: 'Columns updated successfully.' });
+    } catch (error) {
+        console.error('Error updating columns:', error.message);
+        res.status(500).json({ message: error.message });
     }
 });
 

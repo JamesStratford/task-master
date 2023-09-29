@@ -19,7 +19,7 @@ function KanbanBoard({ userInfo }) {
   const socket = useContext(SocketContext);
   const { kanbanColumns, setKanbanColumns } = useContext(KanbanContext);
   const { remoteDrags } = useContext(MultiplayerContext);
-  const [updateKanbanBoard] = useKanban(socket, setKanbanColumns);
+  const [updateKanbanBoard] = useKanban(socket, kanbanColumns, setKanbanColumns);
 
   const toggleOverlay = (taskId) => {
     if (isOverlayOpen) {
@@ -179,11 +179,18 @@ function KanbanBoard({ userInfo }) {
     if (type === "column") {
       // Column dragging logic
       const newColumns = Array.from(kanbanColumns.columns);
+      console.log("newColumns before", newColumns)
+
       const [movedColumn] = newColumns.splice(source.index, 1);
       newColumns.splice(destination.index, 0, movedColumn);
 
       const updatedTasks = kanbanColumns.tasks || {};
-      
+      console.log("newColumns after", newColumns)
+      // const newState = {
+      //   ...kanbanColumns,
+      //   columns: newColumns,
+      // };
+      // setKanbanColumns(newState);
 
       await updateKanbanBoard(newColumns, updatedTasks);
     } else {

@@ -215,7 +215,6 @@ export const updateColumnTaskIds = async (req, res) => {
 export const updateBoard = async (board) => {
     try {
         const { updatedColumns, updatedTasks } = board;
-        
         // Create an array of update operations for columns
         const columnUpdates = updatedColumns.map((column, index) => {
             const nextColumnId = index === updatedColumns.length - 1 ? null : updatedColumns[index + 1].id;
@@ -224,9 +223,9 @@ export const updateBoard = async (board) => {
                     filter: { id: column.id },
                     update: { 
                         $set: { 
-                            nextColumnId: nextColumnId, 
                             title: column.title,
                             taskIds: column.taskIds,
+                            nextColumnId: nextColumnId, 
                         } 
                     }
                 }

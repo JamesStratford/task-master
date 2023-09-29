@@ -17,19 +17,13 @@ const Task = ({
     const remoteDrag = isBeingDraggedRemotely ? remoteDrags[task.taskId] : null;
     const cursor = cursors[remoteDrag?.user];
     const cursorPosition = cursor;
-
-    useEffect(() => {
-        console.log(remoteDrag)
-        console.log(cursors)
-        console.log(cursor)
-    }, [cursor, remoteDrag])
-
     const modifiedStyle = isBeingDraggedRemotely && cursorPosition
         ? {
             ...style,
             position: 'absolute',
             top: cursorPosition.y,
             left: cursorPosition.x,
+            width: '300px',
         }
         : style;
 

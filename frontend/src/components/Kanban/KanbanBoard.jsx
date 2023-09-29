@@ -179,18 +179,9 @@ function KanbanBoard({ userInfo }) {
     if (type === "column") {
       // Column dragging logic
       const newColumns = Array.from(kanbanColumns.columns);
-      console.log("newColumns before", newColumns)
-
       const [movedColumn] = newColumns.splice(source.index, 1);
       newColumns.splice(destination.index, 0, movedColumn);
-
       const updatedTasks = kanbanColumns.tasks || {};
-      console.log("newColumns after", newColumns)
-      // const newState = {
-      //   ...kanbanColumns,
-      //   columns: newColumns,
-      // };
-      // setKanbanColumns(newState);
 
       await updateKanbanBoard(newColumns, updatedTasks);
     } else {

@@ -28,21 +28,6 @@ export const useKanban = (socket, kanbanBoard, setKanbanBoard) => {
       };
       return updatedKanbanColumns;
     });
-    console.log('updatedColumns', updatedColumns)
-    // try {
-    //   const response = await axios.put(
-    //     `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-board`,
-    //     { 
-    //       updatedColumns: kanbanBoard.columns, 
-    //       updatedTasks: kanbanBoard.tasks 
-    //     }
-    //   );
-    //   if (response.status !== 200) {
-    //     console.error('Failed to update the board in the backend:', response.statusText);
-    //   }
-    // } catch (error) {
-    //   console.error('Failed to update the board in the backend:', error);
-    // }
 
     // Set the flag to make an API call
     setShouldUpdateBackend(true);
@@ -69,7 +54,6 @@ export const useKanban = (socket, kanbanBoard, setKanbanBoard) => {
 
     // Make an API call if shouldUpdateBackend is true
     if (shouldUpdateBackend) {
-      console.log('Updating the board in the backend...');
       updateBackend();
       setShouldUpdateBackend(false); // Reset the flag after making an API call
     }

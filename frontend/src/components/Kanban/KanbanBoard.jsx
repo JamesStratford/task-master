@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CardOverlay from "./CardOverlay";
 import axios from "axios";
@@ -12,14 +12,15 @@ import { MultiplayerContext } from "./Multiplayer/MultiplayerContext";
 import { useKanban } from "./useKanban";
 
 function KanbanBoard({ userInfo }) {
-  const [editingTaskId, setEditingTaskId] = useState(null);
-  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-  const [currentTask, setCurrentTask] = useState(null);
-  const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
   const socket = useContext(SocketContext);
   const { kanbanColumns, setKanbanColumns } = useContext(KanbanContext);
   const { remoteDrags } = useContext(MultiplayerContext);
   const [updateKanbanBoard] = useKanban(socket, kanbanColumns, setKanbanColumns);
+  
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [currentTask, setCurrentTask] = useState(null);
+  const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
 
   const toggleOverlay = (taskId) => {
     if (isOverlayOpen) {
@@ -164,6 +165,16 @@ function KanbanBoard({ userInfo }) {
         columns: updatedColumns,
       });
 
+      // Remove the column from the database
+      await axios.delete(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/delete-column`,
+        {
+          data: {
+            coulumnId: columnId,
+          },
+        }
+      );
+
       await updateKanbanBoard(updatedColumns, updatedTasks);
 
     } catch (error) {
@@ -243,7 +254,6 @@ function KanbanBoard({ userInfo }) {
       console.error("Failed to add card:", error);
     }
   };
-
 
   const updateCardContent = async (taskId, newContent) => {
     try {

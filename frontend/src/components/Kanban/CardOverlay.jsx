@@ -168,7 +168,7 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
             <button className="save-description-btn" onClick={handleUpdateTask}>
               Save
             </button>
-            <button
+            <button 
               className="cancel-description-btn"
               onClick={handleCancelEdit}
             >

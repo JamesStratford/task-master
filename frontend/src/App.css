@@ -436,7 +436,7 @@ body {
 
 /* Style for Card Overlay */
 .card-overlay {
-  /* Your existing styles for Card Overlay */
+  color: black;
 }
 
 /* Style for Label Overlay */

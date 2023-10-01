@@ -6,6 +6,7 @@ function LabelOverlay({ onClose, createNewLabel }) {
   const [newLabel, setNewLabel] = useState("");
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   // Function to toggle color picker visibility
   const toggleColorPicker = () => {
@@ -14,22 +15,33 @@ function LabelOverlay({ onClose, createNewLabel }) {
 
   // Function to handle creating a new label
   const handleCreateLabel = async () => {
-    // Check if the newLabel is empty or contains only whitespace
     if (!newLabel.trim()) {
       console.error("Label text is required.");
       return;
     }
 
     try {
-      // Create a new label object using the text and color
       const newLabelObject = { text: newLabel.trim(), color: labelColor };
-
-      // Create the label and pass it to the parent component
       createNewLabel(newLabelObject);
     } catch (error) {
       console.error("Failed to create label:", error);
     }
   };
+
+  // Function to close the LabelOverlay
+  const handleClose = () => {
+    setIsVisible(false);
+    onClose();
+  };
+
+  // New method to close only the LabelOverlay
+  const closeLabelOverlay = () => {
+    setIsVisible(false);
+  };
+
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <div className="label-overlay">
@@ -62,7 +74,7 @@ function LabelOverlay({ onClose, createNewLabel }) {
             Create Label
           </button>
         </div>
-        <button onClick={onClose} className="close-button-overlay">
+        <button onClick={closeLabelOverlay} className="close-button-overlay">
           X
         </button>
       </div>

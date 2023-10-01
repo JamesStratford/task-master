@@ -33,7 +33,7 @@ function LabelOverlay({ onClose, createNewLabel }) {
 
   return (
     <div className="label-overlay">
-      <div className="overlay-content">
+      <div className="label-overlay-content">
         <h5 className="overlay-header">Create Label</h5>
         <div className="label-input-container">
           <input

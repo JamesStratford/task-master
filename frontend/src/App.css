@@ -427,7 +427,13 @@ body {
     margin-left: 5px;
   }
 
+  /* Label Overlay content */
   .label-overlay {
-    background-color: red;
+    background-color: white;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.6);
+    margin-left: 10px;
+  }
+
+  .overlay-header {
+    color: black;
   }

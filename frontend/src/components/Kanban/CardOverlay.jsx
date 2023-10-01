@@ -179,7 +179,8 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
         <button onClick={onClose} className="close-button-overlay">
           <img src={require("./close.png")} alt="Close" />
         </button>
-        {isLabelOverlayVisible && (
+      </div>
+      {isLabelOverlayVisible && (
           <LabelOverlay
             // Pass any props that the LabelOverlay component needs
             // For example, you can pass a function to create a new label
@@ -189,8 +190,8 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
             setNewLabel={setNewLabel}
           />
         )}
-      </div>
     </div>
+    
   );
 }
 

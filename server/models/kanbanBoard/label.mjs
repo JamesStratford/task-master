@@ -8,7 +8,6 @@ const labelSchema = new mongoose.Schema({
   color: {
     type: String,
     required: false,
-    default: '#ff0000', // Red by default
   },
 });
 

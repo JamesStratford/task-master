@@ -58,6 +58,7 @@
         }
         }
         toggleLabelInput();
+        closeLabelOverlay();
     };
 
     // Function to close the LabelOverlay

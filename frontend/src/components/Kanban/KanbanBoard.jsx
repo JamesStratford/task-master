@@ -328,28 +328,28 @@ function KanbanBoard({ userInfo }) {
   };
 
   // Update all contents within a task
-  // const updateTaskContents = async (updatedTask) => {
-  //   try {
-  //     // Update the task in the local state
-  //     setState((prevState) => ({
-  //       ...prevState,
-  //       tasks: {
-  //         ...prevState.tasks,
-  //         [updatedTask.taskId]: updatedTask,
-  //       },
-  //     }));
+  const updateTaskContents = async (updatedTask) => {
+    try {
+      // Update the task in the local state
+      setKanbanColumns((prevState) => ({
+        ...prevState,
+        tasks: {
+          ...prevState.tasks,
+          [updatedTask.taskId]: updatedTask,
+        },
+      }));
   
-  //     // Update the task in the database
-  //     await axios.put(
-  //       `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
-  //       {
-  //         newTask: updatedTask,
-  //       }
-  //     );
-  //   } catch (error) {
-  //     console.error("Failed to update task:", error);
-  //   }
-  // };
+      // Update the task in the database
+      await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
+        {
+          newTask: updatedTask,
+        }
+      );
+    } catch (error) {
+      console.error("Failed to update task:", error);
+    }
+  };
 
   return (
     <DragDropContext

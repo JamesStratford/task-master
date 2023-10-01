@@ -9,9 +9,11 @@ export const useKanban = (socket, kanbanBoard, setKanbanBoard) => {
       );
       setKanbanBoard(data.data);
     };
+
     socket.on('updateBoard', () => {
       fetchData();
     });
+    
     console.log("Fetching Data for Board")
     fetchData();
   }, [socket, setKanbanBoard]);
@@ -57,7 +59,7 @@ export const useKanban = (socket, kanbanBoard, setKanbanBoard) => {
       updateBackend();
       setShouldUpdateBackend(false); // Reset the flag after making an API call
     }
-  }, [shouldUpdateBackend, kanbanBoard]);
+  }, [socket, shouldUpdateBackend, kanbanBoard]);
 
 
   return [updateKanbanBoard];

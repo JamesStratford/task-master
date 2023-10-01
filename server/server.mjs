@@ -86,6 +86,10 @@ io.on('connection', (socket) => {
   socket.on('dragEnd', (data) => {
     socket.broadcast.emit('dragEnd', { id: socket.id, ...data });
   });
+
+  socket.on('updateBoard', (data) => {
+    socket.broadcast.emit('updateBoard', { id: socket.id, ...data });
+  });
 });
 
 server.listen(PORT, () => {

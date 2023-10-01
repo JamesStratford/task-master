@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useContext, useRef } from 'react';
+import React, { useEffect, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { SocketContext } from './SocketContext';
-import { KanbanContext } from './KanbanContext';
 import { MultiplayerContext } from './MultiplayerContext';
 
 // Sub-component to render each cursor
@@ -33,7 +32,6 @@ const Multiplayer = ({ userInfo, parentRef }) => {
     const myCursor = useRef(null);
     const socket = useContext(SocketContext);
     const { setRemoteDrags, cursors, setCursors } = useContext(MultiplayerContext);
-    const { kanbanColumns, setKanbanColumns } = useContext(KanbanContext);
     const cursorsRef = useRef(cursors);
 
     useEffect(() => {

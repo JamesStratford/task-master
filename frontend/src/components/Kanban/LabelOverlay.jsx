@@ -13,49 +13,36 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     setIsColorPickerVisible(!isColorPickerVisible);
   };
 
-  // Function to handle creating a new label
   const createNewLabel = async () => {
-    // Check if the newLabel is empty or contains only whitespace
     if (!newLabel.trim() || !labelColor) {
-      console.error("Label text and color are required.");
+      // Label text and color are required.
       return;
     }
-
-    console.log(
-      "Making API request to:",
-      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`
-    );
-
+  
     try {
-      // Create a new label object using the text from the input field and the selected color
-      const newLabelObject = { text: newLabel.trim(), color: labelColor };
-
-      // Update the task in the local state
+      const newLabelObject = {
+        text: newLabel.trim(),
+        color: labelColor,
+        id: Date.now(),
+      };
+  
       setLabels([...labels, newLabelObject]);
-
-      // Update the task in the database
-      const response = await axios.post(
+  
+      await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`,
-        newLabelObject // Send the newLabelObject in the request body
+        newLabelObject
       );
-
-      // Log the response from the backend
-      console.log("Response from backend:", response.data);
-
-      // If successful, log a success message
-      console.log("Label successfully created:", newLabelObject);
     } catch (error) {
       console.error("Failed to create label:", error);
-
-      // Log the response data if available
+  
       if (error.response) {
         console.error("Response Data:", error.response.data);
       }
     }
-
+  
     toggleLabelInput();
     closeLabelOverlay();
-  };
+  };  
 
   // Function to close the LabelOverlay
   const handleClose = () => {

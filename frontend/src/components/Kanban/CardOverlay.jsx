@@ -8,7 +8,7 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
   const [description, setDescription] = useState(task.description || "");
   const [newLabel, setNewLabel] = useState(false);
   const [labelColor, setLabelColor] = useState("#ffffff");
-  const [labels, setLabels] = useState(task.labels || []);
+  const [labels, setLabels] = useState(task.labels || []); // Ensure labels is always an array
   const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
@@ -48,47 +48,6 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
     setIsLabelOverlayVisible(!isLabelOverlayVisible);
   };
 
-  // Function to create a new label
-  /*const createNewLabel = async () => {
-    // Check if the newLabel is empty or contains only whitespace
-    if (!newLabel.trim()) {
-      console.error("Label text is required."); 
-      return;
-    }
-
-    console.log(
-      "Making API request to:",
-      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`
-    );
-
-    try {
-      // Create a new label object using the text from the input field and the selected color
-      const newLabelObject = { text: newLabel.trim(), color: labelColor };
-
-      // Update the task in the local state
-      setLabels([...labels, newLabelObject]);
-
-      // Update the task in the database
-      await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`,
-        {
-          label: newLabelObject,
-        }
-      );
-
-      // If successful, log a success message
-      console.log("Label successfully created:", newLabelObject);
-    } catch (error) {
-      console.error("Failed to create label:", error);
-
-      // Log the response data if available
-      if (error.response) {
-        console.error("Response Data:", error.response.data);
-      }
-    }
-    toggleLabelInput();
-  };*/
-
   return (
     <div className="card-overlay">
       <div className="overlay-content">
@@ -98,53 +57,12 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
         <div className="labels">
           <h5 className="labels-header">
             Labels
-            {isLabelInputVisible ? (
-              <div className="label-input-container">
-                <input
-                  type="text"
-                  placeholder="Enter label text"
-                  value={newLabel}
-                  onChange={(e) => setNewLabel(e.target.value)}
-                  className="create-label-input"
-                />
-                <button
-                  className="change-color-btn"
-                  onClick={toggleColorPicker}
-                >
-                  <img
-                    src={require("./pick-color.png")}
-                    alt="Edit"
-                    style={{ width: "18px", height: "18px" }}
-                  />
-                </button>
-                {/* Update the onClick handler to toggleLabelOverlay */}
-                <button
-                  onClick={toggleLabelOverlay}
-                  className="create-label-btn"
-                >
-                  Create Label
-                </button>
-                <div className="color-picker-container">
-                  {isColorPickerVisible && (
-                    <div className="color-picker-popover">
-                      <SketchPicker
-                        color={labelColor}
-                        onChange={(color) => setLabelColor(color.hex)}
-                        disableAlpha={true}
-                        presetColors={[]}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              /* Update the onClick handler to toggleLabelOverlay */
               <button className="add-labels-btn" onClick={toggleLabelOverlay}>
                 +
               </button>
-            )}
           </h5>
-          <div className="labels-list">
+        </div>
+        <div className="labels-list">
             {labels.map((label, index) => (
               <span
                 key={index}
@@ -155,7 +73,6 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
               </span>
             ))}
           </div>
-        </div>
         <div className="description">
           <h5 className="description-header">Description</h5>
           <input
@@ -168,7 +85,7 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
             <button className="save-description-btn" onClick={handleUpdateTask}>
               Save
             </button>
-            <button 
+            <button
               className="cancel-description-btn"
               onClick={handleCancelEdit}
             >
@@ -181,17 +98,17 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
         </button>
         {isLabelOverlayVisible && (
           <LabelOverlay
-            // Pass any props that the LabelOverlay component needs
-            // For example, you can pass a function to create a new label
-            onClose={onClose} // Example prop
+            onClose={onClose}
             labelColor={labelColor}
             setLabelColor={setLabelColor}
             setNewLabel={setNewLabel}
+            labels={labels} // Pass the labels array to LabelOverlay
+            setLabels={setLabels} // Pass the setLabels function to LabelOverlay
+            toggleLabelInput={toggleLabelInput} // Pass the toggleLabelInput function to LabelOverlay
           />
         )}
       </div>
     </div>
-    
   );
 }
 

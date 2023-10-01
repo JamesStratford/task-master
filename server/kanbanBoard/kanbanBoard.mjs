@@ -1,5 +1,6 @@
 import Task from '../models/kanbanBoard/task.mjs';
 import Column from '../models/kanbanBoard/column.mjs';
+import Label from '../models/kanbanBoard/label.mjs';
 
 /**
 *   Add a task to the database
@@ -254,7 +255,23 @@ export const updateBoard = async (board) => {
     }
 };
 
-
-
-
-
+/**
+ * Save a label to the database.
+ * @param {object} req - The HTTP request object containing saved label data.
+ * @param {object} res - The HTTP response object.
+ * @returns {void}
+ */
+export const saveLabel = async (req, res) => {
+    console.log('Request to save-label endpoint received');
+    const labelData = req.body;
+    console.log("labelData:", labelData);
+    
+    try {
+        // Create a new label using the Label model
+        const newLabel = new Label(labelData);
+        await newLabel.save();
+        res.status(201).json(newLabel);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

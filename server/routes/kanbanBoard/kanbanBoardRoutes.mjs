@@ -10,8 +10,10 @@ import {
     updateColumnTaskIds,
     removeTaskFromColumn,
     updateTask,
+    saveLabel,
     deleteTask
 } from "../../kanbanBoard/kanbanBoard.mjs";
+import Label from '../../models/kanbanBoard/label.mjs';
 import express from 'express';
 import { io } from '../../server.mjs';
 
@@ -62,7 +64,7 @@ router.delete('/delete-task', async (req, res) => {
 
 
 router.post('/add-column', async (req, res) => {
-    const columnData = req.body; // Retrieve the column data from the request body
+    const columnData = req.body;
     try {
         await addColumn(columnData, res).then(() => {
             boardUpdatedHook(io)
@@ -147,7 +149,7 @@ router.put('/update-task', async (req, res) => {
     const task = req.body.newTask;
     try {
         await updateTask({ body: { ...task } }, res).then(() => {
-            boardUpdatedHook(io)
+            boardUpdatedHook(io);
         });
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -166,6 +168,14 @@ router.put('/update-board', async (req, res) => {
     } catch (error) {
         console.error('Error updating columns:', error.message);
         res.status(500).json({ message: error.message });
+    }
+});
+
+router.post('/save-label', async (req, res) => {
+    try {
+        await saveLabel(req, res); // Call the saveLabel function to handle the request
+    } catch (error) {
+        res.status(400).json({ message: error.message });
     }
 });
 

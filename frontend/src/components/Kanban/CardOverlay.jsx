@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { SketchPicker } from 'react-color';
+import { SketchPicker } from "react-color";
+import axios from "axios";
 
-function CardOverlay({
-  task,
-  onClose,
-  updateTaskDescription,
-}) {
-
-  // TODO: Add priorities and dates to card overlay
-  
+function CardOverlay({ task, onClose, updateTaskContents }) {
   // State to manage task description and labels
   const [description, setDescription] = useState(task.description || "");
-  const [newLabel, setNewLabel] = useState("");
+  const [newLabel, setNewLabel] = useState(false);
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [labels, setLabels] = useState(task.labels || []);
   const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
@@ -22,9 +16,14 @@ function CardOverlay({
     setDescription(e.target.value);
   };
 
-  // Function to save task description
-  const handleSaveDescription = () => {
-    updateTaskDescription(task.taskId, description);
+  // Function to save task description and labels
+  const handleUpdateTask = () => {
+    const updatedTask = {
+      ...task, // Keep the existing task data
+      description: description, // Update the description
+      labels: labels, // Update the labels
+    };
+    updateTaskContents(updatedTask);
   };
 
   // Function to cancel editing description
@@ -44,9 +43,42 @@ function CardOverlay({
   };
 
   // Function to create a new label
-  const createNewLabel = () => {
-    if (newLabel) {
-      setLabels([...labels, { text: newLabel, color: labelColor }]);
+  const createNewLabel = async () => {
+    // Check if the newLabel is empty or contains only whitespace
+    if (!newLabel.trim()) {
+      console.error("Label text is required."); 
+      return;
+    }
+
+    console.log(
+      "Making API request to:",
+      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`
+    );
+
+    try {
+      // Create a new label object using the text from the input field and the selected color
+      const newLabelObject = { text: newLabel.trim(), color: labelColor };
+
+      // Update the task in the local state
+      setLabels([...labels, newLabelObject]);
+
+      // Update the task in the database
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`,
+        {
+          label: newLabelObject,
+        }
+      );
+
+      // If successful, log a success message
+      console.log("Label successfully created:", newLabelObject);
+    } catch (error) {
+      console.error("Failed to create label:", error);
+
+      // Log the response data if available
+      if (error.response) {
+        console.error("Response Data:", error.response.data);
+      }
     }
     toggleLabelInput();
   };
@@ -73,11 +105,15 @@ function CardOverlay({
                   className="change-color-btn"
                   onClick={toggleColorPicker}
                 >
-                  <img src={require('./pick-color.png')} alt="Edit" style={{ width: '18px', height: '18px' }} />
+                  <img
+                    src={require("./pick-color.png")}
+                    alt="Edit"
+                    style={{ width: "18px", height: "18px" }}
+                  />
                 </button>
                 <button onClick={createNewLabel} className="create-label-btn">
                   Create Label
-                </button>   
+                </button>
                 <div className="color-picker-container">
                   {isColorPickerVisible && (
                     <div className="color-picker-popover">
@@ -117,11 +153,8 @@ function CardOverlay({
             onChange={handleDescriptionChange}
             className="description-input"
           />
-          <div className="input-button-container">  
-            <button
-              className="save-description-btn"
-              onClick={handleSaveDescription}
-            >
+          <div className="input-button-container">
+            <button className="save-description-btn" onClick={handleUpdateTask}>
               Save
             </button>
             <button

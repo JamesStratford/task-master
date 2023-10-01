@@ -256,3 +256,16 @@ export const saveLabel = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+/**
+ * Get all labels from the database.
+ * @returns {Label[]} - An array of all labels in the database.
+ */
+export const getAllLabels = async () => {
+    try {
+      const labels = await Label.find({});
+      return labels;
+    } catch (error) {
+      throw new Error(`Failed to get labels: ${error.message}`);
+    }
+  };

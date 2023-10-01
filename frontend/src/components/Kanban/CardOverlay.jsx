@@ -39,11 +39,6 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
     setNewLabel("");
   };
 
-  // Function to toggle color picker visibility
-  const toggleColorPicker = () => {
-    setIsColorPickerVisible(!isColorPickerVisible);
-  };
-
   const toggleLabelOverlay = () => {
     setIsLabelOverlayVisible(!isLabelOverlayVisible);
   };

@@ -46,7 +46,7 @@ function LabelOverlay({ onClose, createNewLabel }) {
   return (
     <div className="label-overlay">
       <div className="label-overlay-content">
-        <h5 className="overlay-header">Create Label</h5>
+        <h5 className="label-overlay-header">Create a label</h5>
         <div className="label-input-container">
           <input
             type="text"
@@ -55,29 +55,33 @@ function LabelOverlay({ onClose, createNewLabel }) {
             onChange={(e) => setNewLabel(e.target.value)}
             className="create-label-input"
           />
-          <button className="change-color-btn" onClick={toggleColorPicker}>
-            Pick Color
-          </button>
-          <div className="color-picker-container">
-            {isColorPickerVisible && (
-              <div className="color-picker-popover">
-                <SketchPicker
-                  color={labelColor}
-                  onChange={(color) => setLabelColor(color.hex)}
-                  disableAlpha={true}
-                  presetColors={[]}
-                />
-              </div>
-            )}
+          <div className="create-label-container" onClick={toggleColorPicker}>
+            <button className="change-color-btn" onClick={toggleColorPicker}>
+              <img
+                src={require("./pick-color.png")}
+                alt="Pick Color"
+                style={{ width: "20px", height: "20px" }}
+              />
+            </button>
+            <button onClick={handleCreateLabel} className="create-label-btn">
+              Create Label
+            </button>
           </div>
-          <button onClick={handleCreateLabel} className="create-label-btn">
-            Create Label
-          </button>
         </div>
         <button onClick={closeLabelOverlay} className="close-button-overlay">
           X
         </button>
       </div>
+      {isColorPickerVisible && (
+        <div className="color-picker-overlay">
+          <SketchPicker
+            color={labelColor}
+            onChange={(color) => setLabelColor(color.hex)}
+            disableAlpha={true}
+            presetColors={[]}
+          />
+        </div>
+      )}
     </div>
   );
 }

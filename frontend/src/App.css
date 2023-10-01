@@ -308,7 +308,7 @@ body {
 }
 
 .create-label-input {
-  width: 50%;
+  width: 90%;
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -317,12 +317,12 @@ body {
 
 .change-color-btn {
   background-color: rgb(238, 238, 238);
-  width: 8%;
+  width: 15%;
   border: none;
-  padding: 3px 2px;
+  padding: 7px px;
   border-radius: 4px;
   cursor: pointer;
-  margin-left: 5px;
+  margin-left: -5px;
   position: relative;
   top: 3px;
 }
@@ -332,7 +332,7 @@ body {
 }
 
 .create-label-btn {
-  width: 24%;
+  width: 75%;
   background-color: #3273dc;
   color: #ffffff;
   border: none;
@@ -427,27 +427,33 @@ body {
     margin-left: 5px;
   }
 
-/* Style for the parent container of both overlays */
+/* Label Overlay styling */
 .overlay-container {
-  position: relative; /* Make the container a positioning context for absolutely positioned children */
+  position: relative;
   display: flex;
-  align-items: flex-start; /* Align content to the top */
+  align-items: flex-start;
 }
 
-/* Style for Card Overlay */
-.card-overlay {
-  color: black;
-}
 
-/* Style for Label Overlay */
+/* Updated styling for Label Overlay */
 .label-overlay {
   background-color: white;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.6);
-  width: 60%;
-  margin-left: 2px; /* Adjust this value for spacing between the overlays */
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  margin: 0 auto;
+  width: 40%;
   position: absolute;
   top: 40%;
-  transition: left 0.3s ease-in-out; /* Add a transition for smooth animation */
+  left: 5%;
+  z-index: 1; /* Place it above the CardOverlay */
 }
+
+.label-overlay-header {
+  color: black;
+  font-size: 14px;
+}
+
 
 

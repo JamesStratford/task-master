@@ -7,7 +7,8 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [allLabels, setAllLabels] = useState([]); // State to store all labels from the database
+  const [allLabels, setAllLabels] = useState([]);
+  const [selectedLabel, setSelectedLabel] = useState(""); // State to store the selected label from the dropdown
 
   useEffect(() => {
     // Fetch all labels from the database when the component mounts
@@ -16,18 +17,17 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
         );
-        setAllLabels(response.data); // Set the fetched labels in state
+        setAllLabels(response.data);
       } catch (error) {
         console.error("Failed to fetch labels:", error);
       }
     };
 
     fetchAllLabels();
-  }, []); // Empty dependency array to run this effect only once
+  }, []);
 
   const createNewLabel = async () => {
     if (!newLabel.trim() || !labelColor) {
-      // Label text and color are required.
       return;
     }
 
@@ -55,10 +55,23 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     toggleLabelInput();
     closeLabelOverlay();
   };
-  
+
   // Function to toggle color picker visibility
   const toggleColorPicker = () => {
     setIsColorPickerVisible(!isColorPickerVisible);
+  };
+
+  const handleAddLabelToCard = () => {
+    // Check if a label is selected
+    if (selectedLabel) {
+      // Find the selected label in the allLabels array
+      const labelToAdd = allLabels.find((label) => label.text === selectedLabel);
+      if (labelToAdd) {
+        // Add the label to the current card's labels
+        setLabels([...labels, labelToAdd]);
+      }
+    }
+    closeLabelOverlay();
   };
 
   // New method to close only the LabelOverlay
@@ -74,7 +87,11 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     <div className="label-overlay">
       <div className="label-overlay-content">
         <div className="label-dropdown-container">
-          <select className="label-dropdown">
+          <select
+            className="label-dropdown"
+            value={selectedLabel}
+            onChange={(e) => setSelectedLabel(e.target.value)}
+          >
             <option value="">Select a Label</option>
             {allLabels.map((label) => (
               <option
@@ -86,6 +103,12 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
               </option>
             ))}
           </select>
+          <button
+            onClick={handleAddLabelToCard}
+            className="add-label-button"
+          >
+            +
+          </button>
         </div>
         <h5 className="label-overlay-header">Create a label</h5>
         <div className="label-input-container">

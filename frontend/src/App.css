@@ -433,7 +433,6 @@ body {
   align-items: flex-start;
 }
 
-
 /* Updated styling for Label Overlay */
 .label-overlay {
   background-color: white;
@@ -446,13 +445,42 @@ body {
   position: absolute;
   top: 40%;
   left: 5%;
-  z-index: 1; /* Place it above the CardOverlay */
+  z-index: 1;
 }
 
 .label-overlay-header {
   color: black;
   font-size: 14px;
 }
+
+.label-dropdown {
+  width: 75%;
+  padding: 7px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+.select-label-item {
+  display: flex; /* Use flex display for alignment */
+  align-items: center; /* Center the checkbox and label vertically */
+  width: 100%; /* Set the width to 80% */
+  margin-bottom: 10px; /* Add some margin between each label */
+}
+
+.select-label-text {
+  padding: 5px 10px;
+  color: white;
+  font-weight: 600;
+  background-color: #ffffff;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  flex-grow: 1;
+  padding: 5px; 
+}
+
 
 
 

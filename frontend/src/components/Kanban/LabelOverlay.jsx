@@ -8,10 +8,9 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [allLabels, setAllLabels] = useState([]);
-  const [selectedLabel, setSelectedLabel] = useState(""); // State to store the selected label from the dropdown
+  const [selectedLabel, setSelectedLabel] = useState("");
 
   useEffect(() => {
-    // Fetch all labels from the database when the component mounts
     const fetchAllLabels = async () => {
       try {
         const response = await axios.get(
@@ -56,25 +55,29 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     closeLabelOverlay();
   };
 
-  // Function to toggle color picker visibility
   const toggleColorPicker = () => {
     setIsColorPickerVisible(!isColorPickerVisible);
   };
 
   const handleAddLabelToCard = () => {
-    // Check if a label is selected
     if (selectedLabel) {
-      // Find the selected label in the allLabels array
       const labelToAdd = allLabels.find((label) => label.text === selectedLabel);
+
       if (labelToAdd) {
-        // Add the label to the current card's labels
-        setLabels([...labels, labelToAdd]);
+        const isLabelAlreadyAssigned = labels.some(
+          (label) => label.text === labelToAdd.text
+        );
+
+        if (!isLabelAlreadyAssigned) {
+          setLabels([...labels, labelToAdd]);
+        } else {
+          console.error("Label is already assigned to the card.");
+        }
       }
     }
     closeLabelOverlay();
   };
 
-  // New method to close only the LabelOverlay
   const closeLabelOverlay = () => {
     setIsVisible(false);
   };
@@ -82,6 +85,11 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   if (!isVisible) {
     return null;
   }
+
+  // Filter labels to exclude those already assigned to the card
+  const filteredLabels = allLabels.filter((label) => {
+    return !labels.some((cardLabel) => cardLabel.text === label.text);
+  });
 
   return (
     <div className="label-overlay">
@@ -93,7 +101,7 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
             onChange={(e) => setSelectedLabel(e.target.value)}
           >
             <option value="">Select a Label</option>
-            {allLabels.map((label) => (
+            {filteredLabels.map((label) => (
               <option
                 key={label.id}
                 value={label.text}

@@ -426,3 +426,8 @@ body {
     cursor: pointer;
     margin-left: 5px;
   }
+
+  .label-overlay {
+    background-color: red;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.6);
+  }

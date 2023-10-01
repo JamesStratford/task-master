@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { SketchPicker } from "react-color";
 import axios from "axios";
+import LabelOverlay from "./LabelOverlay";
 
 function CardOverlay({ task, onClose, updateTaskContents }) {
   // State to manage task description and labels
@@ -9,6 +10,7 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [labels, setLabels] = useState(task.labels || []);
   const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
+  const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
 
   // Function to handle description change
@@ -42,8 +44,12 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
     setIsColorPickerVisible(!isColorPickerVisible);
   };
 
+  const toggleLabelOverlay = () => {
+    setIsLabelOverlayVisible(!isLabelOverlayVisible);
+  };
+
   // Function to create a new label
-  const createNewLabel = async () => {
+  /*const createNewLabel = async () => {
     // Check if the newLabel is empty or contains only whitespace
     if (!newLabel.trim()) {
       console.error("Label text is required."); 
@@ -81,7 +87,7 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
       }
     }
     toggleLabelInput();
-  };
+  };*/
 
   return (
     <div className="card-overlay">
@@ -111,7 +117,11 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
                     style={{ width: "18px", height: "18px" }}
                   />
                 </button>
-                <button onClick={createNewLabel} className="create-label-btn">
+                {/* Update the onClick handler to toggleLabelOverlay */}
+                <button
+                  onClick={toggleLabelOverlay}
+                  className="create-label-btn"
+                >
                   Create Label
                 </button>
                 <div className="color-picker-container">
@@ -128,7 +138,8 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
                 </div>
               </div>
             ) : (
-              <button className="add-labels-btn" onClick={toggleLabelInput}>
+              /* Update the onClick handler to toggleLabelOverlay */
+              <button className="add-labels-btn" onClick={toggleLabelOverlay}>
                 +
               </button>
             )}
@@ -168,6 +179,16 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
         <button onClick={onClose} className="close-button-overlay">
           <img src={require("./close.png")} alt="Close" />
         </button>
+        {isLabelOverlayVisible && (
+          <LabelOverlay
+            // Pass any props that the LabelOverlay component needs
+            // For example, you can pass a function to create a new label
+            onClose={onClose} // Example prop
+            labelColor={labelColor}
+            setLabelColor={setLabelColor}
+            setNewLabel={setNewLabel}
+          />
+        )}
       </div>
     </div>
   );

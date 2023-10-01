@@ -63,7 +63,7 @@ function LabelOverlay({ onClose, createNewLabel }) {
           </button>
         </div>
         <button onClick={onClose} className="close-button-overlay">
-          Close
+          X
         </button>
       </div>
     </div>

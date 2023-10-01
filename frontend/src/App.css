@@ -427,13 +427,27 @@ body {
     margin-left: 5px;
   }
 
-  /* Label Overlay content */
-  .label-overlay {
-    background-color: white;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.6);
-    margin-left: 10px;
-  }
+/* Style for the parent container of both overlays */
+.overlay-container {
+  position: relative; /* Make the container a positioning context for absolutely positioned children */
+  display: flex;
+  align-items: flex-start; /* Align content to the top */
+}
 
-  .overlay-header {
-    color: black;
-  }
+/* Style for Card Overlay */
+.card-overlay {
+  /* Your existing styles for Card Overlay */
+}
+
+/* Style for Label Overlay */
+.label-overlay {
+  background-color: white;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.6);
+  width: 60%;
+  margin-left: 2px; /* Adjust this value for spacing between the overlays */
+  position: absolute;
+  top: 40%;
+  transition: left 0.3s ease-in-out; /* Add a transition for smooth animation */
+}
+
+

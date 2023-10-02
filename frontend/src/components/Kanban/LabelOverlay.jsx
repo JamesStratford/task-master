@@ -8,10 +8,14 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [allLabels, setAllLabels] = useState([]);
-  const [selectedLabel, setSelectedLabel] = useState(""); // State to store the selected label from the dropdown
+  const [selectedLabel, setSelectedLabel] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedLabel, setEditedLabel] = useState({
+    text: "",
+    color: "#ffffff",
+  });
 
   useEffect(() => {
-    // Fetch all labels from the database when the component mounts
     const fetchAllLabels = async () => {
       try {
         const response = await axios.get(
@@ -27,8 +31,6 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   }, []);
 
   const createNewLabel = async () => {
-    /* Creates a new label then adds it to the current card */
-
     if (!newLabel.trim() || !labelColor) {
       return;
     }
@@ -58,24 +60,39 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     closeLabelOverlay();
   };
 
-  // Function to toggle color picker visibility
   const toggleColorPicker = () => {
     setIsColorPickerVisible(!isColorPickerVisible);
   };
 
-  // Function to add a label to the current card
   const addLabelToCard = (label) => {
     if (!labels.some((assignedLabel) => assignedLabel.text === label.text)) {
       setLabels([...labels, label]);
     }
   };
 
-  // Function to remove a label from the current card
   const removeLabelFromCard = (label) => {
-    setLabels(labels.filter((assignedLabel) => assignedLabel.text !== label.text));
+    setLabels(
+      labels.filter((assignedLabel) => assignedLabel.text !== label.text)
+    );
   };
 
-  // New method to close only the LabelOverlay
+  const handleEditLabel = (label) => {
+    setIsEditing(!isEditing);
+    setSelectedLabel(label);
+    setEditedLabel({ text: label.text, color: label.color });
+  };
+
+  const handleSaveEditedLabel = () => {
+    const updatedLabels = labels.map((l) =>
+      l.text === selectedLabel.text
+        ? { text: editedLabel.text, color: editedLabel.color }
+        : l
+    );
+
+    setLabels(updatedLabels);
+    setIsEditing(false);
+  };
+
   const closeLabelOverlay = () => {
     setIsVisible(false);
   };
@@ -95,7 +112,9 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
                 type="checkbox"
                 className="select-label-checkbox"
                 value={label.text}
-                checked={labels.some((assignedLabel) => assignedLabel.text === label.text)}
+                checked={labels.some(
+                  (assignedLabel) => assignedLabel.text === label.text
+                )}
                 onChange={(e) => {
                   setSelectedLabel(label);
                   if (e.target.checked) {
@@ -111,6 +130,16 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
               >
                 {label.text}
               </span>
+              <button
+                onClick={() => handleEditLabel(label)}
+                className="edit-label-button"
+              >
+                <img
+                  src={require("./edit.png")}
+                  alt="Edit Label"
+                  style={{ width: "10px", height: "10px" }}
+                />
+              </button>
             </div>
           ))}
         </div>
@@ -148,6 +177,37 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
             disableAlpha={true}
             presetColors={[]}
           />
+        </div>
+      )}
+      {isEditing && (
+        <div className="editing-overlay">
+          <input
+            type="text"
+            value={editedLabel.text}
+            onChange={(e) =>
+              setEditedLabel({ ...editedLabel, text: e.target.value })
+            }
+            className="edit-label-input"
+          />
+          <div className="color-picker-container">
+            <SketchPicker
+              color={editedLabel.color}
+              onChange={(color) =>
+                setEditedLabel({ ...editedLabel, color: color.hex })
+              }
+              disableAlpha={true}
+              presetColors={[]}
+            />
+          </div>
+          <button onClick={handleSaveEditedLabel} className="save-label-button">
+            Save Label
+          </button>
+          <button
+            onClick={() => setIsEditing(false)}
+            className="close-button-overlay"
+          >
+            <img src={require("./close.png")} alt="Close" />
+          </button>
         </div>
       )}
     </div>

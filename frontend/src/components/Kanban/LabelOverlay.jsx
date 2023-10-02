@@ -105,7 +105,7 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     <div className="label-overlay">
       <div className="label-overlay-header">
         <div className="label-list">
-          <h5 className="label-overlay-header">Labels</h5>
+          <h1 className="label-overlay-header">Labels</h1>
           {allLabels.map((label) => (
             <div key={label.id} className="select-label-checkbox-container">
               <input
@@ -137,7 +137,7 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
                 <img
                   src={require("./edit.png")}
                   alt="Edit Label"
-                  style={{ width: "10px", height: "10px" }}
+                  style={{ width: "15px", height: "15px" }}
                 />
               </button>
             </div>
@@ -181,6 +181,13 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
       )}
       {isEditing && (
         <div className="editing-overlay">
+          {/* Preview of the current label */}
+          <div
+            className="label-preview"
+            style={{ backgroundColor: editedLabel.color }}
+          >
+            {editedLabel.text}
+          </div>
           <input
             type="text"
             value={editedLabel.text}

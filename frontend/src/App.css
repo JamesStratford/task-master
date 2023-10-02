@@ -438,27 +438,20 @@ body {
   background-color: white;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.6);
   border-radius: 10px;
-  padding: 20px;
+  padding-right: 20px;
+  padding-left: 20px;
+  padding-bottom: 20px;
   text-align: center;
   margin: 0 auto;
-  width: 40%;
+  width: 50%;
   position: absolute;
-  top: 40%;
+  top: 10%;
   left: 5%;
   z-index: 1;
 }
 
 .label-overlay-header {
   color: black;
-  font-size: 14px;
-}
-
-.label-dropdown {
-  width: 75%;
-  padding: 7px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-family: Arial, sans-serif;
   font-size: 14px;
 }
 
@@ -469,18 +462,6 @@ body {
   margin-bottom: 10px; /* Add some margin between each label */
 }
 
-.select-label-text {
-  padding: 5px 10px;
-  color: white;
-  font-weight: 600;
-  background-color: #ffffff;
-  border-radius: 8px;
-  font-family: Arial, sans-serif;
-  font-size: 16px;
-  flex-grow: 1;
-  padding: 5px; 
-}
-
 .select-label-checkbox-container {
   margin-bottom: 5px; /* Add margin to separate checkbox items */
 }
@@ -488,11 +469,59 @@ body {
 .select-label-text {
   padding: 5px 10px;
   background-color: #ffffff;
+  color: white;
+  font-weight: 600;
   border-radius: 8px;
   font-family: Arial, sans-serif;
   font-size: 14px;
   display: inline-block;
-  width: 70%; /* Make the label text take up 100% of the width within its container */
+  width: 55%; /* Make the label text take up 100% of the width within its container */
   vertical-align: middle; /* Align the label text vertically with the checkbox */
   margin-left: 10px; /* Add some space between the checkbox and label text */
+  margin-right: 10px;
 }
+
+.edit-label-button {
+  background-color: #ffffff;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+  padding-top: 5px;
+}
+
+.editing-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2; /* Place the editing overlay above the label editor */
+}
+
+/* Additional styling for the editing section elements */
+.edit-label-input {
+  margin-bottom: 10px;
+}
+
+.save-label-button {
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.close-button-overlay {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}
+

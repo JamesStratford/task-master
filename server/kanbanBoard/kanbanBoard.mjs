@@ -32,6 +32,19 @@ export const updateTask = async (req, res) => {
 };
 
 /**
+*   Delete a task from the database
+*   @param {string} taskId - The ID of the task to be deleted
+*/
+export const deleteTask = async (req, res) => {
+    const taskId = req.body.taskId;
+    try {
+        await Task.deleteOne({ taskId });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+/**
 *   Get the all tasks unordered
 *   @returns {Task[]}
 */
@@ -235,13 +248,13 @@ export const saveLabel = async (req, res) => {
     console.log("labelData:", labelData);
 
     try {
-        // Create a new label using the Label model
         const newLabel = new Label(labelData);
         await newLabel.save();
         res.status(201).json(newLabel);
     } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
+        console.error("Error creating label:", error);
+        res.status(400).json({ message: "Failed to create label", error: error.message });
+    }    
 };
 
 /**
@@ -264,7 +277,9 @@ export const getAllLabels = async () => {
  * @returns {void}
  */
 export const deleteLabel = async (req, res) => {
+    console.log("Request to delete-label endpoint received");
     const labelId = req.body.labelId;
+    console.log("labelId:", req.body.labelId)
     try {
         await Label.deleteOne({ _id: labelId }); // Assuming the label ID is stored as _id in MongoDB
         res.status(200).json({ message: 'Label deleted successfully' });

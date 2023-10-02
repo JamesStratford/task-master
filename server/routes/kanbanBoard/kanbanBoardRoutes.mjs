@@ -12,6 +12,8 @@ import {
     updateTask,
     saveLabel,
     getAllLabels,
+    deleteTask,
+    deleteLabel,
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import Label from '../../models/kanbanBoard/label.mjs';
 import express from 'express';
@@ -165,7 +167,7 @@ router.put('/reorder-columns', async (req, res) => {
 
 router.post('/save-label', async (req, res) => {
     try {
-        await saveLabel(req, res); // Call the saveLabel function to handle the request
+        await saveLabel(req, res);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -181,6 +183,7 @@ router.get('/get-all-labels', async (req, res) => {
 });
 
 router.delete('/delete-label', async (req, res) => {
+    console.log("deleting label...");
     try {
         await deleteLabel(req, res);
     } catch (error) {

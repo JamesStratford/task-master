@@ -63,7 +63,7 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   const handleDeleteLabel = async () => {
     try {
       console.log("Deleting label with ID:", selectedLabel._id); // Debugging statement
-  
+
       // Make an HTTP DELETE request with the correct labelId parameter
       await axios.delete(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/delete-label`,
@@ -71,33 +71,39 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
           data: { labelId: selectedLabel._id }, // Use selectedLabel._id
         }
       );
-  
+
       // After successful deletion, update the label list by filtering out the deleted label
       setAllLabels((prevLabels) =>
         prevLabels.filter((label) => label._id !== selectedLabel._id)
       );
-  
+
       setIsEditing(false); // Close the editing overlay
     } catch (error) {
       console.error("Failed to delete label:", error);
       // Handle the error as needed
     }
-  };  
+  };
 
   const toggleColorPicker = () => {
     setIsColorPickerVisible(!isColorPickerVisible);
   };
 
   const addLabelToCard = (label) => {
-    if (!labels.some((assignedLabel) => assignedLabel.text === label.text)) {
-      setLabels([...labels, label]);
+    // Check if the label exists in the system before adding it to a card
+    if (allLabels.some((systemLabel) => systemLabel.text === label.text)) {
+      if (!labels.some((assignedLabel) => assignedLabel.text === label.text)) {
+        setLabels([...labels, label]);
+      }
     }
   };
 
   const removeLabelFromCard = (label) => {
-    setLabels(
-      labels.filter((assignedLabel) => assignedLabel.text !== label.text)
-    );
+    // Remove the label from the card only if it exists in the system
+    if (allLabels.some((systemLabel) => systemLabel.text === label.text)) {
+      setLabels(
+        labels.filter((assignedLabel) => assignedLabel.text !== label.text)
+      );
+    }
   };
 
   const handleEditLabel = (label) => {
@@ -106,16 +112,39 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     setEditedLabel({ text: label.text, color: label.color });
   };
 
-  const handleSaveEditedLabel = () => {
-    console.log("SAVING LABEL");
-    const updatedLabels = labels.map((l) =>
-      l.text === selectedLabel.text
-        ? { text: editedLabel.text, color: editedLabel.color }
-        : l
-    );
+  const handleSaveEditedLabel = async () => {
+    try {
+      const updatedLabel = {
+        _id: selectedLabel._id, // Assuming selectedLabel.id is the label's ID
+        text: editedLabel.text,
+        color: editedLabel.color,
+      };
 
-    setLabels(updatedLabels);
-    setIsEditing(false);
+      console.log("Sending update request with data:", updatedLabel);
+
+      // Send a PUT request to update the label
+      const response = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-label`,
+        updatedLabel
+      );
+
+      if (response.status === 200) {
+        const updatedLabels = labels.map((l) =>
+          l._id === selectedLabel._id ? response.data : l
+        );
+        setLabels(updatedLabels);
+        setIsEditing(false);
+      } else {
+        console.error("Failed to update label:", response.data.message);
+      }
+
+      console.log("Updated Label Data:", updatedLabel);
+      console.log("Received Response from Server:", response);
+
+      // Rest of the code...
+    } catch (error) {
+      console.error("Failed to save edited label:", error);
+    }
   };
 
   const closeLabelOverlay = () => {
@@ -151,9 +180,17 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
               />
               <span
                 className="select-label-text"
-                style={{ backgroundColor: label.color }}
+                style={{
+                  backgroundColor:
+                    editedLabel.text === label.text
+                      ? editedLabel.color
+                      : label.color,
+                  // Add additional styling as needed
+                }}
               >
-                {label.text}
+                {editedLabel.text === label.text
+                  ? editedLabel.text
+                  : label.text}
               </span>
               <button
                 onClick={() => handleEditLabel(label)}

@@ -14,6 +14,7 @@ import {
     getAllLabels,
     deleteTask,
     deleteLabel,
+    updateLabel,
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import Label from '../../models/kanbanBoard/label.mjs';
 import express from 'express';
@@ -94,7 +95,6 @@ router.put('/update-column', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
-
 
 router.get('/get-columns', async (req, res) => {
     try {
@@ -186,6 +186,14 @@ router.delete('/delete-label', async (req, res) => {
     console.log("deleting label...");
     try {
         await deleteLabel(req, res);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/update-label', async (req, res) => {
+    try {
+        await updateLabel(req, res); // Call the handleUpdateLabel function
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

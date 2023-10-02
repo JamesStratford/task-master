@@ -8,7 +8,7 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
   const [description, setDescription] = useState(task.description || "");
   const [newLabel, setNewLabel] = useState(false);
   const [labelColor, setLabelColor] = useState("#ffffff");
-  const [labels, setLabels] = useState(task.labels || []); // Ensure labels is always an array
+  const [labels, setLabels] = useState(task.labels || []);
   const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);

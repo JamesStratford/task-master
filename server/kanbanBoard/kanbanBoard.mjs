@@ -296,24 +296,24 @@ export const deleteLabel = async (req, res) => {
  */
 export const updateLabel = async (req, res) => {
     try {
-      const updatedLabel = req.body;
-      console.log("Updating label...", updatedLabel);
-  
-      const label = await Label.findOneAndUpdate(
-        { _id: updatedLabel._id },
-        updatedLabel,
-        { new: true }
-      );
-  
-      if (!label) {
-        return res.status(404).json({ message: "Label not found" });
-      }
-  
-      res.status(200).json(label);
+        const updatedLabel = req.body;
+        console.log("Updating label...", updatedLabel);
+
+        const label = await Label.findOneAndUpdate(
+            { _id: updatedLabel._id },
+            updatedLabel,
+            { new: true }
+        );
+
+        if (!label) {
+            return res.status(404).json({ message: "Label not found" });
+        }
+
+        res.status(200).json(label);
     } catch (error) {
-      res.status(400).json({ message: error.message });
+        res.status(400).json({ message: error.message });
     }
-  };
-  
+};
+
 
 

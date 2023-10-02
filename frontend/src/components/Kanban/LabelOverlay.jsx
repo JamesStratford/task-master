@@ -22,14 +22,19 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
           `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
         );
     
+        // Filter out labels that already exist in the labels state
+        const newLabels = response.data.filter(
+          (label) => !labels.some((l) => l._id === label._id)
+        );
+    
         // Merge the local labels with the fetched labels
-        const mergedLabels = [...labels, ...response.data];
+        const mergedLabels = [...labels, ...newLabels];
     
         setAllLabels(mergedLabels);
       } catch (error) {
         console.error("Failed to fetch labels:", error);
       }
-    };     
+    };    
 
     fetchAllLabels();
   }, []);
@@ -38,31 +43,35 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     if (!newLabel.trim() || !labelColor) {
       return;
     }
-
+  
     try {
       const newLabelObject = {
         text: newLabel.trim(),
         color: labelColor,
-        id: Date.now(),
       };
-
-      setLabels([...labels, newLabelObject]);
-
-      await axios.post(
+  
+      const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`,
         newLabelObject
       );
+  
+      // Assuming the server responds with the created label
+      const createdLabel = response.data;
+  
+      // Update the state with the created label, including its generated "_id"
+      setLabels([...labels, createdLabel]);
+  
     } catch (error) {
       console.error("Failed to create label:", error);
-
+  
       if (error.response) {
         console.error("Response Data:", error.response.data);
       }
     }
-
+  
     toggleLabelInput();
     closeLabelOverlay();
-  };
+  };  
 
   const handleDeleteLabel = async () => {
     try {
@@ -161,7 +170,7 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
         <div className="label-list">
           <h1 className="label-overlay-header">Labels</h1>
           {allLabels.map((label) => (
-            <div key={label.id} className="select-label-checkbox-container">
+            <div key={label._id} className="select-label-checkbox-container">
               <input
                 type="checkbox"
                 className="select-label-checkbox"

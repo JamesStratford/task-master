@@ -499,7 +499,8 @@ body {
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: top;
+  padding-top: 40px;
   align-items: center;
   z-index: 2; /* Place the editing overlay above the label editor */
 }
@@ -507,6 +508,7 @@ body {
 /* Additional styling for the editing section elements */
 .edit-label-input {
   margin-bottom: 10px;
+  width: 80%;
 }
 
 .save-label-button {
@@ -524,4 +526,23 @@ body {
   right: 5px;
   cursor: pointer;
 }
+
+.label-preview {
+  background-color: #ffffff;
+  color: white;
+  padding: 8px;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding-left: 40px;
+  padding-right: 40px;
+  border-radius: 10px;
+}
+
+.edit-label-button-container {
+  display: flex;
+  justify-content: space-between;
+  max-width: 100%;
+}
+
 

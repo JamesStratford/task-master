@@ -60,6 +60,29 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     closeLabelOverlay();
   };
 
+  const handleDeleteLabel = async () => {
+    try {
+      console.log("Deleting label with ID:", selectedLabel.id); // Debugging statement
+      // Make an HTTP DELETE request with the correct labelId parameter
+      const response = await axios.delete("/api/kanban/delete-label", {
+        data: { labelId: selectedLabel.id }, // Use selectedLabel._id
+      });
+      console.log("Delete label response:", response.data); // Log the response or handle it as needed
+  
+      if (response.status === 200) {
+        console.log("Label deleted successfully.");
+      } else {
+        console.error("Label deletion failed. Status:", response.status);
+      }
+  
+      setIsEditing(false); // Close the editing overlay
+    } catch (error) {
+      console.error("Failed to delete label:", error);
+      // Handle the error as needed
+    }
+  };
+  
+
   const toggleColorPicker = () => {
     setIsColorPickerVisible(!isColorPickerVisible);
   };
@@ -181,9 +204,8 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
       )}
       {isEditing && (
         <div className="editing-overlay">
-          {/* Preview of the current label */}
           <div
-            className="label-preview"
+            className="edit-label-preview"
             style={{ backgroundColor: editedLabel.color }}
           >
             {editedLabel.text}
@@ -206,9 +228,17 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
               presetColors={[]}
             />
           </div>
-          <button onClick={handleSaveEditedLabel} className="save-label-button">
-            Save Label
-          </button>
+          <div className="edit-label-button-container">
+            <button
+              onClick={handleSaveEditedLabel}
+              className="save-label-button"
+            >
+              Save Label
+            </button>
+            <button onClick={handleDeleteLabel} className="delete-label-button">
+              Delete Label
+            </button>
+          </div>
           <button
             onClick={() => setIsEditing(false)}
             className="close-button-overlay"

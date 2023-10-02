@@ -32,19 +32,6 @@ export const updateTask = async (req, res) => {
 };
 
 /**
-*   Delete a task from the database
-*   @param {string} taskId - The ID of the task to be deleted
-*/
-export const deleteTask = async (req, res) => {
-    const taskId = req.body.taskId;
-    try {
-        await Task.deleteOne({ taskId });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-/**
 *   Get the all tasks unordered
 *   @returns {Task[]}
 */
@@ -222,7 +209,7 @@ export const updateColumnTaskIds = async (req, res) => {
  */
 export const reorderColumns = async (req, res) => {
     const columns = req.updatedColumns; // Assuming req.body contains an array of columns in the desired order
-    
+
     try {
         // Iterate through the columns and update them in the database
         for (let i = 0; i < columns.length; i++) {
@@ -246,7 +233,7 @@ export const saveLabel = async (req, res) => {
     console.log('Request to save-label endpoint received');
     const labelData = req.body;
     console.log("labelData:", labelData);
-    
+
     try {
         // Create a new label using the Label model
         const newLabel = new Label(labelData);
@@ -263,9 +250,25 @@ export const saveLabel = async (req, res) => {
  */
 export const getAllLabels = async () => {
     try {
-      const labels = await Label.find({});
-      return labels;
+        const labels = await Label.find({});
+        return labels;
     } catch (error) {
-      throw new Error(`Failed to get labels: ${error.message}`);
+        throw new Error(`Failed to get labels: ${error.message}`);
     }
-  };
+};
+
+/**
+ * Delete a label from the database
+ * @param {object} req - The HTTP request object containing labelId
+ * @param {object} res - The HTTP response object.
+ * @returns {void}
+ */
+export const deleteLabel = async (req, res) => {
+    const labelId = req.body.labelId;
+    try {
+        await Label.deleteOne({ _id: labelId }); // Assuming the label ID is stored as _id in MongoDB
+        res.status(200).json({ message: 'Label deleted successfully' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

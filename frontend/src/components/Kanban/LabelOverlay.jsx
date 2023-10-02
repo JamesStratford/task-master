@@ -21,11 +21,15 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
         );
-        setAllLabels(response.data);
+    
+        // Merge the local labels with the fetched labels
+        const mergedLabels = [...labels, ...response.data];
+    
+        setAllLabels(mergedLabels);
       } catch (error) {
         console.error("Failed to fetch labels:", error);
       }
-    };
+    };     
 
     fetchAllLabels();
   }, []);
@@ -119,33 +123,29 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
         text: editedLabel.text,
         color: editedLabel.color,
       };
-
-      console.log("Sending update request with data:", updatedLabel);
-
-      // Send a PUT request to update the label
-      const response = await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-label`,
-        updatedLabel
+  
+      // Update the label in the local state without making an API call
+      const updatedLabels = labels.map((l) =>
+        l._id === selectedLabel._id ? { ...l, ...updatedLabel } : l
       );
-
-      if (response.status === 200) {
-        const updatedLabels = labels.map((l) =>
-          l._id === selectedLabel._id ? response.data : l
+  
+      // Update both labels and allLabels
+      setLabels(updatedLabels);
+  
+      // Also, update allLabels with the updated label
+      setAllLabels((prevAllLabels) => {
+        return prevAllLabels.map((label) =>
+          label._id === selectedLabel._id ? { ...label, ...updatedLabel } : label
         );
-        setLabels(updatedLabels);
-        setIsEditing(false);
-      } else {
-        console.error("Failed to update label:", response.data.message);
-      }
-
-      console.log("Updated Label Data:", updatedLabel);
-      console.log("Received Response from Server:", response);
-
+      });
+  
+      setIsEditing(false);
+  
       // Rest of the code...
     } catch (error) {
       console.error("Failed to save edited label:", error);
     }
-  };
+  };  
 
   const closeLabelOverlay = () => {
     setIsVisible(false);

@@ -63,6 +63,7 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   const handleDeleteLabel = async () => {
     try {
       console.log("Deleting label with ID:", selectedLabel._id); // Debugging statement
+  
       // Make an HTTP DELETE request with the correct labelId parameter
       await axios.delete(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/delete-label`,
@@ -70,12 +71,18 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
           data: { labelId: selectedLabel._id }, // Use selectedLabel._id
         }
       );
+  
+      // After successful deletion, update the label list by filtering out the deleted label
+      setAllLabels((prevLabels) =>
+        prevLabels.filter((label) => label._id !== selectedLabel._id)
+      );
+  
       setIsEditing(false); // Close the editing overlay
     } catch (error) {
       console.error("Failed to delete label:", error);
       // Handle the error as needed
     }
-  };
+  };  
 
   const toggleColorPicker = () => {
     setIsColorPickerVisible(!isColorPickerVisible);

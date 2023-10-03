@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SketchPicker } from "react-color";
 import axios from "axios";
 
-function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
+function LabelOverlay({ labels, setLabels, toggleLabelInput, updateLabels }) {
   const [newLabel, setNewLabel] = useState("");
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
@@ -15,7 +15,6 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     color: "#ffffff",
   });
 
-  // Fetch labels data when the component mounts
   useEffect(() => {
     const fetchAllLabels = async () => {
       try {
@@ -23,7 +22,6 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
           `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
         );
 
-        // Merge the fetched labels with the local labels
         const mergedLabels = response.data;
 
         setAllLabels(mergedLabels);
@@ -40,16 +38,13 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
       return;
     }
 
-    // Check if a label with the same text already exists
     const labelExists = allLabels.some(
       (label) => label.text === newLabel.trim()
     );
 
     if (labelExists) {
-      // Handle the case where a label with the same text exists
       console.error("Label with the same text already exists");
       closeLabelOverlay();
-      // You can display an error message or take other actions as needed
       return;
     }
 
@@ -64,11 +59,10 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
         newLabelObject
       );
 
-      // Assuming the server responds with the created label
       const createdLabel = response.data;
 
-      // Update the state with the created label, including its generated "_id"
       setLabels([...labels, createdLabel]);
+      updateLabels([...labels, createdLabel]);
     } catch (error) {
       console.error("Failed to create label:", error);
 
@@ -83,25 +77,22 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
 
   const handleDeleteLabel = async () => {
     try {
-      console.log("Deleting label with ID:", selectedLabel._id); // Debugging statement
+      console.log("Deleting label with ID:", selectedLabel._id);
 
-      // Make an HTTP DELETE request with the correct labelId parameter
       await axios.delete(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/delete-label`,
         {
-          data: { labelId: selectedLabel._id }, // Use selectedLabel._id
+          data: { labelId: selectedLabel._id },
         }
       );
 
-      // After successful deletion, update the label list by filtering out the deleted label
       setAllLabels((prevLabels) =>
         prevLabels.filter((label) => label._id !== selectedLabel._id)
       );
 
-      setIsEditing(false); // Close the editing overlay
+      setIsEditing(false);
     } catch (error) {
       console.error("Failed to delete label:", error);
-      // Handle the error as needed
     }
   };
 
@@ -110,19 +101,17 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   };
 
   const addLabelToCard = (label) => {
-    // Check if the label exists in the system before adding it to a card
     if (allLabels.some((systemLabel) => systemLabel.text === label.text)) {
-      if (!labels.some((assignedLabel) => assignedLabel.text === label.text)) {
+      if (!labels.some((assignedLabel) => assignedLabel._id === label._id)) {
         setLabels([...labels, label]);
       }
     }
   };
 
   const removeLabelFromCard = (label) => {
-    // Remove the label from the card only if it exists in the system
     if (allLabels.some((systemLabel) => systemLabel.text === label.text)) {
       setLabels(
-        labels.filter((assignedLabel) => assignedLabel.text !== label.text)
+        labels.filter((assignedLabel) => assignedLabel._id !== label._id)
       );
     }
   };
@@ -136,38 +125,35 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   const handleSaveEditedLabel = async () => {
     try {
       const updatedLabel = {
-        _id: selectedLabel._id, // Assuming selectedLabel._id is the label's ID
-        text: editedLabel.text, // Use the text from editedLabel state
-        color: editedLabel.color, // Use the color from editedLabel state
+        _id: selectedLabel._id,
+        text: editedLabel.text,
+        color: editedLabel.color,
       };
-  
-      // Update the label in the local state without making an API call
+
       const updatedLabels = labels.map((l) =>
         l._id === selectedLabel._id ? { ...l, ...updatedLabel } : l
       );
-  
-      // Update both labels and allLabels
+
       setLabels(updatedLabels);
-  
+
       setAllLabels((prevAllLabels) => {
         return prevAllLabels.map((label) =>
-          label._id === selectedLabel._id ? { ...label, ...updatedLabel } : label
+          label._id === selectedLabel._id
+            ? { ...label, ...updatedLabel }
+            : label
         );
       });
-  
+
       setIsEditing(false);
-  
-      // Make an API request to update the label in the database
+
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-label`,
         updatedLabel
       );
-  
-      // Rest of the code...
     } catch (error) {
       console.error("Failed to save edited label:", error);
     }
-  };  
+  };
 
   const closeLabelOverlay = () => {
     setIsVisible(false);
@@ -189,7 +175,7 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
                 className="select-label-checkbox"
                 value={label.text}
                 checked={labels.some(
-                  (assignedLabel) => assignedLabel.text === label.text
+                  (assignedLabel) => assignedLabel._id === label._id
                 )}
                 onChange={(e) => {
                   setSelectedLabel(label);
@@ -204,13 +190,12 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
                 className="select-label-text"
                 style={{
                   backgroundColor:
-                    editedLabel.text === label.text
+                    editedLabel._id === label._id
                       ? editedLabel.color
                       : label.color,
-                  // Add additional styling as needed
                 }}
               >
-                {editedLabel.text === label.text
+                {editedLabel._id === label._id
                   ? editedLabel.text
                   : label.text}
               </span>

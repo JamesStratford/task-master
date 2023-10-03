@@ -136,35 +136,38 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
   const handleSaveEditedLabel = async () => {
     try {
       const updatedLabel = {
-        _id: selectedLabel._id, // Assuming selectedLabel.id is the label's ID
-        text: editedLabel.text,
-        color: editedLabel.color,
+        _id: selectedLabel._id, // Assuming selectedLabel._id is the label's ID
+        text: editedLabel.text, // Use the text from editedLabel state
+        color: editedLabel.color, // Use the color from editedLabel state
       };
-
+  
       // Update the label in the local state without making an API call
       const updatedLabels = labels.map((l) =>
         l._id === selectedLabel._id ? { ...l, ...updatedLabel } : l
       );
-
+  
       // Update both labels and allLabels
       setLabels(updatedLabels);
-
-      // Also, update allLabels with the updated label
+  
       setAllLabels((prevAllLabels) => {
         return prevAllLabels.map((label) =>
-          label._id === selectedLabel._id
-            ? { ...label, ...updatedLabel }
-            : label
+          label._id === selectedLabel._id ? { ...label, ...updatedLabel } : label
         );
       });
-
+  
       setIsEditing(false);
-
+  
+      // Make an API request to update the label in the database
+      await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-label`,
+        updatedLabel
+      );
+  
       // Rest of the code...
     } catch (error) {
       console.error("Failed to save edited label:", error);
     }
-  };
+  };  
 
   const closeLabelOverlay = () => {
     setIsVisible(false);

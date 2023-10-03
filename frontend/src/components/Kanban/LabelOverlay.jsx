@@ -15,26 +15,22 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     color: "#ffffff",
   });
 
+  // Fetch labels data when the component mounts
   useEffect(() => {
     const fetchAllLabels = async () => {
       try {
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
         );
-    
-        // Filter out labels that already exist in the labels state
-        const newLabels = response.data.filter(
-          (label) => !labels.some((l) => l._id === label._id)
-        );
-    
-        // Merge the local labels with the fetched labels
-        const mergedLabels = [...labels, ...newLabels];
-    
+
+        // Merge the fetched labels with the local labels
+        const mergedLabels = response.data;
+
         setAllLabels(mergedLabels);
       } catch (error) {
         console.error("Failed to fetch labels:", error);
       }
-    };    
+    };
 
     fetchAllLabels();
   }, []);
@@ -43,35 +39,47 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
     if (!newLabel.trim() || !labelColor) {
       return;
     }
-  
+
+    // Check if a label with the same text already exists
+    const labelExists = allLabels.some(
+      (label) => label.text === newLabel.trim()
+    );
+
+    if (labelExists) {
+      // Handle the case where a label with the same text exists
+      console.error("Label with the same text already exists");
+      closeLabelOverlay();
+      // You can display an error message or take other actions as needed
+      return;
+    }
+
     try {
       const newLabelObject = {
         text: newLabel.trim(),
         color: labelColor,
       };
-  
+
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`,
         newLabelObject
       );
-  
+
       // Assuming the server responds with the created label
       const createdLabel = response.data;
-  
+
       // Update the state with the created label, including its generated "_id"
       setLabels([...labels, createdLabel]);
-  
     } catch (error) {
       console.error("Failed to create label:", error);
-  
+
       if (error.response) {
         console.error("Response Data:", error.response.data);
       }
     }
-  
+
     toggleLabelInput();
     closeLabelOverlay();
-  };  
+  };
 
   const handleDeleteLabel = async () => {
     try {
@@ -132,29 +140,31 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, onClose }) {
         text: editedLabel.text,
         color: editedLabel.color,
       };
-  
+
       // Update the label in the local state without making an API call
       const updatedLabels = labels.map((l) =>
         l._id === selectedLabel._id ? { ...l, ...updatedLabel } : l
       );
-  
+
       // Update both labels and allLabels
       setLabels(updatedLabels);
-  
+
       // Also, update allLabels with the updated label
       setAllLabels((prevAllLabels) => {
         return prevAllLabels.map((label) =>
-          label._id === selectedLabel._id ? { ...label, ...updatedLabel } : label
+          label._id === selectedLabel._id
+            ? { ...label, ...updatedLabel }
+            : label
         );
       });
-  
+
       setIsEditing(false);
-  
+
       // Rest of the code...
     } catch (error) {
       console.error("Failed to save edited label:", error);
     }
-  };  
+  };
 
   const closeLabelOverlay = () => {
     setIsVisible(false);

@@ -193,9 +193,37 @@ router.delete('/delete-label', async (req, res) => {
 
 router.put('/update-label', async (req, res) => {
     try {
-        await updateLabel(req, res); // Call the handleUpdateLabel function
+        await updateLabel(req, res);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/update-label-list', async (req, res) => {
+    const updatedLabels = req.body.updatedLabels; // Updated list of labels
+
+    try {
+        // Loop through the updatedLabels and update each label in the database
+        for (const updatedLabel of updatedLabels) {
+            // Find the label by its ID
+            const label = await Label.findOne({ _id: updatedLabel._id });
+
+            if (!label) {
+                return res.status(404).json({ message: 'Label not found' });
+            }
+
+            // Update the label data with the new data
+            label.text = updatedLabel.text;
+            label.color = updatedLabel.color;
+
+            // Save the updated label
+            await label.save();
+        }
+
+        res.status(200).json({ message: 'Label list updated successfully' });
+    } catch (error) {
+        console.error("Error updating label list:", error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

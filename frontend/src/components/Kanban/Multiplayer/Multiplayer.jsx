@@ -13,7 +13,7 @@ const Cursor = ({ id, pos }) => (
     }}>
         <img
             src={`https://cdn.discordapp.com/avatars/${pos.discordId}/${pos.avatar}?size=80`}
-            alt="Cursor"
+            alt={`Cursor-${id}`}
             style={{
                 width: '20px',
                 height: '20px',
@@ -106,8 +106,7 @@ const Multiplayer = ({ userInfo, parentRef }) => {
                 const updatedRemoteDrags = { ...prevRemoteDrags };
                 delete updatedRemoteDrags[data.draggableId];  // Mark this item as no longer being dragged remotely
                 return updatedRemoteDrags;
-            });
-            console.log('data', data)           
+            });    
         };
 
         socket.on('dragStart', handleDragStart);

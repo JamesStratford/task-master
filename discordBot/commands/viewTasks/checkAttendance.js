@@ -36,8 +36,8 @@ module.exports = {
                 // Check if column with title "Meeting" exists
                 let meetingColumn;
                 try {
-                    const columns = await axios.get('/get-columns'); // Update this URL if necessary
-                    meetingColumn = columns.data.find(column => column.title === 'Meeting');
+                    const columns = await axios.get('/get-columns'); 
+                    meetingColumn = columns.data.find(column => column.title === 'Meeting Minutes');
                 } catch (err) {
                     console.error('Error fetching columns:', err);
                     await interaction.reply('Error checking or creating Meeting column.');
@@ -47,7 +47,7 @@ module.exports = {
                 // If column with title "Meeting" doesn't exist, create it.
                 if (!meetingColumn) {
                     try {
-                        const newColumn = { title: 'Meeting', taskIds: [] };
+                        const newColumn = { title: 'Meeting Minutes', taskIds: [] };
                         meetingColumn = (await axios.post('/add-column', newColumn)).data;
                     } catch (err) {
                         console.error('Error creating new Meeting column:', err);
@@ -58,14 +58,19 @@ module.exports = {
 
                 // Add a new task with content "Meeting" and description as member names
                 try {
-                    const newTask = {
-                        content: 'Meeting attendees: ' + memberNames,
+
+                        // Format the current date.
+                        const currentDate = new Date();
+                        const formattedDate = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
+                        
+                        const newTask = {
+                        content: `${formattedDate} Meeting attendees: ${memberNames}`,
                         labels: [],
                     };
                     const createdTask = (await axios.post('/add-task', { newCard: newTask, columnId: meetingColumn.id })).data;
                 } catch (err) {
                     console.error('Error adding task:', err);
-                    await interaction.reply('Error adding task to the Meeting column.');
+                    await interaction.reply('Error adding meeting to the Meeting column.');
                 }
             } catch (err) {
                 console.error("Error fetching members:", err);

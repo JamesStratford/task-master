@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { SocketContext } from '../../../components/Kanban/Multiplayer/SocketContext';
 import { MultiplayerContext } from '../../../components/Kanban/Multiplayer/MultiplayerContext';
 import Multiplayer from '../../../components/Kanban/Multiplayer/Multiplayer';

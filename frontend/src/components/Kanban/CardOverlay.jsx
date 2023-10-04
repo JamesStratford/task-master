@@ -3,7 +3,13 @@ import { SketchPicker } from "react-color";
 import axios from "axios";
 import LabelOverlay from "./LabelOverlay";
 
-function CardOverlay({ task, onClose, updateTaskContents }) {
+function CardOverlay({
+  task,
+  onClose,
+  updateTaskContents,
+  allLabels,
+  setAllLabels,
+}) {
   // State to manage task description and labels
   const [description, setDescription] = useState(task.description || "");
   const [newLabel, setNewLabel] = useState(false);
@@ -19,12 +25,24 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
   };
 
   // Function to save task description and labels
+  // When you save an edited label, update allLabels using the setAllLabels prop
   const handleUpdateTask = () => {
     const updatedTask = {
-      ...task, // Keep the existing task data
-      description: description, // Update the description
-      labels: labels, // Update the labels
+      ...task,
+      description: description,
+      labels: labels,
     };
+
+    // Check if the edited label is new (not in allLabels)
+    const isNewLabel = !allLabels.some((label) =>
+      labels.some((l) => l.text === label.text)
+    );
+
+    // If it's a new label, add it to allLabels
+    if (isNewLabel) {
+      setAllLabels([...allLabels, ...labels]);
+    }
+
     updateTaskContents(updatedTask);
   };
 
@@ -52,22 +70,22 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
         <div className="labels">
           <h5 className="labels-header">
             Labels
-              <button className="add-labels-btn" onClick={toggleLabelOverlay}>
-                +
-              </button>
+            <button className="add-labels-btn" onClick={toggleLabelOverlay}>
+              +
+            </button>
           </h5>
         </div>
         <div className="labels-list">
-            {labels.map((label, index) => (
-              <span
-                key={index}
-                className="label-text"
-                style={{ backgroundColor: label.color }}
-              >
-                {label.text}
-              </span>
-            ))}
-          </div>
+          {labels.map((label, index) => (
+            <span
+              key={index}
+              className="label-text"
+              style={{ backgroundColor: label.color }}
+            >
+              {label.text}
+            </span>
+          ))}
+        </div>
         <div className="description">
           <h5 className="description-header">Description</h5>
           <input
@@ -100,6 +118,8 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
             labels={labels} // Pass the labels array to LabelOverlay
             setLabels={setLabels} // Pass the setLabels function to LabelOverlay
             toggleLabelInput={toggleLabelInput} // Pass the toggleLabelInput function to LabelOverlay
+            allLabels={allLabels}
+            setAllLabels={setAllLabels}
           />
         )}
       </div>

@@ -12,11 +12,31 @@ function KanbanBoard() {
   const [currentTask, setCurrentTask] = useState(null);
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [allLabels, setAllLabels] = useState([]);
 
   const [state, setState] = useState({
     tasks: {},
     columns: [],
   });
+
+
+  useEffect(() => {
+    const fetchAllLabels = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
+        );
+
+        const mergedLabels = response.data;
+
+        setAllLabels(mergedLabels);
+      } catch (error) {
+        console.error("Failed to fetch labels:", error);
+      }
+    };
+
+    fetchAllLabels();
+  }, []);
 
   // Load task descriptions from the database on component mount
   useEffect(() => {
@@ -572,6 +592,8 @@ function KanbanBoard() {
                 task={currentTask}
                 onClose={toggleOverlay}
                 updateTaskContents={updateTaskContents}
+                allLabels={allLabels}
+                setAllLabels={setAllLabels}
               />
             )}
             {provided.placeholder}

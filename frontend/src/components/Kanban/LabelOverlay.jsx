@@ -2,12 +2,19 @@ import React, { useState, useEffect } from "react";
 import { SketchPicker } from "react-color";
 import axios from "axios";
 
-function LabelOverlay({ labels, setLabels, toggleLabelInput, updateLabels }) {
+function LabelOverlay({
+  labels,
+  setLabels,
+  toggleLabelInput,
+  updateLabels,
+  allLabels,
+  setAllLabels,
+}) {
   const [newLabel, setNewLabel] = useState("");
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [allLabels, setAllLabels] = useState([]);
+  //const [allLabels, setAllLabels] = useState([]);
   const [selectedLabel, setSelectedLabel] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedLabel, setEditedLabel] = useState({
@@ -122,6 +129,7 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, updateLabels }) {
     setEditedLabel({ text: label.text, color: label.color });
   };
 
+  // When you save an edited label, update allLabels using the setAllLabels prop
   const handleSaveEditedLabel = async () => {
     try {
       const updatedLabel = {
@@ -136,13 +144,14 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, updateLabels }) {
 
       setLabels(updatedLabels);
 
-      setAllLabels((prevAllLabels) => {
-        return prevAllLabels.map((label) =>
+      // Update allLabels with the edited label using the setAllLabels prop
+      setAllLabels((prevAllLabels) =>
+        prevAllLabels.map((label) =>
           label._id === selectedLabel._id
             ? { ...label, ...updatedLabel }
             : label
-        );
-      });
+        )
+      );
 
       setIsEditing(false);
 
@@ -195,9 +204,7 @@ function LabelOverlay({ labels, setLabels, toggleLabelInput, updateLabels }) {
                       : label.color,
                 }}
               >
-                {editedLabel._id === label._id
-                  ? editedLabel.text
-                  : label.text}
+                {editedLabel._id === label._id ? editedLabel.text : label.text}
               </span>
               <button
                 onClick={() => handleEditLabel(label)}

@@ -87,7 +87,8 @@ function LabelOverlay({
         newLabelObject
       );
 
-      fetchAllLabels(); // Updates label overlay with the new label list
+      setCardLabels([...cardLabels, newLabelObject]);
+      //fetchAllLabels(); // Updates label overlay with the new label list
     } catch (error) {
       console.error("Failed to create label:", error);
 
@@ -127,10 +128,11 @@ function LabelOverlay({
    * Opens the editing overlay and keeps track of the current label being edited and its data.
    * @param {Object} label - The current label being edited
    */
-  const updateEditingLabel = (label) => {
+  const updateEditingLabel = (label, index) => {
     setIsEditing(true); // Open the editing overlay
     setEditingLabel({
       label,
+      index,
       labelId: label.labelId,
       text: label.text,
       color: label.color,
@@ -145,57 +147,66 @@ function LabelOverlay({
    */
   const handleSaveEditedLabel = async () => {
     try {
-      const { label, text, color } = editingLabel; // Get the label currently being edited
-
-      // The updated version of the label currently being edited
-      const updatedLabel = {
-        labelId: label.labelId, // Keep same ID
-        text,
-        color,
-      };
-
-      // Search through all labels and update the label with the matching ID with new text/color
-      const updatedCardLabels = cardLabels.map((oldLabel) =>
-        oldLabel.labelId === label.labelId ? updatedLabel : oldLabel
+      const { labelId, text, color } = editingLabel; // Get the label currently being edited
+  
+      // Check if a label with the same ID exists in cardLabels
+      const existingLabelIndex = cardLabels.findIndex(
+        (label) => label.labelId === labelId
       );
-
-      setCardLabels(updatedCardLabels); // Updates the list of labels in the current card overlay
-
+  
+      if (existingLabelIndex !== -1) {
+        // Update the text and color of the existing label
+        const updatedCardLabels = [...cardLabels];
+        updatedCardLabels[existingLabelIndex].text = text;
+        updatedCardLabels[existingLabelIndex].color = color;
+  
+        setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
+      }
+  
       // Update allLabels with the edited label using the setAllLabels prop
       setAllLabels((prevAllLabels) =>
         prevAllLabels.map((oldLabel) =>
-          oldLabel.labelId === label.labelId
-            ? { ...oldLabel, ...updatedLabel }
-            : oldLabel
+          oldLabel.labelId === labelId ? { ...oldLabel, text, color } : oldLabel
         )
       );
-
+  
       // Save the edited label to the database
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-label`,
-        updatedLabel
+        { labelId, text, color }
       );
-
+  
       setIsEditing(false); // Close the editing overlay
     } catch (error) {
       console.error("Failed to save edited label:", error);
     }
   };
+  
 
   /* *
    * Allows for a user to check/uncheck a label to add/remove it from the card.
    * @param {Object} label - The label that was checked/unchecked
    */
   const handleCheckboxChange = (label) => {
-    // If the label is already added to the card, uncheck the label and remove it from the card
-    if (cardLabels.some((assignedLabel) => assignedLabel._id === label._id)) {
-      setCardLabels(
-        cardLabels.filter((assignedLabel) => assignedLabel._id !== label._id)
+    // Check if the label is already added to the card
+    const isLabelSelected = cardLabels.some(
+      (assignedLabel) => assignedLabel.labelId === label.labelId
+    );
+
+    // Create a copy of cardLabels
+    let updatedCardLabels = [...cardLabels];
+
+    if (isLabelSelected) {
+      // If the label is already selected, unselect it and remove it from the card
+      updatedCardLabels = updatedCardLabels.filter(
+        (assignedLabel) => assignedLabel.labelId !== label.labelId
       );
     } else {
-      // If the label is not already added to the card, check the label and add it to the card
-      setCardLabels([...cardLabels, label]);
+      // If the label is not selected, select it and add it to the card
+      updatedCardLabels.push(label);
     }
+
+    setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
   };
 
   return (
@@ -204,7 +215,7 @@ function LabelOverlay({
         <div className="label-list">
           <h1 className="label-overlay-header">Labels</h1>
           {/* List of the labels in label overlay */}
-          {allLabels.map((label) => (
+          {allLabels.map((label, index) => (
             <div key={label._id} className="select-label-checkbox-container">
               <input
                 type="checkbox"
@@ -219,17 +230,17 @@ function LabelOverlay({
                 className="select-label-text"
                 style={{
                   backgroundColor:
-                    editingLabel._id === label._id
+                    editingLabel.labelId === label.labelId
                       ? editingLabel.color
                       : label.color,
                 }}
               >
-                {editingLabel._id === label._id
+                {editingLabel.labelId === label.labelId
                   ? editingLabel.text
                   : label.text}
               </span>
               <button
-                onClick={() => updateEditingLabel(label)}
+                onClick={() => updateEditingLabel(label, index)}
                 className="edit-label-button"
               >
                 <img

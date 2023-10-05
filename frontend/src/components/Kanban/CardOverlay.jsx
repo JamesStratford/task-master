@@ -15,7 +15,7 @@ function CardOverlay({
   const [newLabel, setNewLabel] = useState(false);
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [labels, setLabels] = useState(task.labels || []);
-  const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
+  const [isLabelInputVisible, setIsLabelInputVisible] = useState(false); 
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
 
@@ -120,6 +120,7 @@ function CardOverlay({
             toggleLabelInput={toggleLabelInput} // Pass the toggleLabelInput function to LabelOverlay
             allLabels={allLabels}
             setAllLabels={setAllLabels}
+            toggleLabelOverlay={toggleLabelOverlay}
           />
         )}
       </div>

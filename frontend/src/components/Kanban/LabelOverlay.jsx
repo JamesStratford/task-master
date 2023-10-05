@@ -9,15 +9,15 @@ function LabelOverlay({
   updateLabels,
   allLabels,
   setAllLabels,
+  toggleLabelOverlay,
 }) {
   const [newLabel, setNewLabel] = useState("");
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
   //const [allLabels, setAllLabels] = useState([]);
   const [selectedLabel, setSelectedLabel] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [editedLabel, setEditedLabel] = useState({
+  const [editingLabel, setEditingLabel] = useState({
     text: "",
     color: "#ffffff",
   });
@@ -123,33 +123,39 @@ function LabelOverlay({
     }
   };
 
-  const handleEditLabel = (label) => {
-    setIsEditing(!isEditing);
-    setSelectedLabel(label);
-    setEditedLabel({ text: label.text, color: label.color });
+  /**
+  * Keeps track of the current label being edited and fetches the data.
+  *  @param {Object} label - The current label being edited
+  */
+  const updateEditingLabel = (label) => {
+    setEditingLabel({
+      label,
+      text: label.text,
+      color: label.color,
+    });
   };
 
   // When you save an edited label, update allLabels using the setAllLabels prop
   const handleSaveEditedLabel = async () => {
     try {
+      const { label, text, color } = editingLabel;
+
       const updatedLabel = {
-        _id: selectedLabel._id,
-        text: editedLabel.text,
-        color: editedLabel.color,
+        _id: label._id,
+        text,
+        color,
       };
 
       const updatedLabels = labels.map((l) =>
-        l._id === selectedLabel._id ? { ...l, ...updatedLabel } : l
+        l._id === label._id ? { ...l, ...updatedLabel } : l
       );
 
       setLabels(updatedLabels);
 
       // Update allLabels with the edited label using the setAllLabels prop
       setAllLabels((prevAllLabels) =>
-        prevAllLabels.map((label) =>
-          label._id === selectedLabel._id
-            ? { ...label, ...updatedLabel }
-            : label
+        prevAllLabels.map((l) =>
+          l._id === label._id ? { ...l, ...updatedLabel } : l
         )
       );
 
@@ -165,18 +171,15 @@ function LabelOverlay({
   };
 
   const closeLabelOverlay = () => {
-    setIsVisible(false);
+    toggleLabelOverlay(); // Toggle the label overlay visibility
   };
-
-  if (!isVisible) {
-    return null;
-  }
 
   return (
     <div className="label-overlay">
       <div className="label-overlay-header">
         <div className="label-list">
           <h1 className="label-overlay-header">Labels</h1>
+          {/* List of the labels in label overlay */}
           {allLabels.map((label) => (
             <div key={label._id} className="select-label-checkbox-container">
               <input
@@ -199,15 +202,15 @@ function LabelOverlay({
                 className="select-label-text"
                 style={{
                   backgroundColor:
-                    editedLabel._id === label._id
-                      ? editedLabel.color
+                    editingLabel._id === label._id
+                      ? editingLabel.color
                       : label.color,
                 }}
               >
-                {editedLabel._id === label._id ? editedLabel.text : label.text}
+                {editingLabel._id === label._id ? editingLabel.text : label.text}
               </span>
               <button
-                onClick={() => handleEditLabel(label)}
+                onClick={() => updateEditingLabel(label)}
                 className="edit-label-button"
               >
                 <img
@@ -259,23 +262,23 @@ function LabelOverlay({
         <div className="editing-overlay">
           <div
             className="edit-label-preview"
-            style={{ backgroundColor: editedLabel.color }}
+            style={{ backgroundColor: editingLabel.color }}
           >
-            {editedLabel.text}
+            {editingLabel.text}
           </div>
           <input
             type="text"
-            value={editedLabel.text}
+            value={editingLabel.text}
             onChange={(e) =>
-              setEditedLabel({ ...editedLabel, text: e.target.value })
+              setEditingLabel({ ...editingLabel, text: e.target.value })
             }
             className="edit-label-input"
           />
           <div className="color-picker-container">
             <SketchPicker
-              color={editedLabel.color}
+              color={editingLabel.color}
               onChange={(color) =>
-                setEditedLabel({ ...editedLabel, color: color.hex })
+                setEditingLabel({ ...editingLabel, color: color.hex })
               }
               disableAlpha={true}
               presetColors={[]}

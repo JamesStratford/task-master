@@ -282,7 +282,7 @@ export const deleteLabel = async (req, res) => {
     const labelId = req.body.labelId;
     console.log("labelId:", req.body.labelId)
     try {
-        await Label.deleteOne({ _id: labelId }); // Assuming the label ID is stored as _id in MongoDB
+        await Label.deleteOne({ labelId: labelId }); // Assuming the label ID is stored as _id in MongoDB
         res.status(200).json({ message: 'Label deleted successfully' });
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -300,7 +300,7 @@ export const updateLabel = async (req, res) => {
         console.log("Updating label...", updatedLabel);
 
         const label = await Label.findOneAndUpdate(
-            { _id: updatedLabel._id },
+            { labelId: updatedLabel.labelId },
             updatedLabel,
             { new: true }
         );

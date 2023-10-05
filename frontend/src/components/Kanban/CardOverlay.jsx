@@ -14,8 +14,7 @@ function CardOverlay({
   const [description, setDescription] = useState(task.description || "");
   const [newLabel, setNewLabel] = useState(false);
   const [labelColor, setLabelColor] = useState("#ffffff");
-  const [labels, setLabels] = useState(task.labels || []);
-  const [isLabelInputVisible, setIsLabelInputVisible] = useState(false); 
+  const [cardLabels, setCardLabels] = useState(task.labels || []);
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
 
@@ -30,17 +29,17 @@ function CardOverlay({
     const updatedTask = {
       ...task,
       description: description,
-      labels: labels,
+      labels: cardLabels,
     };
 
     // Check if the edited label is new (not in allLabels)
     const isNewLabel = !allLabels.some((label) =>
-      labels.some((l) => l.text === label.text)
+    cardLabels.some((l) => l.text === label.text)
     );
 
     // If it's a new label, add it to allLabels
     if (isNewLabel) {
-      setAllLabels([...allLabels, ...labels]);
+      setAllLabels([...allLabels, ...cardLabels]);
     }
 
     updateTaskContents(updatedTask);
@@ -49,12 +48,6 @@ function CardOverlay({
   // Function to cancel editing description
   const handleCancelEdit = () => {
     setDescription(task.description || "");
-  };
-
-  // Function to toggle label input visibility
-  const toggleLabelInput = () => {
-    setIsLabelInputVisible(!isLabelInputVisible);
-    setNewLabel("");
   };
 
   const toggleLabelOverlay = () => {
@@ -76,7 +69,7 @@ function CardOverlay({
           </h5>
         </div>
         <div className="labels-list">
-          {labels.map((label, index) => (
+          {cardLabels.map((label, index) => (
             <span
               key={index}
               className="label-text"
@@ -115,9 +108,8 @@ function CardOverlay({
             labelColor={labelColor}
             setLabelColor={setLabelColor}
             setNewLabel={setNewLabel}
-            labels={labels} // Pass the labels array to LabelOverlay
-            setLabels={setLabels} // Pass the setLabels function to LabelOverlay
-            toggleLabelInput={toggleLabelInput} // Pass the toggleLabelInput function to LabelOverlay
+            cardLabels={cardLabels} // Pass the labels array to LabelOverlay
+            setCardLabels={setCardLabels} // Pass the setLabels function to LabelOverlay
             allLabels={allLabels}
             setAllLabels={setAllLabels}
             toggleLabelOverlay={toggleLabelOverlay}

@@ -7,7 +7,6 @@ const router = express.Router();
  * Returns Discord server and channel credentials
  */
 router.get('/discord-widget', async (req, res) => {
-    console.log("DISCORD WIDGET");
     try {
         const discordServerId = process.env.DISCORD_SERVER_ID;
         const discordChannelId = process.env.DISCORD_CHANNEL_ID;

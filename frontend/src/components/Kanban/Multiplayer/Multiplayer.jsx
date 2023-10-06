@@ -1,77 +1,128 @@
-import React, { useEffect, useState, useRef } from 'react';
-import socketIOClient from 'socket.io-client';
+import React, { useEffect, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { SocketContext } from './SocketContext';
+import { MultiplayerContext } from './MultiplayerContext';
 
+// Sub-component to render each cursor
+const Cursor = ({ id, pos }) => (
+    <div key={id} style={{
+        position: 'absolute',
+        top: `${pos.y - 10}px`,
+        left: `${pos.x}px`,
+        zIndex: '10000'
+    }}>
+        <img
+            src={`https://cdn.discordapp.com/avatars/${pos.discordId}/${pos.avatar}?size=80`}
+            alt={`Cursor-${id}`}
+            style={{
+                width: '20px',
+                height: '20px',
+                boxShadow: '0px 0px 10px 2px #ffffff',
+                borderRadius: '50%'
+            }}
+        />
+        <div style={{ fontSize: '10px' }}>
+            {pos.text}
+        </div>
+    </div>
+);
+
+// Main Multiplayer component
 const Multiplayer = ({ userInfo, parentRef }) => {
-    const socketRef = useRef();
-    const [cursors, setCursors] = useState({});
+    const myCursor = useRef(null);
+    const socket = useContext(SocketContext);
+    const { setRemoteDrags, cursors, setCursors } = useContext(MultiplayerContext);
+    const cursorsRef = useRef(cursors);
 
     useEffect(() => {
-        socketRef.current = socketIOClient(`${process.env.REACT_APP_BACKEND_URL}`);
+        cursorsRef.current = cursors;
+    }, [cursors]);
 
-        socketRef.current.on('cursorMove', (data) => {
+    // Socket Event Handlers
+    useEffect(() => {
+        const handleSocketEvents = () => {
+            if (!socket) return;
+            socket.on('cursorMove', handleCursorMove);
+            socket.on('cursorRemove', handleCursorRemove);
+            return () => {
+                socket.disconnect();
+            };
+        };
+
+        const handleCursorMove = (data) => {
             setCursors((prevCursors) => ({
                 ...prevCursors,
-                [data.id]: { x: data.x, y: data.y, text: data.text }
+                [data.id]: { x: data.x, y: data.y, discordId: data.discordId, avatar: data.avatar, text: data.text }
             }));
-        });
+        };
 
-        socketRef.current.on('cursorRemove', (data) => {
+        const handleCursorRemove = (data) => {
             setCursors((prevCursors) => {
                 const updatedCursors = { ...prevCursors };
                 delete updatedCursors[data.id];
                 return updatedCursors;
             });
-        });
-
-        return () => {
-            socketRef.current.disconnect();
         };
-    }, []);
+        handleSocketEvents();
+    }, [socket, setCursors]);
 
+    // Emitting Cursor Position
     useEffect(() => {
-        if (!parentRef.current) return;
         const handleMouseMove = (event) => {
+            if (!socket || !parentRef.current) return;
             const bounds = parentRef.current.getBoundingClientRect();
             const x = event.clientX - bounds.left;
             const y = event.clientY - bounds.top;
-
-            socketRef.current.emit('cursorMove', { x, y, text: userInfo ? userInfo : '' });
+            myCursor.current = { x, y };  // Update cursor position
+            socket.emit('cursorMove', { x, y, discordId: userInfo.discordId, avatar: userInfo.avatar, text: userInfo ? userInfo.global_name : '' });
         };
 
+        if (!parentRef.current) return;
         const current = parentRef.current;
         current.addEventListener('mousemove', handleMouseMove);
         return () => current.removeEventListener('mousemove', handleMouseMove);
-    }, [parentRef, userInfo]);
+    }, [parentRef, userInfo, socket]);
 
+    // Listening to Emits from other users
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleDragStart = (data) => {
+            setRemoteDrags(prevRemoteDrags => {
+                const updatedRemoteDrags = { ...prevRemoteDrags };
+                updatedRemoteDrags[data.draggableId] = {
+                    user: data.id,
+                    cursor: {
+                        x: cursorsRef.current[data.id]?.x,
+                        y: cursorsRef.current[data.id]?.y
+                    }
+                };
+                return updatedRemoteDrags;
+            });
+        };
+
+        const handleDragEnd = (data) => {
+            setRemoteDrags(prevRemoteDrags => {
+                const updatedRemoteDrags = { ...prevRemoteDrags };
+                delete updatedRemoteDrags[data.draggableId];  // Mark this item as no longer being dragged remotely
+                return updatedRemoteDrags;
+            });    
+        };
+
+        socket.on('dragStart', handleDragStart);
+        socket.on('dragEnd', handleDragEnd);
+
+        return () => {
+            socket.off('dragStart', handleDragStart);
+            socket.off('dragEnd', handleDragEnd);
+        };
+    }, [socket, setRemoteDrags, userInfo]);
 
     return (
         <>
-            {/* Rendering cursors using transformed coordinates */}
             {Object.entries(cursors).map(([id, pos]) => (
-                <div key={id} style={{
-                    position: 'absolute',
-                    top: `${pos.y - 10}px`,
-                    left: `${pos.x}px`,
-                    zIndex: '10000'
-                }}>
-                    <img
-                        src={`https://cdn.discordapp.com/avatars/${pos.text.discordId}/${pos.text.avatar}?size=80`}
-                        alt="Cursor"
-                        style={{
-                            width: '20px', // adjust as needed
-                            height: '20px', // adjust as needed
-                            boxShadow: '0px 0px 10px 2px #ffffff', // glow effect
-                            borderRadius: '50%', // rounded corners
-                        }}
-                    />
-                    <div style={{
-                        fontSize: '10px', // adjust as needed
-                        //... other styles for text, if needed
-                    }}>{pos.text.global_name}</div>
-                </div>
+                <Cursor key={id} id={id} pos={pos} />
             ))}
-
         </>
     );
 };

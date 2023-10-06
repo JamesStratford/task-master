@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import KanbanBoard from './KanbanBoard';
 import Multiplayer from './Multiplayer/Multiplayer';
+import { SocketProvider } from './Multiplayer/SocketContext';
+import { KanbanProvider } from './Multiplayer/KanbanContext';
+import { MultiplayerProvider } from './Multiplayer/MultiplayerContext';
 
-const ChildComponent = ({ id, parentPosition }) => {
+const ChildComponent = ({ id, userInfo, parentPosition }) => {
     const [position, setPosition] = useState({ x: 0, y: 0 });
 
     return (
@@ -13,41 +16,56 @@ const ChildComponent = ({ id, parentPosition }) => {
                 top: parentPosition.y + position.y,
             }}
         >
-            <KanbanBoard />
+            <KanbanBoard userInfo={userInfo} />
         </div>
     );
 };
 
 const ParentComponent = ({ userInfo }) => {
     const [children, setChildren] = useState([]);
-    // Get window res
+    const parentRef = useRef();  // Reference for the parent div
+
     const width = window.innerWidth;
     const height = window.innerHeight * 0.75;
-    
 
     useEffect(() => {
-        // Assuming you have some API or other logic to get the required information
-        // to create child components
         const loadChildren = async () => {
-            // ... load your child components here e.g., from an API or other logic
-            // For instance, you might get an array of boards from API and set it to state like this
-            setChildren([{ id: '1', parentPosition: {x: 0, y:0} }]);
+            try {
+                // ... load your child components here e.g., from an API or other logic
+                setChildren([{ id: '1', parentPosition: { x: 0, y: 0 } }]);
+            } catch (error) {
+                console.error('Error loading children:', error);
+            }
         };
 
         loadChildren();
-    }, []);
-
-    const parentRef = useRef();
+    }, []);  // Empty dependency array if no outside variables are used
 
     return (
-        <div ref={parentRef} id="parent" style={{ position: 'relative', width, height, backgroundColor: 'black', overflow: 'hidden' }}>
-            <div ref={parentRef} style={{ position: 'relative' }}>
-                {children.map(child =>
-                    <ChildComponent key={child.id} {...child} />
-                )}
-                <Multiplayer userInfo={userInfo} parentRef={parentRef} />
-            </div>
-        </div>
+        <SocketProvider>
+            <KanbanProvider>
+                <MultiplayerProvider parentRef={parentRef}>
+                    <div
+                        ref={parentRef}
+                        id="parent"
+                        style={{
+                            position: 'relative',
+                            width,
+                            height,
+                            backgroundColor: 'black',
+                            overflow: 'hidden'
+                        }}
+                    >
+                        <div style={{ position: 'relative' }}>
+                            {children.map(child =>
+                                <ChildComponent userInfo={userInfo} key={child.id} {...child} />
+                            )}
+                            <Multiplayer userInfo={userInfo} parentRef={parentRef} />
+                        </div>
+                    </div>
+                </MultiplayerProvider>
+            </KanbanProvider>
+        </SocketProvider>
     );
 };
 

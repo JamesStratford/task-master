@@ -275,3 +275,21 @@ export const saveLabel = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+/**
+ * 
+ */
+export const getColumnByIndex = async (index) => {
+    const columns = await getColumns();
+    return columns[index];
+};
+
+export const getTasksByIds = async (taskIds) => {
+    const allTasks = await getTasks();
+    return allTasks.filter(task => taskIds.includes(task.taskId));
+};
+
+export const getTotalColumnCount = async () => {
+    const columns = await getColumns();
+    return columns.length;
+};

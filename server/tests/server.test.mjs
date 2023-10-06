@@ -1,5 +1,5 @@
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url); // Initialize createRequire
+const require = createRequire(import.meta.url);
 import chai from 'chai';
 
 const io = require('socket.io-client');
@@ -27,12 +27,12 @@ describe('Socket.io Server Tests', () => {
     clientSocket.disconnect();
   });
 
-  it('should send and receive a message', (done) => {
-    clientSocket.on('message', (message) => {
-      expect(message).to.equal('Hello, Client!');
+  it('should broadcast cursor position to other clients', (done) => {
+    const data = { id: 123, x: 100, y: 100 };
+    clientSocket.on('cursorMove', (message) => {
+      expect(message).to.eql(data);
       done();
     });
-
-    serverSocket.send('Hello, Client!');
+    serverSocket.emit('cursorMove', { id: 123, ...data });
   });
 });

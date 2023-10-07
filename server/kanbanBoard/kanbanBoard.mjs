@@ -275,3 +275,36 @@ export const saveLabel = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+export const addChecklistItem = async (taskId, checklistItem, res) => {
+    try {
+        await Task.updateOne({ taskId }, { $push: { checklist: checklistItem } });
+        res.status(201).json(checklistItem);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const updateChecklistItem = async (taskId, checklistItemId, updatedData, res) => {
+    try {
+        await Task.updateOne(
+            { taskId, "checklist._id": checklistItemId },
+            { $set: { "checklist.$": updatedData } }
+        );
+        res.status(201).json(updatedData);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const deleteChecklistItem = async (taskId, checklistItemId, res) => {
+    try {
+        await Task.updateOne(
+            { taskId },
+            { $pull: { checklist: { _id: checklistItemId } } }
+        );
+        res.status(200).json({ message: 'Checklist item deleted' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

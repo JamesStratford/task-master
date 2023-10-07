@@ -11,7 +11,10 @@ import {
     removeTaskFromColumn,
     updateTask,
     saveLabel,
-    deleteTask
+    deleteTask,
+    addChecklistItem,
+    updateChecklistItem,
+    deleteChecklistItem,
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import Label from '../../models/kanbanBoard/label.mjs';
 import express from 'express';
@@ -178,5 +181,39 @@ router.post('/save-label', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+router.post('/add-checklist-item', async (req, res) => {
+    const { taskId, checklistItem } = req.body;
+    try {
+        await addChecklistItem(taskId, checklistItem, res).then(() => {
+            boardUpdatedHook(io);
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/update-checklist-item', async (req, res) => {
+    const { taskId, checklistItemId, updatedData } = req.body;
+    try {
+        await updateChecklistItem(taskId, checklistItemId, updatedData, res).then(() => {
+            boardUpdatedHook(io);
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.delete('/delete-checklist-item', async (req, res) => {
+    const { taskId, checklistItemId } = req.body;
+    try {
+        await deleteChecklistItem(taskId, checklistItemId, res).then(() => {
+            boardUpdatedHook(io);
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
 
 export default router;

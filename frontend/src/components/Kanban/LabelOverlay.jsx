@@ -89,7 +89,7 @@ function LabelOverlay({
       );
 
       setCardLabels([...cardLabels, newLabelObject]);
-      //fetchAllLabels(); // Updates label overlay with the new label list
+      fetchEveryLabel();
     } catch (error) {
       console.error("Failed to create label:", error);
 
@@ -118,6 +118,8 @@ function LabelOverlay({
       setAllLabels((prevLabels) =>
         prevLabels.filter((label) => label !== editingLabel.labelId)
       );
+
+      fetchEveryLabel();
 
       setIsEditing(false); // Close the editing overlay
     } catch (error) {
@@ -208,6 +210,7 @@ function LabelOverlay({
       updatedCardLabels.push(label);
     }
 
+    fetchEveryLabel();
     setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
   };
 

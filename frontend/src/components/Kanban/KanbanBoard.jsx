@@ -43,14 +43,14 @@ function KanbanBoard() {
       console.log("Fetched all tasks:", allTasks);
 
       // Iterate through each task to check and update labels
+      // Iterate through each task to check and update labels
       for (const taskId in allTasks) {
         if (allTasks.hasOwnProperty(taskId)) {
           const task = allTasks[taskId];
           let taskUpdated = false; // Flag to track if the task needs updating
 
-          // Iterate through the labels in the task
-          task.labels.forEach((taskLabel) => {
-            // Find the corresponding label in allExistingLabels by labelId
+          // Filter out labels that do not have a matching labelId in allExistingLabels
+          task.labels = task.labels.filter((taskLabel) => {
             const correspondingLabel = allExistingLabels.find(
               (existingLabel) => existingLabel.labelId === taskLabel.labelId
             );
@@ -66,6 +66,14 @@ function KanbanBoard() {
                 taskLabel.text = correspondingLabel.text;
                 taskUpdated = true; // Set the flag to indicate the task needs updating
               }
+              return true; // Keep this label in task.labels
+            } else {
+              // No matching label found, so remove it from task.labels
+              console.log(
+                `Removing label from task ${taskId}, labelId: ${taskLabel.labelId}, text: "${taskLabel.text}"`
+              );
+              taskUpdated = true; // Set the flag to indicate the task needs updating
+              return false; // Exclude this label from task.labels
             }
           });
 

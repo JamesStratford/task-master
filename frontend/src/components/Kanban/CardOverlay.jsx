@@ -43,6 +43,7 @@ function CardOverlay({
       setAllLabels([...allLabels, ...cardLabels]);
     }
 
+    fetchEveryLabel();
     updateTaskContents(updatedTask);
   };
 

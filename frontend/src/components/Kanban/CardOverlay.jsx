@@ -9,7 +9,7 @@ function CardOverlay({
   updateTaskContents,
   allLabels,
   setAllLabels,
-  fetchEveryLabel,
+  fetchAllLabels,
 }) {
   // State to manage task description and labels
   const [description, setDescription] = useState(task.description || "");
@@ -43,7 +43,7 @@ function CardOverlay({
       setAllLabels([...allLabels, ...cardLabels]);
     }
 
-    fetchEveryLabel();
+    fetchAllLabels();
     updateTaskContents(updatedTask);
   };
 
@@ -115,7 +115,8 @@ function CardOverlay({
             allLabels={allLabels}
             setAllLabels={setAllLabels}
             toggleLabelOverlay={toggleLabelOverlay}
-            fetchEveryLabel={fetchEveryLabel}
+            fetchAllLabels={fetchAllLabels}
+            handleUpdateTask={handleUpdateTask}
           />
         )}
       </div>

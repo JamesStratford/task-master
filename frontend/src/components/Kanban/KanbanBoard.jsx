@@ -664,7 +664,7 @@ function KanbanBoard() {
                 updateTaskContents={updateTaskContents}
                 allLabels={allLabels}
                 setAllLabels={setAllLabels}
-                fetchEveryLabel={fetchAllLabels}
+                fetchAllLabels={fetchAllLabels}
               />
             )}
             {provided.placeholder}

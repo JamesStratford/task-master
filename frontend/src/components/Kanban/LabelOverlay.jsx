@@ -10,7 +10,8 @@ function LabelOverlay({
   allLabels,
   setAllLabels,
   toggleLabelOverlay,
-  fetchEveryLabel,
+  fetchAllLabels,
+  handleUpdateTask,
 }) {
   const [newLabelText, setNewLabelText] = useState("");
   const [newLabelColor, setNewLabelColor] = useState("#FF0000");
@@ -24,10 +25,6 @@ function LabelOverlay({
     color: "#ffffff",
   });
 
-  useEffect(() => {
-    fetchAllLabels();
-  });
-
   const closeLabelOverlay = () => {
     toggleLabelOverlay();
   };
@@ -39,24 +36,6 @@ function LabelOverlay({
   const toggleLabelInput = () => {
     setIsColorPickerVisible(false);
     setNewLabelText("");
-  };
-
-  /* *
-   * Fetches all labels from the database and updates the allLabels state using the setAllLabels prop.
-   */
-  const fetchAllLabels = async () => {
-    try {
-      // Fetch all labels from the database
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
-      );
-
-      // Update the allLabels with the updated label list
-      const updatedLabelList = response.data;
-      setAllLabels(updatedLabelList);
-    } catch (error) {
-      console.error("Failed to fetch labels:", error);
-    }
   };
 
   /* *
@@ -89,7 +68,7 @@ function LabelOverlay({
       );
 
       setCardLabels([...cardLabels, newLabelObject]);
-      fetchEveryLabel();
+      handleUpdateTask();
     } catch (error) {
       console.error("Failed to create label:", error);
 
@@ -119,7 +98,7 @@ function LabelOverlay({
         prevLabels.filter((label) => label !== editingLabel.labelId)
       );
 
-      fetchEveryLabel();
+      handleUpdateTask();
 
       setIsEditing(false); // Close the editing overlay
     } catch (error) {
@@ -163,8 +142,9 @@ function LabelOverlay({
         updatedCardLabels[existingLabelIndex].text = text;
         updatedCardLabels[existingLabelIndex].color = color;
   
-        fetchEveryLabel();
-        setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
+        //fetchAllLabels();
+        //setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
+        
       }
   
       // Update allLabels with the edited label using the setAllLabels prop
@@ -179,7 +159,7 @@ function LabelOverlay({
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-label`,
         { labelId, text, color }
       );
-  
+      handleUpdateTask();
       setIsEditing(false); // Close the editing overlay
     } catch (error) {
       console.error("Failed to save edited label:", error);
@@ -210,8 +190,8 @@ function LabelOverlay({
       updatedCardLabels.push(label);
     }
 
-    fetchEveryLabel();
-    setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
+    //setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
+    handleUpdateTask();
   };
 
   return (

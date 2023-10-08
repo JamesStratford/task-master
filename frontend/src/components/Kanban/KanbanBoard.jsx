@@ -20,78 +20,76 @@ function KanbanBoard() {
   });
 
   useEffect(() => {
-    const fetchAllLabels = async () => {
-      try {
-        console.log("Fetching all labels...");
-        const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
-        );
-
-        const allExistingLabels = response.data;
-        console.log("Fetched all labels:", allExistingLabels);
-
-        // Fetch all tasks
-        console.log("Fetching all tasks...");
-        const tasksResponse = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-tasks`
-        );
-
-        const allTasks = tasksResponse.data;
-        console.log("Fetched all tasks:", allTasks);
-
-        // Iterate through each task to check and update labels
-        for (const taskId in allTasks) {
-          if (allTasks.hasOwnProperty(taskId)) {
-            const task = allTasks[taskId];
-            let taskUpdated = false; // Flag to track if the task needs updating
-
-            // Iterate through the labels in the task
-            task.labels.forEach((taskLabel) => {
-              // Find the corresponding label in allExistingLabels by labelId
-              const correspondingLabel = allExistingLabels.find(
-                (existingLabel) => existingLabel.labelId === taskLabel.labelId
-              );
-
-              // Check if a corresponding label with the same labelId exists
-              if (correspondingLabel) {
-                // Check if the label texts are different
-                if (correspondingLabel.text !== taskLabel.text) {
-                  // Update the label text in the task's label array
-                  console.log(
-                    `Updating label text in task ${taskId}, labelId: ${taskLabel.labelId} from "${taskLabel.text}" to "${correspondingLabel.text}"`
-                  );
-                  taskLabel.text = correspondingLabel.text;
-                  taskUpdated = true; // Set the flag to indicate the task needs updating
-                }
-              }
-            });
-
-            // If the task was updated, update it in the database
-            if (taskUpdated) {
-              console.log(
-                `Updating task in the database for taskId: ${taskId}`
-              );
-              await axios.put(
-                `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
-                { newTask: task }
-              );
-            }
-          }
-        }
-
-        // Now, all labels in the tasks have been updated if necessary
-        // You can set your tasks state or perform any other necessary actions here
-        // For example:
-        // setTasks(allTasks);
-
-        setAllLabels(allExistingLabels);
-      } catch (error) {
-        console.error("Failed to fetch labels:", error);
-      }
-    };
-
     fetchAllLabels();
   }, []);
+
+  const fetchAllLabels = async () => {
+    try {
+      console.log("Fetching all labels...");
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
+      );
+
+      const allExistingLabels = response.data;
+      console.log("Fetched all labels:", allExistingLabels);
+
+      // Fetch all tasks
+      console.log("Fetching all tasks...");
+      const tasksResponse = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-tasks`
+      );
+
+      const allTasks = tasksResponse.data;
+      console.log("Fetched all tasks:", allTasks);
+
+      // Iterate through each task to check and update labels
+      for (const taskId in allTasks) {
+        if (allTasks.hasOwnProperty(taskId)) {
+          const task = allTasks[taskId];
+          let taskUpdated = false; // Flag to track if the task needs updating
+
+          // Iterate through the labels in the task
+          task.labels.forEach((taskLabel) => {
+            // Find the corresponding label in allExistingLabels by labelId
+            const correspondingLabel = allExistingLabels.find(
+              (existingLabel) => existingLabel.labelId === taskLabel.labelId
+            );
+
+            // Check if a corresponding label with the same labelId exists
+            if (correspondingLabel) {
+              // Check if the label texts are different
+              if (correspondingLabel.text !== taskLabel.text) {
+                // Update the label text in the task's label array
+                console.log(
+                  `Updating label text in task ${taskId}, labelId: ${taskLabel.labelId} from "${taskLabel.text}" to "${correspondingLabel.text}"`
+                );
+                taskLabel.text = correspondingLabel.text;
+                taskUpdated = true; // Set the flag to indicate the task needs updating
+              }
+            }
+          });
+
+          // If the task was updated, update it in the database
+          if (taskUpdated) {
+            console.log(`Updating task in the database for taskId: ${taskId}`);
+            await axios.put(
+              `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
+              { newTask: task }
+            );
+          }
+        }
+      }
+
+      // Now, all labels in the tasks have been updated if necessary
+      // You can set your tasks state or perform any other necessary actions here
+      // For example:
+      // setTasks(allTasks);
+
+      setAllLabels(allExistingLabels);
+    } catch (error) {
+      console.error("Failed to fetch labels:", error);
+    }
+  };
 
   // Load task descriptions from the database on component mount
   useEffect(() => {
@@ -653,6 +651,7 @@ function KanbanBoard() {
                 updateTaskContents={updateTaskContents}
                 allLabels={allLabels}
                 setAllLabels={setAllLabels}
+                fetchEveryLabel={fetchAllLabels}
               />
             )}
             {provided.placeholder}

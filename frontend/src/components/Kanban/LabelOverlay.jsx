@@ -10,6 +10,7 @@ function LabelOverlay({
   allLabels,
   setAllLabels,
   toggleLabelOverlay,
+  fetchEveryLabel,
 }) {
   const [newLabelText, setNewLabelText] = useState("");
   const [newLabelColor, setNewLabelColor] = useState("#FF0000");
@@ -160,6 +161,7 @@ function LabelOverlay({
         updatedCardLabels[existingLabelIndex].text = text;
         updatedCardLabels[existingLabelIndex].color = color;
   
+        fetchEveryLabel();
         setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
       }
   

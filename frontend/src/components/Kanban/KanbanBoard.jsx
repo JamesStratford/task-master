@@ -19,17 +19,72 @@ function KanbanBoard() {
     columns: [],
   });
 
-
   useEffect(() => {
     const fetchAllLabels = async () => {
       try {
+        console.log("Fetching all labels...");
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
         );
 
-        const mergedLabels = response.data;
+        const allExistingLabels = response.data;
+        console.log("Fetched all labels:", allExistingLabels);
 
-        setAllLabels(mergedLabels);
+        // Fetch all tasks
+        console.log("Fetching all tasks...");
+        const tasksResponse = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-tasks`
+        );
+
+        const allTasks = tasksResponse.data;
+        console.log("Fetched all tasks:", allTasks);
+
+        // Iterate through each task to check and update labels
+        for (const taskId in allTasks) {
+          if (allTasks.hasOwnProperty(taskId)) {
+            const task = allTasks[taskId];
+            let taskUpdated = false; // Flag to track if the task needs updating
+
+            // Iterate through the labels in the task
+            task.labels.forEach((taskLabel) => {
+              // Find the corresponding label in allExistingLabels by labelId
+              const correspondingLabel = allExistingLabels.find(
+                (existingLabel) => existingLabel.labelId === taskLabel.labelId
+              );
+
+              // Check if a corresponding label with the same labelId exists
+              if (correspondingLabel) {
+                // Check if the label texts are different
+                if (correspondingLabel.text !== taskLabel.text) {
+                  // Update the label text in the task's label array
+                  console.log(
+                    `Updating label text in task ${taskId}, labelId: ${taskLabel.labelId} from "${taskLabel.text}" to "${correspondingLabel.text}"`
+                  );
+                  taskLabel.text = correspondingLabel.text;
+                  taskUpdated = true; // Set the flag to indicate the task needs updating
+                }
+              }
+            });
+
+            // If the task was updated, update it in the database
+            if (taskUpdated) {
+              console.log(
+                `Updating task in the database for taskId: ${taskId}`
+              );
+              await axios.put(
+                `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
+                { newTask: task }
+              );
+            }
+          }
+        }
+
+        // Now, all labels in the tasks have been updated if necessary
+        // You can set your tasks state or perform any other necessary actions here
+        // For example:
+        // setTasks(allTasks);
+
+        setAllLabels(allExistingLabels);
       } catch (error) {
         console.error("Failed to fetch labels:", error);
       }
@@ -56,9 +111,9 @@ function KanbanBoard() {
     setSocket(newSocket);
 
     // Board updated
-    newSocket.on('updateBoard', (updatedBoard) => {
+    newSocket.on("updateBoard", (updatedBoard) => {
       setState(updatedBoard);
-    });   
+    });
 
     return () => newSocket.disconnect();
   }, []);
@@ -164,21 +219,22 @@ function KanbanBoard() {
   const updateColumns = async (columns) => {
     try {
       const updatedColumns = [];
-  
+
       // Iterate through the columns and update their nextColumnId
       for (let i = 0; i < columns.length; i++) {
         const column = columns[i];
-        const nextColumnId = i === columns.length - 1 ? null : columns[i + 1].id; // Set the nextColumnId to null for the last column
+        const nextColumnId =
+          i === columns.length - 1 ? null : columns[i + 1].id; // Set the nextColumnId to null for the last column
         column.nextColumnId = nextColumnId; // Update the nextColumnId property of the column
         updatedColumns.push(column);
       }
-      
+
       // Update the local state with the updated columns
       setState({
         ...state,
         columns: updatedColumns,
       });
-  
+
       // Update the database to reflect the changes
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/reorder-columns`,
@@ -189,7 +245,7 @@ function KanbanBoard() {
     } catch (error) {
       console.error("Failed to update column order in the database:", error);
     }
-  };  
+  };
 
   const addColumn = async (newColumnTitle) => {
     if (newColumnTitle.trim() === "") {
@@ -397,7 +453,7 @@ function KanbanBoard() {
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-column`,
         {
-          newColumn
+          newColumn,
         }
       );
     } catch (error) {
@@ -462,7 +518,10 @@ function KanbanBoard() {
             <button onClick={handleAddColumn}>Add Column</button>
           </div>
         ) : (
-          <button className="add-column-button" onClick={() => setIsAdding(true)}>
+          <button
+            className="add-column-button"
+            onClick={() => setIsAdding(true)}
+          >
             + Add Column
           </button>
         )}
@@ -481,7 +540,7 @@ function KanbanBoard() {
           [updatedTask.taskId]: updatedTask,
         },
       }));
-  
+
       // Update the task in the database
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
@@ -502,7 +561,7 @@ function KanbanBoard() {
             className="kanban-board"
             ref={provided.innerRef}
             {...provided.droppableProps}
-            style={{ overflow: 'hidden'}}
+            style={{ overflow: "hidden" }}
           >
             {state.columns &&
               state.columns.map((column, index) => {

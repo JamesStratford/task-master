@@ -44,6 +44,7 @@ function KanbanBoard() {
 
       // Iterate through each task to check and update labels
       // Iterate through each task to check and update labels
+      // Iterate through each task to check and update labels
       for (const taskId in allTasks) {
         if (allTasks.hasOwnProperty(taskId)) {
           const task = allTasks[taskId];
@@ -57,20 +58,24 @@ function KanbanBoard() {
 
             // Check if a corresponding label with the same labelId exists
             if (correspondingLabel) {
-              // Check if the label texts are different
-              if (correspondingLabel.text !== taskLabel.text) {
-                // Update the label text in the task's label array
+              // Check if the label texts or colors are different
+              if (
+                correspondingLabel.text !== taskLabel.text ||
+                correspondingLabel.color !== taskLabel.color
+              ) {
+                // Update the label text and/or color in the task's label array
                 console.log(
-                  `Updating label text in task ${taskId}, labelId: ${taskLabel.labelId} from "${taskLabel.text}" to "${correspondingLabel.text}"`
+                  `Updating label in task ${taskId}, labelId: ${taskLabel.labelId} from "${taskLabel.text}" (Color: ${taskLabel.color}) to "${correspondingLabel.text}" (Color: ${correspondingLabel.color})`
                 );
                 taskLabel.text = correspondingLabel.text;
+                taskLabel.color = correspondingLabel.color;
                 taskUpdated = true; // Set the flag to indicate the task needs updating
               }
               return true; // Keep this label in task.labels
             } else {
               // No matching label found, so remove it from task.labels
               console.log(
-                `Removing label from task ${taskId}, labelId: ${taskLabel.labelId}, text: "${taskLabel.text}"`
+                `Removing label from task ${taskId}, labelId: ${taskLabel.labelId}, text: "${taskLabel.text}" (Color: ${taskLabel.color})`
               );
               taskUpdated = true; // Set the flag to indicate the task needs updating
               return false; // Exclude this label from task.labels

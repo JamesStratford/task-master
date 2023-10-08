@@ -130,30 +130,29 @@ function LabelOverlay({
   const handleSaveEditedLabel = async () => {
     try {
       const { labelId, text, color } = editingLabel; // Get the label currently being edited
-  
+
       // Check if a label with the same ID exists in cardLabels
       const existingLabelIndex = cardLabels.findIndex(
         (label) => label.labelId === labelId
       );
-  
+
       if (existingLabelIndex !== -1) {
         // Update the text and color of the existing label
         const updatedCardLabels = [...cardLabels];
         updatedCardLabels[existingLabelIndex].text = text;
         updatedCardLabels[existingLabelIndex].color = color;
-  
+
         //fetchAllLabels();
         //setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
-        
       }
-  
+
       // Update allLabels with the edited label using the setAllLabels prop
       setAllLabels((prevAllLabels) =>
         prevAllLabels.map((oldLabel) =>
           oldLabel.labelId === labelId ? { ...oldLabel, text, color } : oldLabel
         )
       );
-  
+
       // Save the edited label to the database
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-label`,
@@ -165,7 +164,6 @@ function LabelOverlay({
       console.error("Failed to save edited label:", error);
     }
   };
-  
 
   /* *
    * Allows for a user to check/uncheck a label to add/remove it from the card.
@@ -190,7 +188,8 @@ function LabelOverlay({
       updatedCardLabels.push(label);
     }
 
-    //setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
+    // Update the list of labels in the current card overlay
+    setCardLabels(updatedCardLabels);
     handleUpdateTask();
   };
 
@@ -207,7 +206,7 @@ function LabelOverlay({
                 className="select-label-checkbox"
                 value={label.text}
                 checked={cardLabels.some(
-                  (assignedLabel) => assignedLabel._id === label._id
+                  (assignedLabel) => assignedLabel.labelId === label.labelId
                 )}
                 onChange={() => handleCheckboxChange(label)}
               />

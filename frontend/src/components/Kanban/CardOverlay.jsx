@@ -11,22 +11,31 @@ function CardOverlay({
   setAllLabels,
   fetchAllLabels,
 }) {
-  // State to manage task description and labels
-  const [description, setDescription] = useState(task.description || "");
-  const [newLabel, setNewLabel] = useState(false);
-  const [labelColor, setLabelColor] = useState("#ffffff");
-  const [cardLabels, setCardLabels] = useState(task.labels || []);
-  const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
-  const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
+  const [description, setDescription] = useState(task.description || ""); // Manage the description state
+  const [labelColor, setLabelColor] = useState("#ffffff"); // Manage the label color state
+  const [cardLabels, setCardLabels] = useState(task.labels || []); // Manage the labels state
+  const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false); // Manage the label overlay visibility state
 
-  // Function to handle description change
+  /* Function to handle description change */
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
-  // Function to save task description and labels
-  // When you save an edited label, update allLabels using the setAllLabels prop
+  /* Function to cancel editing description */
+  const handleCancelEdit = () => {
+    setDescription(task.description || "");
+  };
+
+  /* Function to toggle the label overlay */
+  const toggleLabelOverlay = () => {
+    setIsLabelOverlayVisible(!isLabelOverlayVisible);
+  };
+
+  /* *
+   * Function to handle the updating of task contents.
+   * */
   const handleUpdateTask = () => {
+    // Data for the updated task
     const updatedTask = {
       ...task,
       description: description,
@@ -35,7 +44,7 @@ function CardOverlay({
 
     // Check if the edited label is new (not in allLabels)
     const isNewLabel = !allLabels.some((label) =>
-    cardLabels.some((l) => l.text === label.text)
+      cardLabels.some((l) => l.text === label.text)
     );
 
     // If it's a new label, add it to allLabels
@@ -43,17 +52,8 @@ function CardOverlay({
       setAllLabels([...allLabels, ...cardLabels]);
     }
 
-    fetchAllLabels();
-    updateTaskContents(updatedTask);
-  };
-
-  // Function to cancel editing description
-  const handleCancelEdit = () => {
-    setDescription(task.description || "");
-  };
-
-  const toggleLabelOverlay = () => {
-    setIsLabelOverlayVisible(!isLabelOverlayVisible);
+    fetchAllLabels(); // Update all the labels
+    updateTaskContents(updatedTask); // Update this tasks contents
   };
 
   return (
@@ -106,17 +106,18 @@ function CardOverlay({
         </button>
         {isLabelOverlayVisible && (
           <LabelOverlay
-            onClose={onClose}
-            labelColor={labelColor}
-            setLabelColor={setLabelColor}
-            setNewLabel={setNewLabel}
-            cardLabels={cardLabels} // Pass the labels array to LabelOverlay
-            setCardLabels={setCardLabels} // Pass the setLabels function to LabelOverlay
+            // All saved labels for the current card
+            cardLabels={cardLabels}
+            setCardLabels={setCardLabels}
+            // All labels tha have been saved
             allLabels={allLabels}
             setAllLabels={setAllLabels}
-            toggleLabelOverlay={toggleLabelOverlay}
-            fetchAllLabels={fetchAllLabels}
-            handleUpdateTask={handleUpdateTask}
+            // Label color properties
+            labelColor={labelColor}
+            setLabelColor={setLabelColor}
+            toggleLabelOverlay={toggleLabelOverlay} // Function to toggle the label overlay
+            fetchAllLabels={fetchAllLabels} // Function to fetch all labels
+            handleUpdateTask={handleUpdateTask} // Function to handle the updating of task contents
           />
         )}
       </div>

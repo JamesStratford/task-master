@@ -3,36 +3,36 @@ import { SketchPicker } from "react-color";
 import axios from "axios";
 
 function LabelOverlay({
-  labels,
   cardLabels,
   setCardLabels,
-  updateLabels,
   allLabels,
   setAllLabels,
   toggleLabelOverlay,
   fetchAllLabels,
   handleUpdateTask,
 }) {
+  // Label properties
   const [newLabelText, setNewLabelText] = useState("");
   const [newLabelColor, setNewLabelColor] = useState("#FF0000");
-  const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
-  const [selectedLabel, setSelectedLabel] = useState("");
-  const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
+
+  const [isColorPickerVisible, setIsColorPickerVisible] = useState(false); // State to manage color picker visibility
   const [isEditing, setIsEditing] = useState(false); // State to manage editing overlay visibility
-  const [editingLabel, setEditingLabel] = useState({
-    // State to manage the label being edited
+  const [editingLabel, setEditingLabel] = useState({ // State to manage the label being edited
     text: "",
     color: "#ffffff",
   });
 
+  /* Function to close the label overlay */
   const closeLabelOverlay = () => {
     toggleLabelOverlay();
   };
 
+  /* Function to toggle color picker */
   const toggleColorPicker = () => {
     setIsColorPickerVisible(!isColorPickerVisible);
   };
 
+  /* Function to toggle label input */
   const toggleLabelInput = () => {
     setIsColorPickerVisible(false);
     setNewLabelText("");
@@ -76,7 +76,6 @@ function LabelOverlay({
         console.error("Response Data:", error.response.data);
       }
     }
-
     toggleLabelInput();
   };
 

@@ -3,6 +3,7 @@ import { SketchPicker } from "react-color";
 import axios from "axios";
 
 function LabelOverlay({
+  task,
   cardLabels,
   setCardLabels,
   allLabels,
@@ -10,6 +11,7 @@ function LabelOverlay({
   toggleLabelOverlay,
   fetchAllLabels,
   handleUpdateTask,
+  updateTaskContents,
 }) {
   // Label properties
   const [newLabelText, setNewLabelText] = useState("");
@@ -17,7 +19,8 @@ function LabelOverlay({
 
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false); // State to manage color picker visibility
   const [isEditing, setIsEditing] = useState(false); // State to manage editing overlay visibility
-  const [editingLabel, setEditingLabel] = useState({ // State to manage the label being edited
+  const [editingLabel, setEditingLabel] = useState({
+    // State to manage the label being edited
     text: "",
     color: "#ffffff",
   });
@@ -189,7 +192,13 @@ function LabelOverlay({
 
     // Update the list of labels in the current card overlay
     setCardLabels(updatedCardLabels);
-    handleUpdateTask();
+
+    // Update the list of labels in the current task
+    const updatedTask = {
+      ...task,
+      labels: updatedCardLabels,
+    };
+    updateTaskContents(updatedTask); // Update this tasks contents
   };
 
   return (

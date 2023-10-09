@@ -106,6 +106,7 @@ function CardOverlay({
         </button>
         {isLabelOverlayVisible && (
           <LabelOverlay
+            task={task} // The current task
             // All saved labels for the current card
             cardLabels={cardLabels}
             setCardLabels={setCardLabels}
@@ -118,6 +119,7 @@ function CardOverlay({
             toggleLabelOverlay={toggleLabelOverlay} // Function to toggle the label overlay
             fetchAllLabels={fetchAllLabels} // Function to fetch all labels
             handleUpdateTask={handleUpdateTask} // Function to handle the updating of task contents
+            updateTaskContents={updateTaskContents} // Function to update the task contents
           />
         )}
       </div>

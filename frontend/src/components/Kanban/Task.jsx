@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { MultiplayerContext } from "./Multiplayer/MultiplayerContext";
 
 const Task = ({
     task,
@@ -8,8 +9,23 @@ const Task = ({
     removeCard,
     openOverlay,
     provided,
+    style
 }) => {
     const [localContent, setLocalContent] = useState(task.content);
+    const { remoteDrags, cursors } = useContext(MultiplayerContext);  // Access both state variables in one useContext call
+    const isBeingDraggedRemotely = remoteDrags.hasOwnProperty(task.taskId);
+    const remoteDrag = isBeingDraggedRemotely ? remoteDrags[task.taskId] : null;
+    const cursor = cursors[remoteDrag?.user];
+    const cursorPosition = cursor;
+    const modifiedStyle = isBeingDraggedRemotely && cursorPosition
+        ? {
+            ...style,
+            position: 'absolute',
+            top: cursorPosition.y,
+            left: cursorPosition.x,
+            width: '300px',
+        }
+        : style;
 
     return (
         <div
@@ -18,6 +34,7 @@ const Task = ({
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             onDoubleClick={() => setEditingTaskId(task.taskId)}
+            style={modifiedStyle}
         >
             <div className="task-content">
                 <div className="task-labels">

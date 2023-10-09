@@ -213,26 +213,45 @@ export const updateColumnTaskIds = async (req, res) => {
     }
 };
 
-/**
- * Update columns in the database based on the provided data.
- *
- * @param {object} req - The HTTP request object containing updated columns.
- * @param {object} res - The HTTP response object.
- * @returns {void}
- */
-export const reorderColumns = async (req, res) => {
-    const columns = req.updatedColumns; // Assuming req.body contains an array of columns in the desired order
-
+export const updateBoard = async (board) => {
     try {
-        // Iterate through the columns and update them in the database
-        for (let i = 0; i < columns.length; i++) {
-            const column = columns[i];
-            await Column.updateOne({ id: column.id }, { ...column });
-        }
-        console.log("Successfully updated columns in the database.");
+        const { updatedColumns, updatedTasks } = board;
+        // Create an array of update operations for columns
+        const columnUpdates = updatedColumns.map((column, index) => {
+            const nextColumnId = index === updatedColumns.length - 1 ? null : updatedColumns[index + 1].id;
+            return {
+                updateOne: {
+                    filter: { id: column.id },
+                    update: { 
+                        $set: { 
+                            title: column.title,
+                            taskIds: column.taskIds,
+                            nextColumnId: nextColumnId, 
+                        } 
+                    }
+                }
+            };
+        });
+
+        // Execute all column updates in a single batch operation
+        await Column.bulkWrite(columnUpdates);
+        
+        // Create an array of update operations for tasks
+        const taskUpdates = Object.entries(updatedTasks).map(([id, task]) => {
+            return {
+                updateOne: {
+                    filter: { id: id },
+                    update: { $set: task }
+                }
+            };
+        });
+        
+        // Execute all task updates in a single batch operation
+        await Task.bulkWrite(taskUpdates);
+
     } catch (error) {
-        console.error("Error updating columns:", error.message);
-        res.status(400).json({ message: error.message });
+        console.error("Error updating columns and tasks:", error.message);
+        throw error;  // Propagate the error to the caller
     }
 };
 

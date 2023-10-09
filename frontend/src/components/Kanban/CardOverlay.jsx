@@ -70,7 +70,10 @@ function CardOverlay({
             </button>
           </h5>
         </div>
-        <div className="labels-list">
+        <div
+          className="labels-list"
+          style={{ display: "flex", flexWrap: "wrap" }}
+        >
           {cardLabels.map((label, index) => (
             <span
               key={index}
@@ -81,6 +84,7 @@ function CardOverlay({
             </span>
           ))}
         </div>
+
         <div className="description">
           <h5 className="description-header">Description</h5>
           <input

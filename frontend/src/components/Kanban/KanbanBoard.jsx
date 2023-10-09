@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CardOverlay from "./CardOverlay";
 import axios from "axios";
@@ -22,11 +22,6 @@ function KanbanBoard({ userInfo }) {
   const [currentTask, setCurrentTask] = useState(null);
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
   const [allLabels, setAllLabels] = useState([]);
-
-  const [state, setState] = useState({
-    tasks: {},
-    columns: [],
-  });
 
   useEffect(() => {
     fetchAllLabels();
@@ -110,41 +105,6 @@ function KanbanBoard({ userInfo }) {
       setAllLabels(allExistingLabels);
     } catch (error) {
       console.error("Failed to fetch labels:", error);
-    }
-  };
-
-  // Load task descriptions from the database on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-kanban-board`
-      );
-      setState(data.data);
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const newSocket = io(process.env.REACT_APP_BACKEND_URL);
-
-    setSocket(newSocket);
-
-    // Board updated
-    newSocket.on("updateBoard", (updatedBoard) => {
-      setState(updatedBoard);
-    });
-
-    return () => newSocket.disconnect();
-  }, []);
-
-  const toggleOverlay = (taskId) => {
-    if (isOverlayOpen) {
-      setIsOverlayOpen(false);
-    } else {
-      const task = kanbanColumns.tasks[taskId];
-      setCurrentTask(task);
-      setIsOverlayOpen(true);
     }
   };
 
@@ -234,37 +194,6 @@ function KanbanBoard({ userInfo }) {
         newColumnTaskIds: newDestinationTaskIds,
       }
     );
-  };
-
-  const updateColumns = async (columns) => {
-    try {
-      const updatedColumns = [];
-
-      // Iterate through the columns and update their nextColumnId
-      for (let i = 0; i < columns.length; i++) {
-        const column = columns[i];
-        const nextColumnId =
-          i === columns.length - 1 ? null : columns[i + 1].id; // Set the nextColumnId to null for the last column
-        column.nextColumnId = nextColumnId; // Update the nextColumnId property of the column
-        updatedColumns.push(column);
-      }
-
-      // Update the local state with the updated columns
-      setState({
-        ...state,
-        columns: updatedColumns,
-      });
-
-      // Update the database to reflect the changes
-      await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/reorder-columns`,
-        {
-          updatedColumns,
-        }
-      );
-    } catch (error) {
-      console.error("Failed to update column order in the database:", error);
-    }
   };
 
   const addColumn = async (newColumnTitle) => {

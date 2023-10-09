@@ -574,5 +574,33 @@ body {
   max-width: 100%;
 }
 
+.task-dates {
+  margin-top: 20px;
+  color: black;
+}
+
+.date-input {
+  margin-bottom: 10px;
+}
+
+.date-input label {
+  display: block;
+  font-weight: bold;
+}
+
+.date-input input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.start-date-title {
+  font-size: 14px;
+}
+
+.due-date-title {
+  font-size: 14px;
+}
 
 

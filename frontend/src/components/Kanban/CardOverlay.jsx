@@ -15,8 +15,8 @@ function CardOverlay({
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [cardLabels, setCardLabels] = useState(task.labels || []);
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
-  const [startDate, setStartDate] = useState(task.startDate || ""); // Add state for start date
-  const [dueDate, setDueDate] = useState(task.dueDate || ""); // Add state for due date
+  const [startDate, setStartDate] = useState(task.startDate || "");
+  const [dueDate, setDueDate] = useState(task.dueDate || "");
 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
@@ -43,8 +43,8 @@ function CardOverlay({
       ...task,
       description: description,
       labels: cardLabels,
-      startDate: startDate, // Include start date in the updated task
-      dueDate: dueDate, // Include due date in the updated task
+      startDate: startDate,
+      dueDate: dueDate,
     };
 
     const isNewLabel = !allLabels.some((label) =>
@@ -87,10 +87,8 @@ function CardOverlay({
             </span>
           ))}
         </div>
-
-        {/* Start Date */}
+        <h5 className="task-dates-header">Task dates</h5>
         <div className="task-dates">
-          <h5 className="task-dates-header">Task dates</h5>
           <div className="date-input">
             <label className="start-date-title">Start Date</label>
             <input
@@ -101,7 +99,11 @@ function CardOverlay({
           </div>
           <div className="date-input">
             <label className="due-date-title">Due Date</label>
-            <input type="date" value={dueDate} onChange={handleDueDateChange} />
+            <input
+              type="date"
+              value={dueDate}
+              onChange={handleDueDateChange}
+            />
           </div>
         </div>
 

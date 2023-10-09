@@ -574,6 +574,12 @@ body {
   max-width: 100%;
 }
 
+.task-dates-header {
+  color: black;
+  font-size: 20px;
+  margin-bottom: -10px;
+}
+
 .task-dates {
   margin-top: 20px;
   color: black;
@@ -603,4 +609,19 @@ body {
   font-size: 14px;
 }
 
+.task-dates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; /* Place the inputs on each side */
+  margin-left: 5px;
+}
 
+.date-input {
+  width: 45%; /* Adjust the width to your preference */
+  margin-bottom: 10px;
+}
+
+.date-title {
+  font-size: 14px;
+  text-align: center; /* Center the label text */
+}

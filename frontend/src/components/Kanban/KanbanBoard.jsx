@@ -23,6 +23,16 @@ function KanbanBoard({ userInfo }) {
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
   const [allLabels, setAllLabels] = useState([]);
 
+  const toggleOverlay = (taskId) => {
+    if (isOverlayOpen) {
+      setIsOverlayOpen(false);
+    } else {
+      const task = kanbanColumns.tasks[taskId];
+      setCurrentTask(task);
+      setIsOverlayOpen(true);
+    }
+  };
+
   useEffect(() => {
     fetchAllLabels();
   }, []);
@@ -450,7 +460,7 @@ function KanbanBoard({ userInfo }) {
             className="kanban-board"
             ref={provided.innerRef}
             {...provided.droppableProps}
-            style={{ overflow: "hidden" }}
+            style={{ overflow: 'hidden' }}
           >
             {kanbanColumns.columns &&
               kanbanColumns.columns.map((column, index) => {
@@ -544,9 +554,6 @@ function KanbanBoard({ userInfo }) {
                 task={currentTask}
                 onClose={toggleOverlay}
                 updateTaskContents={updateTaskContents}
-                allLabels={allLabels}
-                setAllLabels={setAllLabels}
-                fetchAllLabels={fetchAllLabels}
               />
             )}
             {provided.placeholder}

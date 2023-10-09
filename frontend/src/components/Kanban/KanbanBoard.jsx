@@ -554,6 +554,8 @@ function KanbanBoard({ userInfo }) {
                 task={currentTask}
                 onClose={toggleOverlay}
                 updateTaskContents={updateTaskContents}
+                allLabels={allLabels}
+                fetchAllLabels={fetchAllLabels}
               />
             )}
             {provided.placeholder}

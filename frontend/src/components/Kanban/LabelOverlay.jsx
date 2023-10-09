@@ -16,7 +16,7 @@ function LabelOverlay({
   // Label properties
   const [newLabelText, setNewLabelText] = useState("");
   const [newLabelColor, setNewLabelColor] = useState("#FF0000");
-
+  const [showMoreLabels, setShowMoreLabels] = useState(false);
   const [isColorPickerVisible, setIsColorPickerVisible] = useState(false); // State to manage color picker visibility
   const [isEditing, setIsEditing] = useState(false); // State to manage editing overlay visibility
   const [editingLabel, setEditingLabel] = useState({
@@ -39,6 +39,11 @@ function LabelOverlay({
   const toggleLabelInput = () => {
     setIsColorPickerVisible(false);
     setNewLabelText("");
+  };
+
+  /* Function to toggle show more labels */
+  const toggleShowMoreLabels = () => {
+    setShowMoreLabels(!showMoreLabels);
   };
 
   /* *
@@ -206,43 +211,58 @@ function LabelOverlay({
       <div className="label-overlay-header">
         <div className="label-list">
           <h1 className="label-overlay-header">Labels</h1>
-          {/* List of the labels in label overlay */}
-          {allLabels.map((label, index) => (
-            <div key={label._id} className="select-label-checkbox-container">
-              <input
-                type="checkbox"
-                className="select-label-checkbox"
-                value={label.text}
-                checked={cardLabels.some(
-                  (assignedLabel) => assignedLabel.labelId === label.labelId
-                )}
-                onChange={() => handleCheckboxChange(label)}
-              />
-              <span
-                className="select-label-text"
-                style={{
-                  backgroundColor:
-                    editingLabel.labelId === label.labelId
-                      ? editingLabel.color
-                      : label.color,
-                }}
-              >
-                {editingLabel.labelId === label.labelId
-                  ? editingLabel.text
-                  : label.text}
-              </span>
+          {allLabels.map(
+            (label, index) =>
+              (index < 4 || showMoreLabels) && (
+                <div
+                  key={label._id}
+                  className="select-label-checkbox-container"
+                >
+                  <input
+                    type="checkbox"
+                    className="select-label-checkbox"
+                    value={label.text}
+                    checked={cardLabels.some(
+                      (assignedLabel) => assignedLabel.labelId === label.labelId
+                    )}
+                    onChange={() => handleCheckboxChange(label)}
+                  />
+                  <span
+                    className="select-label-text"
+                    style={{
+                      backgroundColor:
+                        editingLabel.labelId === label.labelId
+                          ? editingLabel.color
+                          : label.color,
+                    }}
+                  >
+                    {editingLabel.labelId === label.labelId
+                      ? editingLabel.text
+                      : label.text}
+                  </span>
+                  <button
+                    onClick={() => updateEditingLabel(label, index)}
+                    className="edit-label-button"
+                  >
+                    <img
+                      src={require("./edit.png")}
+                      alt="Edit Label"
+                      style={{ width: "15px", height: "15px" }}
+                    />
+                  </button>
+                </div>
+              )
+          )}
+          {allLabels.length > 4 && (
+            <div className="select-label-checkbox-container">
               <button
-                onClick={() => updateEditingLabel(label, index)}
-                className="edit-label-button"
+                className="show-more-labels-btn"
+                onClick={toggleShowMoreLabels}
               >
-                <img
-                  src={require("./edit.png")}
-                  alt="Edit Label"
-                  style={{ width: "15px", height: "15px" }}
-                />
+                Show More
               </button>
             </div>
-          ))}
+          )}
         </div>
         <h5 className="label-overlay-header">Create a label</h5>
         <div className="label-input-container">

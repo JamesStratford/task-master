@@ -211,48 +211,49 @@ function LabelOverlay({
       <div className="label-overlay-header">
         <div className="label-list">
           <h1 className="label-overlay-header">Labels</h1>
-          {allLabels.map(
-            (label, index) =>
-              (index < 4 || showMoreLabels) && (
-                <div
-                  key={label._id}
-                  className="select-label-checkbox-container"
-                >
-                  <input
-                    type="checkbox"
-                    className="select-label-checkbox"
-                    value={label.text}
-                    checked={cardLabels.some(
-                      (assignedLabel) => assignedLabel.labelId === label.labelId
-                    )}
-                    onChange={() => handleCheckboxChange(label)}
-                  />
-                  <span
-                    className="select-label-text"
-                    style={{
-                      backgroundColor:
-                        editingLabel.labelId === label.labelId
-                          ? editingLabel.color
-                          : label.color,
-                    }}
-                  >
-                    {editingLabel.labelId === label.labelId
-                      ? editingLabel.text
-                      : label.text}
-                  </span>
-                  <button
-                    onClick={() => updateEditingLabel(label, index)}
-                    className="edit-label-button"
-                  >
-                    <img
-                      src={require("./edit.png")}
-                      alt="Edit Label"
-                      style={{ width: "15px", height: "15px" }}
-                    />
-                  </button>
-                </div>
-              )
-          )}
+          <div className="label-list-scroll">
+            <div className="label-list-container" style={{ overflowY: 'auto' }}>
+              {allLabels.map(
+                (label, index) =>
+                  (index < 4 || showMoreLabels) && (
+                    <div key={label._id} className="select-label-checkbox-container">
+                      <input
+                        type="checkbox"
+                        className="select-label-checkbox"
+                        value={label.text}
+                        checked={cardLabels.some(
+                          (assignedLabel) => assignedLabel.labelId === label.labelId
+                        )}
+                        onChange={() => handleCheckboxChange(label)}
+                      />
+                      <span
+                        className="select-label-text"
+                        style={{
+                          backgroundColor:
+                            editingLabel.labelId === label.labelId
+                              ? editingLabel.color
+                              : label.color,
+                        }}
+                      >
+                        {editingLabel.labelId === label.labelId
+                          ? editingLabel.text
+                          : label.text}
+                      </span>
+                      <button
+                        onClick={() => updateEditingLabel(label, index)}
+                        className="edit-label-button"
+                      >
+                        <img
+                          src={require("./edit.png")}
+                          alt="Edit Label"
+                          style={{ width: "15px", height: "15px" }}
+                        />
+                      </button>
+                    </div>
+                  )
+              )}
+            </div>
+          </div>
           {allLabels.length > 4 && (
             <div className="select-label-checkbox-container">
               <button
@@ -347,6 +348,7 @@ function LabelOverlay({
       )}
     </div>
   );
+  
 }
 
 export default LabelOverlay;

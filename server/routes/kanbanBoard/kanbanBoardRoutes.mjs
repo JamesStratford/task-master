@@ -20,19 +20,17 @@ import { io } from '../../server.mjs';
 const router = express.Router();
 
 /**
-*   Update the board
-*   @param {SocketIO.Server} io - The Socket.IO server
-*/
-// export const boardUpdatedHook = async (io) => {
-//     const tasks = await getTasks();
-//     const columns = await getColumns();
-//     io.emit('updateBoard', { tasks, columns });
-// };
-
+ *  Hook to update the board
+ * @param {SocketIO.Server} io - The socket.io server
+ */
 export const boardUpdatedHook = async (io) => {
     io.emit('updateBoard');
 };
 
+/**
+ *  Add a task to the database
+ * @param {string} columnId - The ID of the column to add the task to
+ */
 router.post('/add-task', async (req, res) => {
     const { columnId, newCard } = req.body;
     try {

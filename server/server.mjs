@@ -46,9 +46,9 @@ app.use(session({
   saveUninitialized: false,
   store: new MongoStore({ dbName: 'sessionStore', mongoUrl: process.env.MONGO_URI, collectionName: 'sessions' }),
   cookie: {
-    path    : '/',
+    path: '/',
     httpOnly: false,
-    maxAge  : 24*60*60*1000
+    maxAge: 24 * 60 * 60 * 1000
   },
 }))
 
@@ -65,12 +65,19 @@ const io = socketIo(server, {
   cors: corsOptions
 });
 
+/**
+ *  Listen for socket connections
+ * @param {string} cursorMove - The ID of the socket connection
+ * @param {number} x - The x coordinate of the cursor
+ * @param {number} y - The y coordinate of the cursor
+ * @param {string} dragStart - The ID of the socket connection
+ */
 io.on('connection', (socket) => {
   socket.on('cursorMove', (data) => {
     // Broadcast the cursor position along with the socket ID to other connected clients
     socket.broadcast.emit('cursorMove', { id: socket.id, ...data });
   });
-  
+
   socket.on('disconnect', () => {
     socket.broadcast.emit('cursorRemove', { id: socket.id });
   });

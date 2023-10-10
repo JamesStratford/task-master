@@ -14,7 +14,7 @@ import {
     getAllLabels,
     deleteTask,
     deleteLabel,
-    updateLabel,,
+    updateLabel,
     addChecklistItem,
     updateChecklistItem,
     deleteChecklistItem,

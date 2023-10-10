@@ -1,253 +1,134 @@
 import React, { useState } from "react";
 import { SketchPicker } from "react-color";
 import axios from "axios";
+import LabelOverlay from "./LabelOverlay";
 
-function CardOverlay({ task, onClose, updateTaskContents }) {
-  // State to manage task description and labels
-  const [description, setDescription] = useState(task.description || "");
-  const [newLabel, setNewLabel] = useState(false);
-  const [labelColor, setLabelColor] = useState("#ffffff");
-  const [labels, setLabels] = useState(task.labels || []);
-  const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
-  const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
+function CardOverlay({
+  task,
+  onClose,
+  updateTaskContents,
+  allLabels,
+  setAllLabels,
+  fetchAllLabels,
+}) {
+  const [description, setDescription] = useState(task.description || ""); // Manage the description state
+  const [labelColor, setLabelColor] = useState("#ffffff"); // Manage the label color state
+  const [cardLabels, setCardLabels] = useState(task.labels || []); // Manage the labels state
+  const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false); // Manage the label overlay visibility state
 
-   // State to manage checklist
-   const [checklist, setChecklist] = useState(task.checklist || []);
-   const [newChecklistItem, setNewChecklistItem] = useState("");
-
-  // Function to handle description change
+  /* Function to handle description change */
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
-  // Function to save task description and labels
-  const handleUpdateTask = () => {
-    const updatedTask = {
-      ...task, // Keep the existing task data
-      description: description, // Update the description
-      labels: labels, // Update the labels
-    };
-    updateTaskContents(updatedTask);
-  };
-
-  // Function to cancel editing description
+  /* Function to cancel editing description */
   const handleCancelEdit = () => {
     setDescription(task.description || "");
   };
 
-  // Function to toggle label input visibility
-  const toggleLabelInput = () => {
-    setIsLabelInputVisible(!isLabelInputVisible);
-    setNewLabel("");
+  /* Function to toggle the label overlay */
+  const toggleLabelOverlay = () => {
+    setIsLabelOverlayVisible(!isLabelOverlayVisible);
   };
 
-  // Function to toggle color picker visibility
-  const toggleColorPicker = () => {
-    setIsColorPickerVisible(!isColorPickerVisible);
-  };
+  /* *
+   * Function to handle the updating of task contents.
+   * */
+  const handleUpdateTask = () => {
+    // Data for the updated task
+    const updatedTask = {
+      ...task,
+      description: description,
+      labels: cardLabels,
+    };
 
-  // Function to create a new label
-  const createNewLabel = async () => {
-    // Check if the newLabel is empty or contains only whitespace
-    if (!newLabel.trim()) {
-      console.error("Label text is required."); 
-      return;
-    }
-
-    console.log(
-      "Making API request to:",
-      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`
+    // Check if the edited label is new (not in allLabels)
+    const isNewLabel = !allLabels.some((label) =>
+      cardLabels.some((l) => l.text === label.text)
     );
 
-    try {
-      // Create a new label object using the text from the input field and the selected color
-      const newLabelObject = { text: newLabel.trim(), color: labelColor };
-
-      // Update the task in the local state
-      setLabels([...labels, newLabelObject]);
-
-      // Update the task in the database
-      await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`,
-        {
-          label: newLabelObject,
-        }
-      );
-
-      // If successful, log a success message
-      console.log("Label successfully created:", newLabelObject);
-    } catch (error) {
-      console.error("Failed to create label:", error);
-
-      // Log the response data if available
-      if (error.response) {
-        console.error("Response Data:", error.response.data);
-      }
+    // If it's a new label, add it to allLabels
+    if (isNewLabel) {
+      setAllLabels([...allLabels, ...cardLabels]);
     }
-    toggleLabelInput();
+
+    fetchAllLabels(); // Update all the labels
+    updateTaskContents(updatedTask); // Update this tasks contents
   };
 
-    // Function to handle new checklist item input change
-    const handleChecklistItemChange = (e) => {
-      setNewChecklistItem(e.target.value);
-    };
-  
-    // Function to add a new checklist item
-    const addChecklistItem = () => {
-      if (!newChecklistItem.trim()) {
-        console.error("Checklist item is required."); 
-        return;
-      }
-  
-      // Adding a new checklist item to state
-      setChecklist([...checklist, { text: newChecklistItem, completed: false }]);
-      
-      // Clear the new checklist item input
-      setNewChecklistItem("");
-    };
-  
-    // Function to toggle checklist item completion status
-    const toggleChecklistItemCompletion = (index) => {
-      const updatedChecklist = [...checklist];
-      updatedChecklist[index].completed = !updatedChecklist[index].completed;
-      setChecklist(updatedChecklist);
-    };
-
-    const deleteChecklistItem = (index) => {
-      // Create a new array excluding the item to be deleted
-      const updatedChecklist = checklist.filter((_, i) => i !== index);
-      
-      // Update the state
-      setChecklist(updatedChecklist);
-  };
-
-    return (
-      <div className="card-overlay">
-        <div className="overlay-content">
-          <div className="task-details">
-            <h4 className="task-name">{task.content}</h4>
-          </div>
-          <div className="labels">
-            <h5 className="labels-header">
-              Labels
-              {isLabelInputVisible ? (
-                <div className="label-input-container">
-                  <input
-                    type="text"
-                    placeholder="Enter label text"
-                    value={newLabel}
-                    onChange={(e) => setNewLabel(e.target.value)}
-                    className="create-label-input"
-                  />
-                  <button
-                    className="change-color-btn"
-                    onClick={toggleColorPicker}
-                  >
-                    <img
-                      src={require("./pick-color.png")}
-                      alt="Edit"
-                      style={{ width: "18px", height: "18px" }}
-                    />
-                  </button>
-                  <button onClick={createNewLabel} className="create-label-btn">
-                    Create Label
-                  </button>
-                  <div className="color-picker-container">
-                    {isColorPickerVisible && (
-                      <div className="color-picker-popover">
-                        <SketchPicker
-                          color={labelColor}
-                          onChange={(color) => setLabelColor(color.hex)}
-                          disableAlpha={true}
-                          presetColors={[]}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <button className="add-labels-btn" onClick={toggleLabelInput}>
-                  +
-                </button>
-              )}
-            </h5>
-            <div className="labels-list">
-              {labels.map((label, index) => (
-                <span
-                  key={index}
-                  className="label-text"
-                  style={{ backgroundColor: label.color }}
-                >
-                  {label.text}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="description">
-            <h5 className="description-header">Description</h5>
-            <input
-              type="text"
-              value={description}
-              onChange={handleDescriptionChange}
-              className="description-input"
-            />
-            <div className="input-button-container">
-              <button className="save-description-btn" onClick={handleUpdateTask}>
-                Save
-              </button>
-              <button
-                className="cancel-description-btn"
-                onClick={handleCancelEdit}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-          <div className="checklist">
-            <h5 className="checklist-header">
-              <img 
-                src={require("./checklist.png")} 
-                alt="Checklist Icon" 
-                className="checklist-icon"
-              />
-              Checklist
-            </h5>
-            <input
-                type="text"
-                value={newChecklistItem}
-                onChange={handleChecklistItemChange}
-                placeholder="New checklist item"
-                className="new-checklist-item-input"
-            />
-            <button onClick={addChecklistItem} className="add-checklist-item-btn">
-                Add
+  return (
+    <div className="card-overlay">
+      <div className="overlay-content">
+        <div className="task-details">
+          <h4 className="task-name">{task.content}</h4>
+        </div>
+        <div className="labels">
+          <h5 className="labels-header">
+            Labels
+            <button className="add-labels-btn" onClick={toggleLabelOverlay}>
+              +
             </button>
-            <div className="checklist-items">
-                {checklist.map((item, index) => (
-                    <div key={index} className="checklist-item">
-                        <input 
-                            type="checkbox" 
-                            checked={item.completed}
-                            onChange={() => toggleChecklistItemCompletion(index)}
-                            className="checklist-item-checkbox"
-                        />
-                        <span className={`checklist-item-text ${item.completed ? 'completed' : ''}`}>
-                            {item.text}
-                        </span>
-                        <button onClick={() => deleteChecklistItem(index)} className="delete-checklist-item-btn">
-                          X
-                        </button>
-                    </div>
-                ))}
-            </div>
+          </h5>
+        </div>
+        <div
+          className="labels-list"
+          style={{ display: "flex", flexWrap: "wrap" }}
+        >
+          {cardLabels.map((label, index) => (
+            <span
+              key={index}
+              className="label-text"
+              style={{ backgroundColor: label.color }}
+            >
+              {label.text}
+            </span>
+          ))}
         </div>
 
+        <div className="description">
+          <h5 className="description-header">Description</h5>
+          <input
+            type="text"
+            value={description}
+            onChange={handleDescriptionChange}
+            className="description-input"
+          />
+          <div className="input-button-container">
+            <button className="save-description-btn" onClick={handleUpdateTask}>
+              Save
+            </button>
+            <button
+              className="cancel-description-btn"
+              onClick={handleCancelEdit}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
         <button onClick={onClose} className="close-button-overlay">
           <img src={require("./close.png")} alt="Close" />
         </button>
+        {isLabelOverlayVisible && (
+          <LabelOverlay
+            task={task} // The current task
+            // All saved labels for the current card
+            cardLabels={cardLabels}
+            setCardLabels={setCardLabels}
+            // All labels tha have been saved
+            allLabels={allLabels}
+            setAllLabels={setAllLabels}
+            // Label color properties
+            labelColor={labelColor}
+            setLabelColor={setLabelColor}
+            toggleLabelOverlay={toggleLabelOverlay} // Function to toggle the label overlay
+            fetchAllLabels={fetchAllLabels} // Function to fetch all labels
+            handleUpdateTask={handleUpdateTask} // Function to handle the updating of task contents
+            updateTaskContents={updateTaskContents} // Function to update the task contents
+          />
+        )}
       </div>
     </div>
-);
+  );
 }
 
 export default CardOverlay;

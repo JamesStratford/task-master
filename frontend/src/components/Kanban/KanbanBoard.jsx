@@ -15,8 +15,12 @@ function KanbanBoard({ userInfo }) {
   const socket = useContext(SocketContext);
   const { kanbanColumns, setKanbanColumns } = useContext(KanbanContext);
   const { remoteDrags } = useContext(MultiplayerContext);
-  const [updateKanbanBoard] = useKanban(socket, kanbanColumns, setKanbanColumns);
-  
+  const [updateKanbanBoard] = useKanban(
+    socket,
+    kanbanColumns,
+    setKanbanColumns
+  );
+
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
@@ -133,7 +137,7 @@ function KanbanBoard({ userInfo }) {
     setKanbanColumns({
       ...kanbanColumns,
       columns: kanbanColumns.columns.map((col) =>
-      col.id === column.id ? updatedColumn : col
+        col.id === column.id ? updatedColumn : col
       ),
     });
 
@@ -243,8 +247,10 @@ function KanbanBoard({ userInfo }) {
 
   const deleteColumn = async (columnId) => {
     try {
-      const updatedColumns = kanbanColumns['columns'].filter(column => column.id !== columnId);
-      const updatedTasks = kanbanColumns['tasks'] || {};
+      const updatedColumns = kanbanColumns["columns"].filter(
+        (column) => column.id !== columnId
+      );
+      const updatedTasks = kanbanColumns["tasks"] || {};
       // Set the updated state
       setKanbanColumns({
         ...kanbanColumns,
@@ -262,7 +268,6 @@ function KanbanBoard({ userInfo }) {
       );
 
       await updateKanbanBoard(updatedColumns, updatedTasks);
-
     } catch (error) {
       console.error("Failed to delete column:", error);
     }
@@ -295,7 +300,12 @@ function KanbanBoard({ userInfo }) {
           moveTaskWithinSameColumn(column, source.index, destination.index);
           return;
         default:
-          moveTaskToDifferentColumn(kanbanColumns, source, destination, draggableId);
+          moveTaskToDifferentColumn(
+            kanbanColumns,
+            source,
+            destination,
+            draggableId
+          );
           return;
       }
     }
@@ -304,9 +314,11 @@ function KanbanBoard({ userInfo }) {
   const addCardToColumn = async (columnId, newCard) => {
     try {
       // Find the column to which the card should be added
-      const columnIndex = kanbanColumns.columns.findIndex((column) => column.id === columnId);
+      const columnIndex = kanbanColumns.columns.findIndex(
+        (column) => column.id === columnId
+      );
       if (columnIndex === -1) {
-        console.error('Column not found:', columnId);
+        console.error("Column not found:", columnId);
         return; // Column not found
       }
 
@@ -335,7 +347,6 @@ function KanbanBoard({ userInfo }) {
 
       // Call updateKanbanBoard to update local state and sync with the backend
       await updateKanbanBoard(updatedColumns, updatedTasks);
-
     } catch (error) {
       console.error("Failed to add card:", error);
     }
@@ -441,17 +452,17 @@ function KanbanBoard({ userInfo }) {
     <DragDropContext
       onDragStart={(start) => {
         // Emit socket.io event for drag start
-        socket.emit('dragStart', { ...start, userInfo });
+        socket.emit("dragStart", { ...start, userInfo });
       }}
       onDragUpdate={(update) => {
         // Emit socket.io event for drag update
-        socket.emit('dragUpdate', { ...update, userInfo: userInfo });
+        socket.emit("dragUpdate", { ...update, userInfo: userInfo });
       }}
       onDragEnd={(result) => {
         onDragEnd(result);
 
         // Emit socket.io event for drag end
-        socket.emit('dragEnd', { ...result, userInfo: userInfo });
+        socket.emit("dragEnd", { ...result, userInfo: userInfo });
       }}
     >
       <Droppable droppableId="all-columns" direction="horizontal" type="column">
@@ -460,14 +471,16 @@ function KanbanBoard({ userInfo }) {
             className="kanban-board"
             ref={provided.innerRef}
             {...provided.droppableProps}
-            style={{ overflow: 'hidden' }}
+            style={{ overflow: "hidden" }}
           >
             {kanbanColumns.columns &&
               kanbanColumns.columns.map((column, index) => {
                 const validTaskIds = column.taskIds.filter((taskId) =>
                   kanbanColumns.tasks.hasOwnProperty(taskId)
                 );
-                const tasks = validTaskIds.map((taskId) => kanbanColumns.tasks[taskId]);
+                const tasks = validTaskIds.map(
+                  (taskId) => kanbanColumns.tasks[taskId]
+                );
                 return (
                   <Draggable
                     draggableId={String(column.id)}
@@ -518,7 +531,11 @@ function KanbanBoard({ userInfo }) {
                                         provided={provided}
                                         style={{
                                           ...provided.draggableProps.style,
-                                          backgroundColor: remoteDrags[String(task.taskId)] ? 'red' : 'white', // Change background color if being dragged remotely
+                                          backgroundColor: remoteDrags[
+                                            String(task.taskId)
+                                          ]
+                                            ? "red"
+                                            : "white", // Change background color if being dragged remotely
                                         }}
                                       />
                                     )}

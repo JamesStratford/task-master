@@ -149,16 +149,8 @@ function LabelOverlay({
         updatedCardLabels[existingLabelIndex].text = text;
         updatedCardLabels[existingLabelIndex].color = color;
 
-        //fetchAllLabels();
-        //setCardLabels(updatedCardLabels); // Update the list of labels in the current card overlay
+        fetchAllLabels();
       }
-
-      // Update allLabels with the edited label using the setAllLabels prop
-      setAllLabels((prevAllLabels) =>
-        prevAllLabels.map((oldLabel) =>
-          oldLabel.labelId === labelId ? { ...oldLabel, text, color } : oldLabel
-        )
-      );
 
       // Save the edited label to the database
       await axios.put(

@@ -322,7 +322,14 @@ function KanbanBoard({ userInfo }) {
         return; // Column not found
       }
 
-      await axios.post(
+      // Set the start_date to the current date and due_date to null
+      const currentDate = new Date();
+      const formattedStartDate = currentDate.toISOString().split("T")[0]; // Get current date in "YYYY-MM-DD" format
+      newCard.start_date = formattedStartDate;
+      newCard.due_date = null;
+
+      // Send a POST request to add the task to the backend
+      const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/add-task`,
         {
           columnId,
@@ -330,23 +337,29 @@ function KanbanBoard({ userInfo }) {
         }
       );
 
-      // Clone the columns and tasks to avoid mutating state directly
-      const updatedColumns = [...kanbanColumns.columns];
-      const updatedTasks = { ...kanbanColumns.tasks };
+      if (response.status === 201) {
+        // Task was successfully added to the server
+        const addedTask = response.data;
 
-      // Prepare the newTask object and add it to updatedTasks
-      const newTask = {
-        ...newCard,
-      };
-      updatedTasks[newTask.id] = newTask;
+        // Clone the columns and tasks to avoid mutating state directly
+        const updatedColumns = [...kanbanColumns.columns];
+        const updatedTasks = { ...kanbanColumns.tasks };
 
-      // Add the new task's id to the taskIds array of the appropriate column
-      const updatedColumn = { ...updatedColumns[columnIndex] };
-      updatedColumn.taskIds = [...updatedColumn.taskIds, newTask.id];
-      updatedColumns[columnIndex] = updatedColumn;
+        // Prepare the newTask object and add it to updatedTasks
+        const newTask = {
+          ...newCard,
+          ...addedTask, // Include any additional data returned by the server
+        };
+        updatedTasks[newTask.id] = newTask;
 
-      // Call updateKanbanBoard to update local state and sync with the backend
-      await updateKanbanBoard(updatedColumns, updatedTasks);
+        // Add the new task's id to the taskIds array of the appropriate column
+        const updatedColumn = { ...updatedColumns[columnIndex] };
+        updatedColumn.taskIds = [...updatedColumn.taskIds, newTask.id];
+        updatedColumns[columnIndex] = updatedColumn;
+
+        // Call updateKanbanBoard to update local state and sync with the backend
+        await updateKanbanBoard(updatedColumns, updatedTasks);
+      }
     } catch (error) {
       console.error("Failed to add card:", error);
     }

@@ -276,34 +276,40 @@ export const saveLabel = async (req, res) => {
     }
 };
 
-export const addChecklistItem = async (taskId, checklistItem, res) => {
-    try {
-        await Task.updateOne({ taskId }, { $push: { checklist: checklistItem } });
-        res.status(201).json(checklistItem);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-export const updateChecklistItem = async (taskId, checklistItemId, updatedData, res) => {
-    try {
-        await Task.updateOne(
-            { taskId, "checklist._id": checklistItemId },
-            { $set: { "checklist.$": updatedData } }
-        );
-        res.status(201).json(updatedData);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-export const deleteChecklistItem = async (taskId, checklistItemId, res) => {
+export const addChecklistItem = async (req, res) => {
+    const { taskId, checklistItem } = req.body;
     try {
         await Task.updateOne(
             { taskId },
-            { $pull: { checklist: { _id: checklistItemId } } }
+            { $push: { checklist: checklistItem } }
         );
-        res.status(200).json({ message: 'Checklist item deleted' });
+        res.status(200).json({ message: "Checklist item added successfully!" });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const updateChecklistItem = async (req, res) => {
+    const { taskId, itemIndex, newItem } = req.body;
+    try {
+        await Task.updateOne(
+            { taskId, "checklist.index": itemIndex },
+            { $set: { "checklist.$.description": newItem.description, "checklist.$.isCompleted": newItem.isCompleted } }
+        );
+        res.status(200).json({ message: "Checklist item updated successfully!" });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const deleteChecklistItem = async (req, res) => {
+    const { taskId, itemIndex } = req.body;
+    try {
+        await Task.updateOne(
+            { taskId },
+            { $pull: { checklist: { index: itemIndex } } }
+        );
+        res.status(200).json({ message: "Checklist item deleted successfully!" });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

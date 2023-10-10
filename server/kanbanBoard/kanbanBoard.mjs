@@ -265,13 +265,74 @@ export const saveLabel = async (req, res) => {
     console.log('Request to save-label endpoint received');
     const labelData = req.body;
     console.log("labelData:", labelData);
-    
+
     try {
-        // Create a new label using the Label model
         const newLabel = new Label(labelData);
         await newLabel.save();
         res.status(201).json(newLabel);
     } catch (error) {
+        console.error("Error creating label:", error);
+        res.status(400).json({ message: "Failed to create label", error: error.message });
+    }
+
+};
+
+/**
+ * Get all labels from the database.
+ * @returns {Label[]} - An array of all labels in the database.
+ */
+export const getAllLabels = async () => {
+    try {
+        const labels = await Label.find({});
+        return labels;
+    } catch (error) {
+        throw new Error(`Failed to get labels: ${error.message}`);
+    }
+};
+
+/**
+ * Delete a label from the database
+ * @param {object} req - The HTTP request object containing labelId
+ * @param {object} res - The HTTP response object.
+ * @returns {void}
+ */
+export const deleteLabel = async (req, res) => {
+    console.log("Request to delete-label endpoint received");
+    const labelId = req.body.labelId;
+    console.log("labelId:", req.body.labelId)
+    try {
+        await Label.deleteOne({ labelId: labelId }); // Assuming the label ID is stored as _id in MongoDB
+        res.status(200).json({ message: 'Label deleted successfully' });
+    } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
+
+/**
+ * Handle PUT request to update a label
+ * @param {object} req - The HTTP request object
+ * @param {object} res - The HTTP response object
+ */
+export const updateLabel = async (req, res) => {
+    try {
+        const updatedLabel = req.body;
+        console.log("Updating label...", updatedLabel);
+
+        const label = await Label.findOneAndUpdate(
+            { labelId: updatedLabel.labelId },
+            updatedLabel,
+            { new: true }
+        );
+
+        if (!label) {
+            return res.status(404).json({ message: "Label not found" });
+        }
+
+        res.status(200).json(label);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+
+

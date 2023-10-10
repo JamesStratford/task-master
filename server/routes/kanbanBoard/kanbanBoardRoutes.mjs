@@ -11,7 +11,10 @@ import {
     removeTaskFromColumn,
     updateTask,
     saveLabel,
-    deleteTask
+    getAllLabels,
+    deleteTask,
+    deleteLabel,
+    updateLabel,
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import Label from '../../models/kanbanBoard/label.mjs';
 import express from 'express';
@@ -62,7 +65,6 @@ router.delete('/delete-task', async (req, res) => {
     }
 });
 
-
 router.post('/add-column', async (req, res) => {
     const columnData = req.body;
     try {
@@ -97,7 +99,6 @@ router.put('/update-column', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
-
 
 router.get('/get-columns', async (req, res) => {
     try {
@@ -173,9 +174,63 @@ router.put('/update-board', async (req, res) => {
 
 router.post('/save-label', async (req, res) => {
     try {
-        await saveLabel(req, res); // Call the saveLabel function to handle the request
+        await saveLabel(req, res);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/get-all-labels', async (req, res) => {
+    try {
+        const labels = await getAllLabels();
+        res.json(labels);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.delete('/delete-label', async (req, res) => {
+    console.log("deleting label...");
+    try {
+        await deleteLabel(req, res);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/update-label', async (req, res) => {
+    try {
+        await updateLabel(req, res);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/update-label-list', async (req, res) => {
+    const updatedLabels = req.body.updatedLabels; // Updated list of labels
+
+    try {
+        // Loop through the updatedLabels and update each label in the database
+        for (const updatedLabel of updatedLabels) {
+            // Find the label by its ID
+            const label = await Label.findOne({ _id: updatedLabel._id });
+
+            if (!label) {
+                return res.status(404).json({ message: 'Label not found' });
+            }
+
+            // Update the label data with the new data
+            label.text = updatedLabel.text;
+            label.color = updatedLabel.color;
+
+            // Save the updated label
+            await label.save();
+        }
+
+        res.status(200).json({ message: 'Label list updated successfully' });
+    } catch (error) {
+        console.error("Error updating label list:", error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

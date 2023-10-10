@@ -10,6 +10,7 @@
         "install_all": "npm install && cd server && npm install && cd ../frontend && npm install && cd ../discordBot && npm install"
     },
     "dependencies": {
+        "react-contenteditable": "^3.3.7"
     },
     "devDependencies": {
         "concurrently": "^6.2.0"

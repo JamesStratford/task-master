@@ -277,18 +277,29 @@ export const saveLabel = async (req, res) => {
 };
 
 /**
- * 
+ * Get a column by its index in the board.
+ * @param {number} index - The index of the column to get.
+ * @returns {Column} - The column at the specified index.
  */
 export const getColumnByIndex = async (index) => {
     const columns = await getColumns();
     return columns[index];
 };
 
+/**
+ * Get tasks by their ID.
+ * @param {string} taskId - The ID of the task to get.
+ * @returns {Task} - The task with the specified ID.
+ */
 export const getTasksByIds = async (taskIds) => {
     const allTasks = await getTasks();
-    return allTasks.filter(task => taskIds.includes(task.taskId));
+    return taskIds.map(taskId => allTasks[taskId]).filter(task => task !== undefined);
 };
 
+/**
+ * Get the total number of columns in the board.
+ * @returns {number} - The total number of columns in the board.
+ */
 export const getTotalColumnCount = async () => {
     const columns = await getColumns();
     return columns.length;

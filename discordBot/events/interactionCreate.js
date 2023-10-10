@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const { handleButtonClick } = require('./commands/editTasks/setDeadline');
+const { handleButtonClick } = require('../commands/editTasks/setDeadline');
 
 module.exports = {
   name: Events.InteractionCreate,

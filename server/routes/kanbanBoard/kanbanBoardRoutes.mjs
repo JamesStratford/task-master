@@ -11,13 +11,13 @@ import {
   removeTaskFromColumn,
   updateTask,
   saveLabel,
-    getAllLabels,
+  getAllLabels,
   deleteTask,
   getColumnByIndex,
   getTasksByIds,
-  getTotalColumnCount,,
-    deleteLabel,
-    updateLabel,
+  getTotalColumnCount,
+  deleteLabel,
+  updateLabel,
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import Label from "../../models/kanbanBoard/label.mjs";
 import express from "express";

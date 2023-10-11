@@ -1,14 +1,12 @@
 const {
   ButtonBuilder,
   ButtonStyle,
-  Events,
-  ModalBuilder,
-  TextInputBuilder,
-  TextInputStyle,
+  EmbedBuilder,
   ActionRowBuilder,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
   SlashCommandBuilder,
+  MessageCollector,
 } = require("discord.js");
 const axios = require("axios");
 require("dotenv").config({ path: "frontend/.env" });
@@ -29,12 +27,12 @@ module.exports = {
 const nextButton = new ButtonBuilder()
   .setCustomId("next_column")
   .setLabel("Next")
-  .setStyle("Primary");
+  .setStyle(ButtonStyle.Primary);
 
 const prevButton = new ButtonBuilder()
   .setCustomId("prev_column")
   .setLabel("Previous")
-  .setStyle("Secondary");
+  .setStyle(ButtonStyle.Secondary);
 
 let currentColumnIndex = 0;
 
@@ -65,14 +63,121 @@ async function handleButtonClick(interaction) {
   nextButton.setDisabled(currentColumnIndex >= totalColumns - 1);
   prevButton.setDisabled(currentColumnIndex <= 0);
 
-  await interaction.update({
-    content: `Select a task from: ${column.title}`,
+  const columnMenuEmbed = new EmbedBuilder()
+    .setTitle("Select a Task to Set a Deadline For")
+    .setDescription(`Select a task from: **${column.title}**`);
+
+  const columnMenuResponse = await interaction.update({
+    embeds: [columnMenuEmbed],
     components: [
       selectMenu,
       new ActionRowBuilder().addComponents(prevButton, nextButton),
     ],
     ephemeral: true,
   });
+
+  checkSelectedTask(interaction, columnMenuResponse);
+}
+
+async function checkSelectedTask(interaction, columnMenuResponse) {
+  // Wait for user to select a task
+  const collectorFilter = (i) => i.user.id === interaction.user.id;
+
+  try {
+    const confirmation = await columnMenuResponse.awaitMessageComponent({
+      filter: collectorFilter,
+      time: 60000,
+    });
+
+    // Check which task was selected
+    let selectedTask;
+    const tasksResponse = await axios.post(
+      `${process.env.SERVER_ORIGIN}/api/kanban/get-tasks-by-ids`,
+      {
+        taskIds: [confirmation.value],
+      }
+    );
+    selectedTask = tasksResponse.data[0];
+
+    if (!selectedTask) {
+      await interaction.editReply({
+        content: `You selected task: ${selectedTask.content}`,
+        components: [],
+      });
+    }
+  } catch (e) {
+    const errorEmbed = new EmbedBuilder()
+      .setTitle("Set Deadline Timed Out")
+      .setDescription("Please try again");
+
+    await interaction.editReply({
+      embeds: [errorEmbed],
+      components: [],
+      ephemeral: true,
+    });
+    console.error(e);
+  }
+
+  // Ask user for due date
+
+  // const dateInput = new TextInputBuilder()
+  //   .setCustomId("dateInput")
+  //   .setPlaceholder("DD/MM/YYYY")
+  //   .setMinLength(10)
+  //   .setMaxLength(10)
+  //   .setStyle(TextInputStyle.Short)
+  //   .setRequired(true);
+
+  // const dateModalComponent = new ActionRowBuilder().addComponents(dateInput);
+
+  // const dateModal = new ModalBuilder()
+  //   .setCustomId("dateModal")
+  //   .setTitle("Set deadline")
+  //   .addComponents(dateModalComponent);
+
+  // await interaction.showModal(dateModal);
+
+  // // Wait for user to submit due date
+
+  // client.on(Events.InteractionCreate, async (interaction) => {
+  //   if (!interaction.isModalSubmit()) return;
+  //   if (interaction.customId === "dateModal") {
+  //     const dueDate = interaction.fields.getTextInputValue("dateInput");
+
+  //     // Check if due_date is valid
+
+  //     const dateFormatRegex =
+  //       /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+
+  //     if (!dateFormatRegex.test(dueDate)) {
+  //       await interaction.reply({
+  //         content: "Please use the format DD/MM/YYYY",
+  //         ephemeral: true,
+  //       });
+  //       return;
+  //     }
+
+  //     // Set deadline to task in web server
+
+  //     try {
+  //       axios.put(`${process.env.SERVER_ORIGIN}/api/kanban/update-task`, {
+  //         newTask: {
+  //           taskId: selectedTask.taskId,
+  //           due_date: dueDate,
+  //         },
+  //       });
+
+  //       await interaction.reply(
+  //         `Your task has been assigned the due date: ${dueDate}`
+  //       );
+  //     } catch (error) {
+  //       console.error("Error fetching tasks: ", error.message);
+  //       await interaction.reply(
+  //         "Sorry, something went wrong while updating your task."
+  //       );
+  //     }
+  //   }
+  // });
 }
 
 async function getColumnMenu() {
@@ -165,8 +270,12 @@ async function execute(interaction) {
   nextButton.setDisabled(currentColumnIndex >= totalColumns - 1);
   prevButton.setDisabled(currentColumnIndex <= 0);
 
+  const columnMenuEmbed = new EmbedBuilder()
+    .setTitle("Select a Task to Set a Deadline For")
+    .setDescription(`Select a task from: **${column.title}**`);
+
   const columnMenuResponse = await interaction.editReply({
-    content: `Select a task from: ${column.title}`,
+    embeds: [columnMenuEmbed],
     components: [
       selectMenu,
       new ActionRowBuilder().addComponents(prevButton, nextButton),
@@ -174,90 +283,5 @@ async function execute(interaction) {
     ephemeral: true,
   });
 
-  // Wait for user to select a task
-  const collectorFilter = (i) => i.user.id === interaction.user.id;
-
-  try {
-    const confirmation = await columnMenuResponse.awaitMessageComponent({
-      filter: collectorFilter,
-      time: 60000,
-    });
-
-    // Check which task was selected
-    let selectedTask;
-    const tasksResponse = await axios.post(
-      `${process.env.SERVER_ORIGIN}/api/kanban/get-tasks-by-ids`,
-      {
-        taskIds: [confirmation.value],
-      }
-    );
-    selectedTask = tasksResponse.data[0];
-  } catch (e) {
-    await interaction.editReply({
-      content: "Task not selected within 1 minute, command cancelled",
-      components: [],
-      ephemeral: true,
-    });
-  }
-
-  // Ask user for due date
-
-  // const dateInput = new TextInputBuilder()
-  //   .setCustomId("dateInput")
-  //   .setPlaceholder("DD/MM/YYYY")
-  //   .setMinLength(10)
-  //   .setMaxLength(10)
-  //   .setStyle(TextInputStyle.Short)
-  //   .setRequired(true);
-
-  // const dateModalComponent = new ActionRowBuilder().addComponents(dateInput);
-
-  // const dateModal = new ModalBuilder()
-  //   .setCustomId("dateModal")
-  //   .setTitle("Set deadline")
-  //   .addComponents(dateModalComponent);
-
-  // await interaction.showModal(dateModal);
-
-  // // Wait for user to submit due date
-
-  // client.on(Events.InteractionCreate, async (interaction) => {
-  //   if (!interaction.isModalSubmit()) return;
-  //   if (interaction.customId === "dateModal") {
-  //     const dueDate = interaction.fields.getTextInputValue("dateInput");
-
-  //     // Check if due_date is valid
-
-  //     const dateFormatRegex =
-  //       /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
-
-  //     if (!dateFormatRegex.test(dueDate)) {
-  //       await interaction.reply({
-  //         content: "Please use the format DD/MM/YYYY",
-  //         ephemeral: true,
-  //       });
-  //       return;
-  //     }
-
-  //     // Set deadline to task in web server
-
-  //     try {
-  //       axios.put(`${process.env.SERVER_ORIGIN}/api/kanban/update-task`, {
-  //         newTask: {
-  //           taskId: selectedTask.taskId,
-  //           due_date: dueDate,
-  //         },
-  //       });
-
-  //       await interaction.reply(
-  //         `Your task has been assigned the due date: ${dueDate}`
-  //       );
-  //     } catch (error) {
-  //       console.error("Error fetching tasks: ", error.message);
-  //       await interaction.reply(
-  //         "Sorry, something went wrong while updating your task."
-  //       );
-  //     }
-  //   }
-  // });
+  checkSelectedTask(interaction, columnMenuResponse);
 }

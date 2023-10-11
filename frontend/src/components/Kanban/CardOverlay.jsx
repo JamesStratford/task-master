@@ -15,6 +15,8 @@ function CardOverlay({
   const [labelColor, setLabelColor] = useState("#ffffff"); // Manage the label color state
   const [cardLabels, setCardLabels] = useState(task.labels || []); // Manage the labels state
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false); // Manage the label overlay visibility state
+  const [checklist, setChecklist] = useState(task.checklist || []);
+  const [newChecklistItem, setNewChecklistItem] = useState("");
 
   /* Function to handle description change */
   const handleDescriptionChange = (e) => {
@@ -55,6 +57,30 @@ function CardOverlay({
     fetchAllLabels(); // Update all the labels
     updateTaskContents(updatedTask); // Update this tasks contents
   };
+
+  const handleCheckItem = (index) => {
+    setChecklist((prev) =>
+      prev.map((item, idx) =>
+        idx === index ? { ...item, isChecked: !item.isChecked } : item
+      )
+    );
+  };
+
+  const handleAddItem = () => {
+    if (newChecklistItem.trim()) {
+      setChecklist((prev) => [...prev, { content: newChecklistItem, isChecked: false }]);
+      setNewChecklistItem("");
+    }
+  };
+
+  const handleNewItemChange = (e) => {
+    setNewChecklistItem(e.target.value);
+  };
+
+  const handleDeleteItem = (index) => {
+    setChecklist((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
 
   return (
     <div className="card-overlay">
@@ -105,6 +131,32 @@ function CardOverlay({
             </button>
           </div>
         </div>
+
+        <div className="checklist">
+      <h5 className="checklist-header">Checklist</h5>
+      <ul>
+        {checklist.map((item, index) => (
+          <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <input
+                type="checkbox"
+                checked={item.isChecked}
+                onChange={() => handleCheckItem(index)}
+              />
+              {item.content}
+            </div>
+            <button onClick={() => handleDeleteItem(index)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+      <input
+        type="text"
+        value={newChecklistItem}
+        onChange={handleNewItemChange}
+        placeholder="Add new item"
+      />
+      <button onClick={handleAddItem}>Add</button>
+    </div>
         <button onClick={onClose} className="close-button-overlay">
           <img src={require("./close.png")} alt="Close" />
         </button>

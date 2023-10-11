@@ -613,7 +613,6 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between; /* Place the inputs on each side */
-  margin-left: 5px;
 }
 
 .date-input {

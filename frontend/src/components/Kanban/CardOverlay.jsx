@@ -87,7 +87,6 @@
               </span>
             ))}
           </div>
-          <h5 className="task-dates-header">Task dates</h5>
           <div className="task-dates">
             <div className="date-input">
               <label className="start-date-title">Start Date</label>

@@ -585,6 +585,7 @@ function KanbanBoard({ userInfo }) {
                 onClose={toggleOverlay}
                 updateTaskContents={updateTaskContents}
                 allLabels={allLabels}
+                setAllLabels={setAllLabels}
                 fetchAllLabels={fetchAllLabels}
               />
             )}

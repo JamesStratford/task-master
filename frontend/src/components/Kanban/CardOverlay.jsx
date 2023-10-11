@@ -93,19 +93,28 @@ function CardOverlay({
         </div>
         <div className="task-dates">
           <div className="date-input">
-            <label className="start-date-title">Start Date</label>
+            <label htmlFor="start-date" className="start-date-title">
+              Start Date
+            </label>
             <input
               type="date"
+              id="start-date"
               value={startDate}
               onChange={handleStartDateChange}
             />
           </div>
           <div className="date-input">
-            <label className="due-date-title">Due Date</label>
-            <input type="date" value={dueDate} onChange={handleDueDateChange} />
+            <label htmlFor="due-date" className="due-date-title">
+              Due Date
+            </label>
+            <input
+              type="date"
+              id="due-date"
+              value={dueDate}
+              onChange={handleDueDateChange}
+            />
           </div>
         </div>
-
         <div className="description">
           <h5 className="description-header">Description</h5>
           <input

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { SketchPicker } from "react-color";
-import axios from "axios";
 import LabelOverlay from "./LabelOverlay";
 
 function CardOverlay({
@@ -42,6 +40,9 @@ function CardOverlay({
     setIsLabelOverlayVisible(!isLabelOverlayVisible);
   };
 
+  /* *
+  * Updates the task with its new contents.
+  */
   const handleUpdateTask = () => {
     const updatedTask = {
       ...task,
@@ -51,14 +52,17 @@ function CardOverlay({
       dueDate: dueDate,
     };
 
+    // Check if the label is new
     const isNewLabel = !allLabels.some((label) =>
       cardLabels.some((l) => l.text === label.text)
     );
 
+    // Add the new label to the list of all labels
     if (isNewLabel) {
       setAllLabels([...allLabels, ...cardLabels]);
     }
 
+    // Update the task
     fetchAllLabels();
     updateTaskContents(updatedTask);
   };

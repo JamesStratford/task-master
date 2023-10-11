@@ -325,8 +325,8 @@ function KanbanBoard({ userInfo }) {
       // Set the start_date to the current date and due_date to null
       const currentDate = new Date();
       const formattedStartDate = currentDate.toISOString().split("T")[0]; // Get current date in "YYYY-MM-DD" format
-      newCard.start_date = formattedStartDate;
-      newCard.due_date = null;
+      newCard.startDate = formattedStartDate;
+      newCard.dueDate = null;
 
       // Send a POST request to add the task to the backend
       const response = await axios.post(

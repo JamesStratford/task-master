@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export const useKanban = (socket, kanbanBoard, setKanbanBoard) => {
+  const [shouldUpdateBackend, setShouldUpdateBackend] = useState(false);
+  const [allLabels, setAllLabels] = useState([]);
+
+
   useEffect(() => {
     const fetchData = async () => {
       const data = await axios.get(
@@ -13,12 +17,11 @@ export const useKanban = (socket, kanbanBoard, setKanbanBoard) => {
     socket.on('updateBoard', () => {
       fetchData();
     });
-    
+
     console.log("Fetching Data for Board")
     fetchData();
   }, [socket, setKanbanBoard]);
 
-  const [shouldUpdateBackend, setShouldUpdateBackend] = useState(false);
 
   const updateKanbanBoard = async (updatedColumns, updatedTasks) => {
     // Update local state
@@ -62,6 +65,26 @@ export const useKanban = (socket, kanbanBoard, setKanbanBoard) => {
   }, [socket, shouldUpdateBackend, kanbanBoard]);
 
 
-  return [updateKanbanBoard];
+  useEffect(() => {
+    const fetchAllLabels = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
+        );
+
+        const allExistingLabels = response.data;
+
+        setAllLabels(allExistingLabels);
+      } catch (error) {
+        console.error("Failed to fetch labels:", error);
+      }
+    };
+    fetchAllLabels();
+  }
+    , []);
+
+
+
+  return [updateKanbanBoard, setAllLabels, allLabels];
 };
 

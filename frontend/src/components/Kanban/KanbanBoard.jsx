@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CardOverlay from "./CardOverlay";
 import axios from "axios";
@@ -15,13 +15,12 @@ function KanbanBoard({ userInfo }) {
   const socket = useContext(SocketContext);
   const { kanbanColumns, setKanbanColumns } = useContext(KanbanContext);
   const { remoteDrags } = useContext(MultiplayerContext);
-  const [updateKanbanBoard] = useKanban(socket, kanbanColumns, setKanbanColumns);
-  
+  const [updateKanbanBoard, setAllLabels, allLabels] = useKanban(socket, kanbanColumns, setKanbanColumns);
+
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
-  const [allLabels, setAllLabels] = useState([]);
 
   const toggleOverlay = (taskId) => {
     if (isOverlayOpen) {
@@ -30,91 +29,6 @@ function KanbanBoard({ userInfo }) {
       const task = kanbanColumns.tasks[taskId];
       setCurrentTask(task);
       setIsOverlayOpen(true);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllLabels();
-  }, []);
-
-  const fetchAllLabels = async () => {
-    try {
-      console.log("Fetching all labels...");
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-all-labels`
-      );
-
-      const allExistingLabels = response.data;
-      console.log("Fetched all labels:", allExistingLabels);
-
-      // Fetch all tasks
-      console.log("Fetching all tasks...");
-      const tasksResponse = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-tasks`
-      );
-
-      const allTasks = tasksResponse.data;
-      console.log("Fetched all tasks:", allTasks);
-
-      // Iterate through each task to check and update labels
-      // Iterate through each task to check and update labels
-      // Iterate through each task to check and update labels
-      for (const taskId in allTasks) {
-        if (allTasks.hasOwnProperty(taskId)) {
-          const task = allTasks[taskId];
-          let taskUpdated = false; // Flag to track if the task needs updating
-
-          // Filter out labels that do not have a matching labelId in allExistingLabels
-          task.labels = task.labels.filter((taskLabel) => {
-            const correspondingLabel = allExistingLabels.find(
-              (existingLabel) => existingLabel.labelId === taskLabel.labelId
-            );
-
-            // Check if a corresponding label with the same labelId exists
-            if (correspondingLabel) {
-              // Check if the label texts or colors are different
-              if (
-                correspondingLabel.text !== taskLabel.text ||
-                correspondingLabel.color !== taskLabel.color
-              ) {
-                // Update the label text and/or color in the task's label array
-                console.log(
-                  `Updating label in task ${taskId}, labelId: ${taskLabel.labelId} from "${taskLabel.text}" (Color: ${taskLabel.color}) to "${correspondingLabel.text}" (Color: ${correspondingLabel.color})`
-                );
-                taskLabel.text = correspondingLabel.text;
-                taskLabel.color = correspondingLabel.color;
-                taskUpdated = true; // Set the flag to indicate the task needs updating
-              }
-              return true; // Keep this label in task.labels
-            } else {
-              // No matching label found, so remove it from task.labels
-              console.log(
-                `Removing label from task ${taskId}, labelId: ${taskLabel.labelId}, text: "${taskLabel.text}" (Color: ${taskLabel.color})`
-              );
-              taskUpdated = true; // Set the flag to indicate the task needs updating
-              return false; // Exclude this label from task.labels
-            }
-          });
-
-          // If the task was updated, update it in the database
-          if (taskUpdated) {
-            console.log(`Updating task in the database for taskId: ${taskId}`);
-            await axios.put(
-              `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
-              { newTask: task }
-            );
-          }
-        }
-      }
-
-      // Now, all labels in the tasks have been updated if necessary
-      // You can set your tasks state or perform any other necessary actions here
-      // For example:
-      // setTasks(allTasks);
-
-      setAllLabels(allExistingLabels);
-    } catch (error) {
-      console.error("Failed to fetch labels:", error);
     }
   };
 
@@ -133,7 +47,7 @@ function KanbanBoard({ userInfo }) {
     setKanbanColumns({
       ...kanbanColumns,
       columns: kanbanColumns.columns.map((col) =>
-      col.id === column.id ? updatedColumn : col
+        col.id === column.id ? updatedColumn : col
       ),
     });
 
@@ -341,31 +255,6 @@ function KanbanBoard({ userInfo }) {
     }
   };
 
-  const updateCardContent = async (taskId, newContent) => {
-    try {
-      const newTask = kanbanColumns.tasks[taskId];
-      newTask.content = newContent;
-      const updatedTasks = {
-        ...kanbanColumns.tasks,
-        [taskId]: newTask,
-      };
-
-      setKanbanColumns({
-        ...kanbanColumns,
-        tasks: updatedTasks,
-      });
-
-      await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task`,
-        {
-          newTask,
-        }
-      );
-    } catch (error) {
-      console.error("Failed to update card content:", error);
-    }
-  };
-
   const removeCard = async (taskId) => {
     // Filter out the task with the specified taskId to remove it
     const updatedTasks = { ...kanbanColumns.tasks };
@@ -555,7 +444,7 @@ function KanbanBoard({ userInfo }) {
                 onClose={toggleOverlay}
                 updateTaskContents={updateTaskContents}
                 allLabels={allLabels}
-                fetchAllLabels={fetchAllLabels}
+                setAllLabels={setAllLabels}
               />
             )}
             {provided.placeholder}

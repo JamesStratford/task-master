@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { SketchPicker } from "react-color";
 import axios from "axios";
 
@@ -9,7 +9,6 @@ function LabelOverlay({
   allLabels,
   setAllLabels,
   toggleLabelOverlay,
-  fetchAllLabels,
   handleUpdateTask,
   updateTaskContents,
 }) {

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import LabelOverlay from "./LabelOverlay";
 
+
 function CardOverlay({
   task,
   onClose,
   updateTaskContents,
   allLabels,
   setAllLabels,
-  fetchAllLabels,
+  // fetchAllLabels,
 }) {
   const [description, setDescription] = useState(task.description || "");
   const [labelColor, setLabelColor] = useState("#ffffff");
@@ -62,9 +63,7 @@ function CardOverlay({
       setAllLabels([...allLabels, ...cardLabels]);
     }
 
-    // Update the task
-    fetchAllLabels();
-    updateTaskContents(updatedTask);
+    updateTaskContents(updatedTask); // Update this tasks contents
   };
 
   return (
@@ -151,10 +150,8 @@ function CardOverlay({
             setAllLabels={setAllLabels}
             labelColor={labelColor}
             setLabelColor={setLabelColor}
-            toggleLabelOverlay={toggleLabelOverlay}
-            fetchAllLabels={fetchAllLabels}
-            handleUpdateTask={handleUpdateTask}
-            updateTaskContents={updateTaskContents}
+            toggleLabelOverlay={toggleLabelOverlay} // Function to toggle the label overlay
+            updateTaskContents={updateTaskContents} // Function to update the task contents
           />
         )}
       </div>

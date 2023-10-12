@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { SketchPicker } from "react-color";
-import axios from "axios";
 import LabelOverlay from "./LabelOverlay";
+
 
 function CardOverlay({
   task,
@@ -9,7 +8,7 @@ function CardOverlay({
   updateTaskContents,
   allLabels,
   setAllLabels,
-  fetchAllLabels,
+  // fetchAllLabels,
 }) {
   const [description, setDescription] = useState(task.description || ""); // Manage the description state
   const [labelColor, setLabelColor] = useState("#ffffff"); // Manage the label color state
@@ -52,7 +51,6 @@ function CardOverlay({
       setAllLabels([...allLabels, ...cardLabels]);
     }
 
-    fetchAllLabels(); // Update all the labels
     updateTaskContents(updatedTask); // Update this tasks contents
   };
 
@@ -121,7 +119,7 @@ function CardOverlay({
             labelColor={labelColor}
             setLabelColor={setLabelColor}
             toggleLabelOverlay={toggleLabelOverlay} // Function to toggle the label overlay
-            fetchAllLabels={fetchAllLabels} // Function to fetch all labels
+            // fetchAllLabels={fetchAllLabels} // Function to fetch all labels
             handleUpdateTask={handleUpdateTask} // Function to handle the updating of task contents
             updateTaskContents={updateTaskContents} // Function to update the task contents
           />

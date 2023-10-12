@@ -9,7 +9,6 @@ function LabelOverlay({
   allLabels,
   setAllLabels,
   toggleLabelOverlay,
-  handleUpdateTask,
   updateTaskContents,
 }) {
   // Label properties
@@ -75,7 +74,6 @@ function LabelOverlay({
       );
 
       setCardLabels([...cardLabels, newLabelObject]);
-      handleUpdateTask();
     } catch (error) {
       console.error("Failed to create label:", error);
 
@@ -103,8 +101,6 @@ function LabelOverlay({
       setAllLabels((prevLabels) =>
         prevLabels.filter((label) => label !== editingLabel.labelId)
       );
-
-      handleUpdateTask();
 
       setIsEditing(false); // Close the editing overlay
     } catch (error) {
@@ -147,8 +143,6 @@ function LabelOverlay({
         const updatedCardLabels = [...cardLabels];
         updatedCardLabels[existingLabelIndex].text = text;
         updatedCardLabels[existingLabelIndex].color = color;
-
-        fetchAllLabels();
       }
 
       // Save the edited label to the database
@@ -156,7 +150,6 @@ function LabelOverlay({
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-label`,
         { labelId, text, color }
       );
-      handleUpdateTask();
       setIsEditing(false); // Close the editing overlay
     } catch (error) {
       console.error("Failed to save edited label:", error);

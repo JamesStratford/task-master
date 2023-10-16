@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import LabelOverlay from "./LabelOverlay";
 
-
 function CardOverlay({
   task,
   onClose,
@@ -16,10 +15,11 @@ function CardOverlay({
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
   const [startDate, setStartDate] = useState(task.startDate);
   const [dueDate, setDueDate] = useState(task.dueDate);
+  const [selectedUser, setSelectedUser] = useState("");
 
   useEffect(() => {
     handleUpdateTask();
-  }, [startDate, dueDate]);
+  }, [startDate, dueDate, selectedUser]);
 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
@@ -41,9 +41,13 @@ function CardOverlay({
     setIsLabelOverlayVisible(!isLabelOverlayVisible);
   };
 
+  const handleUserChange = (e) => {
+    setSelectedUser(e.target.value);
+  };
+
   /* *
-  * Updates the task with its new contents.
-  */
+   * Updates the task with its new contents.
+   */
   const handleUpdateTask = () => {
     const updatedTask = {
       ...task,
@@ -118,6 +122,17 @@ function CardOverlay({
             />
           </div>
         </div>
+        <div className="assign-user">
+          <h5 className="assign-user-header">Assign User to Task</h5>
+          <select value={selectedUser} onChange={handleUserChange}>
+            <option value="">Select User</option>
+            <option value="user1">User 1</option>
+            <option value="user2">User 2</option>
+          </select>
+        </div>
+        <button onClick={onClose} className="close-button-overlay">
+          <img src={require("./close.png")} alt="Close" />
+        </button>
         <div className="description">
           <h5 className="description-header">Description</h5>
           <input

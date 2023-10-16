@@ -124,7 +124,7 @@ function CardOverlay({
         </div>
         <div className="assign-user">
           <h5 className="assign-user-header">Assign User to Task</h5>
-          <select value={selectedUser} onChange={handleUserChange}>
+          <select className="assign-user-menu" value={selectedUser} onChange={handleUserChange}>
             <option value="">Select User</option>
             <option value="user1">User 1</option>
             <option value="user2">User 2</option>

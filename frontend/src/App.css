@@ -624,3 +624,17 @@ body {
   font-size: 14px;
   text-align: center; /* Center the label text */
 }
+
+.assign-user {
+  padding-bottom: 20px;
+}
+
+.assign-user-header {
+  color: black;
+  font-size: 20px;
+  margin-top: 0px;
+  margin-bottom: -10px;
+}
+
+.assign-user-menu {
+}

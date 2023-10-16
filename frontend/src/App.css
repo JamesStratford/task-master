@@ -627,6 +627,8 @@ body {
 
 .assign-user {
   padding-bottom: 20px;
+  display: flex;
+  align-items: center;
 }
 
 .assign-user-header {
@@ -636,5 +638,12 @@ body {
   margin-bottom: 5px;
 }
 
+.discord-logo {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
 .assign-user-menu {
+  margin-top: 0px;
 }

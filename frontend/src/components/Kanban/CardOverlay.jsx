@@ -122,13 +122,12 @@ function CardOverlay({
             />
           </div>
         </div>
+        <h5 className="assign-user-header">Assign User to Task</h5>
         <div className="assign-user">
-          <h5 className="assign-user-header">Assign User to Task</h5>
           <img
             className="discord-logo"
             src={require("./discord.png")}
             alt="Discord Logo"
-            style={{ width: "30px", height: "30px" }}
           />
           <select
             className="assign-user-menu"

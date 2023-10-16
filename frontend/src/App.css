@@ -639,11 +639,20 @@ body {
 }
 
 .discord-logo {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   margin-right: 10px;
 }
 
 .assign-user-menu {
-  margin-top: 0px;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  margin-top: -3px;
+  border-radius: 4px;
+  background-color: #7289DA; /* Background color of the dropdown */
+  color: #ffffff; /* Text color */
+  cursor: pointer;
+  outline: none;
 }
+

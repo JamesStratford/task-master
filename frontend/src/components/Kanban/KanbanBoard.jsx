@@ -28,11 +28,15 @@ function KanbanBoard({ userInfo }) {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    // Define an async function to fetch users from your API
+    /*
+     * Fetch all users from the database.
+     */
     async function fetchUsers() {
       console.log("Fetching users...");
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-users`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-users`
+        );
         console.log("Users:", response.data);
         setUsers(response.data);
       } catch (error) {
@@ -40,7 +44,6 @@ function KanbanBoard({ userInfo }) {
       }
     }
 
-    // Call the fetchUsers function when the component mounts
     fetchUsers();
   }, []);
 

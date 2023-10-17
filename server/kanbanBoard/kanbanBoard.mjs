@@ -339,10 +339,8 @@ export const updateLabel = async (req, res) => {
 *  Gets all users from the database 
 */
 export const getUser = async () => {
-    console.log("Request to get-users endpoint received");
     try {
-        const users = await UserInfo.find(); // Fetch all users without specifying fields
-        console.log("users:", users);
+        const users = await UserInfo.find()
         return users;
     } catch (error) {
         console.error("> Error fetching users:", error);

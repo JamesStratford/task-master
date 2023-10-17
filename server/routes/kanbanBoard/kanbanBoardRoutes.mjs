@@ -236,11 +236,8 @@ router.put('/update-label-list', async (req, res) => {
 });
 
 router.get('/get-users', async (req, res) => {
-    console.log("getting users...");
     try {
-        console.log("> getting users...");
         const users = await getUser();
-        console.log("> users:", users);
         res.json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });

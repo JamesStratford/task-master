@@ -139,7 +139,7 @@ function CardOverlay({
             <option value="">Select a Discord user</option>
             {users.map((user) => (
               <option key={user.discordId} value={user.id} style={{ color: 'white' }}>
-                {user.username}
+                {user.global_name ? user.global_name : user.username}
               </option>
             ))}
           </select>

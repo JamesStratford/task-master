@@ -155,6 +155,11 @@ function CardOverlay({
               </option>
             ))}
           </select>
+          {selectedUser !== "" && (
+            <button className="unassign-button" onClick={handleUserChange}>
+              Unassign
+            </button>
+          )}
         </div>
         <button onClick={onClose} className="close-button-overlay">
           <img src={require("./close.png")} alt="Close" />

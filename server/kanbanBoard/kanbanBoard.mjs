@@ -1,6 +1,7 @@
 import Task from '../models/kanbanBoard/task.mjs';
 import Column from '../models/kanbanBoard/column.mjs';
 import Label from '../models/kanbanBoard/label.mjs';
+import User from '../models/kanbanBoard/users.mjs';
 
 /**
 *   Add a task to the database
@@ -334,22 +335,17 @@ export const updateLabel = async (req, res) => {
     }
 };
 
-
-/**
- * Get all users' information
- * @returns {User[]}
- */
-export const getUsers = async (req, res) => {
+/* 
+*  Gets all users from the database 
+*/
+export const getUser = async () => {
+    console.log("Request to get-users endpoint received");
     try {
-        const usersArray = await User.find({}).exec(); // Replace 'User' with your actual MongoDB model
-        const usersObject = usersArray.reduce((acc, user) => {
-            acc[user.id] = user;
-            return acc;
-        }, {});
-        return usersObject;
+        const users = await User.find(); // Fetch all users without specifying fields
+        return users;
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error("> Error fetching users:", error);
+        throw new Error("Failed to fetch users");
     }
 };
-
 

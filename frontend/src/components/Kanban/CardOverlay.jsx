@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import LabelOverlay from "./LabelOverlay";
+import axios from "axios";
 
 function CardOverlay({
   task,
@@ -8,7 +9,7 @@ function CardOverlay({
   allLabels,
   setAllLabels,
   users,
-  // fetchAllLabels,
+  setUsers,
 }) {
   const [description, setDescription] = useState(task.description || "");
   const [labelColor, setLabelColor] = useState("#ffffff");
@@ -137,7 +138,7 @@ function CardOverlay({
           >
             <option value="">Select a Discord user</option>
             {users.map((user) => (
-              <option key={user.discordId} value={user.id}>
+              <option key={user.discordId} value={user.id} style={{ color: 'white' }}>
                 {user.username}
               </option>
             ))}

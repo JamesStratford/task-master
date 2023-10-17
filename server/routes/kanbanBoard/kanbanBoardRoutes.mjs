@@ -15,6 +15,7 @@ import {
     deleteTask,
     deleteLabel,
     updateLabel,
+    getUser,
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import Label from '../../models/kanbanBoard/label.mjs';
 import express from 'express';
@@ -232,15 +233,18 @@ router.put('/update-label-list', async (req, res) => {
         console.error("Error updating label list:", error);
         res.status(500).json({ message: 'Internal server error' });
     }
+});
 
-    router.get('/get-users', async (req, res) => {
-        try {
-            const users = await getUsers();
-            res.json(users);
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    });
+router.get('/get-users', async (req, res) => {
+    console.log("getting users...");
+    try {
+        console.log("> getting users...");
+        const users = await getUser();
+        console.log("> users:", users);
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 });
 
 export default router;

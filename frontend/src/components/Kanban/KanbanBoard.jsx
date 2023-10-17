@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import CardOverlay from "./CardOverlay";
 import axios from "axios";
@@ -15,12 +15,34 @@ function KanbanBoard({ userInfo }) {
   const socket = useContext(SocketContext);
   const { kanbanColumns, setKanbanColumns } = useContext(KanbanContext);
   const { remoteDrags } = useContext(MultiplayerContext);
-  const [updateKanbanBoard, setAllLabels, allLabels] = useKanban(socket, kanbanColumns, setKanbanColumns);
+  const [updateKanbanBoard, setAllLabels, allLabels] = useKanban(
+    socket,
+    kanbanColumns,
+    setKanbanColumns
+  );
 
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [openDropdownColumnId, setOpenDropdownColumnId] = useState(null);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    // Define an async function to fetch users from your API
+    async function fetchUsers() {
+      console.log("Fetching users...");
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-users`);
+        console.log("Users:", response.data);
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    }
+
+    // Call the fetchUsers function when the component mounts
+    fetchUsers();
+  }, []);
 
   const toggleOverlay = (taskId) => {
     if (isOverlayOpen) {
@@ -63,7 +85,10 @@ function KanbanBoard({ userInfo }) {
       );
       console.log("Successfully updated column task IDs in the database.");
     } catch (error) {
-      console.error("Failed to update column task IDs in the database:", error);
+      console.error(
+        "Failed to update column task IDs in the database:",
+        error.response.data
+      );
     }
   };
 
@@ -471,6 +496,8 @@ function KanbanBoard({ userInfo }) {
                 updateTaskContents={updateTaskContents}
                 allLabels={allLabels}
                 setAllLabels={setAllLabels}
+                users={users}
+                setUsers={setUsers}
               />
             )}
             {provided.placeholder}

@@ -17,12 +17,17 @@ function CardOverlay({
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
   const [startDate, setStartDate] = useState(task.startDate);
   const [dueDate, setDueDate] = useState(task.dueDate);
-  const [selectedUser, setSelectedUser] = useState("");
+  const [selectedUser, setSelectedUser] = useState(task.assignedUser || "");
   const [selectedUsername, setSelectedUsername] = useState("");
 
   useEffect(() => {
     handleUpdateTask();
   }, [startDate, dueDate, selectedUsername]);
+
+  useEffect(() => {
+    const selectedUserObject = users.find((user) => user.id === selectedUser);
+    setSelectedUsername(selectedUserObject ? selectedUserObject.username : "");
+  }, [selectedUser, users]);
 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
@@ -46,13 +51,7 @@ function CardOverlay({
 
   const handleUserChange = (e) => {
     const selectedUserId = e.target.value;
-    // Find the user object with the selected ID
-    const selectedUserObject = users.find((user) => user.id === selectedUserId);
-    // Update the state with the username
-    setSelectedUser(selectedUserId); // Store the ID
-    console.log("Selected user: ", selectedUserObject)
-    setSelectedUsername(selectedUserObject ? selectedUserObject.username : ""); // Store the username
-    console.log("Selected username: ", selectedUsername);
+    setSelectedUser(selectedUserId);
   };
 
   /* *

@@ -656,3 +656,13 @@ body {
   outline: none;
 }
 
+.unassign-button{
+  background-color: #e31f4d;
+  color: #fff;
+  border: none;
+  padding: 9px 7px;
+  cursor: pointer;
+  margin-top: -3px;
+  margin-left: 5px;
+  border-radius: 5px;
+}

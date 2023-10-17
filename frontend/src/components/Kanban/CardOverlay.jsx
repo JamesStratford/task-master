@@ -18,10 +18,11 @@ function CardOverlay({
   const [startDate, setStartDate] = useState(task.startDate);
   const [dueDate, setDueDate] = useState(task.dueDate);
   const [selectedUser, setSelectedUser] = useState("");
+  const [selectedUsername, setSelectedUsername] = useState("");
 
   useEffect(() => {
     handleUpdateTask();
-  }, [startDate, dueDate, selectedUser]);
+  }, [startDate, dueDate, selectedUsername]);
 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
@@ -44,7 +45,14 @@ function CardOverlay({
   };
 
   const handleUserChange = (e) => {
-    setSelectedUser(e.target.value);
+    const selectedUserId = e.target.value;
+    // Find the user object with the selected ID
+    const selectedUserObject = users.find((user) => user.id === selectedUserId);
+    // Update the state with the username
+    setSelectedUser(selectedUserId); // Store the ID
+    console.log("Selected user: ", selectedUserObject)
+    setSelectedUsername(selectedUserObject ? selectedUserObject.username : ""); // Store the username
+    console.log("Selected username: ", selectedUsername);
   };
 
   /* *
@@ -57,7 +65,7 @@ function CardOverlay({
       labels: cardLabels,
       startDate: startDate,
       dueDate: dueDate,
-      assignedUser: selectedUser,
+      assignedUser: selectedUsername,
     };
 
     // Check if the label is new
@@ -139,7 +147,11 @@ function CardOverlay({
           >
             <option value="">Select a Discord user</option>
             {users.map((user) => (
-              <option key={user.discordId} value={user.id} style={{ color: 'white' }}>
+              <option
+                key={user.discordId}
+                value={user.id}
+                style={{ color: "white" }}
+              >
                 {user.global_name ? user.global_name : user.username}
               </option>
             ))}

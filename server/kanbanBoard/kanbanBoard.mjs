@@ -222,12 +222,12 @@ export const updateBoard = async (board) => {
             return {
                 updateOne: {
                     filter: { id: column.id },
-                    update: { 
-                        $set: { 
+                    update: {
+                        $set: {
                             title: column.title,
                             taskIds: column.taskIds,
-                            nextColumnId: nextColumnId, 
-                        } 
+                            nextColumnId: nextColumnId,
+                        }
                     }
                 }
             };
@@ -235,7 +235,7 @@ export const updateBoard = async (board) => {
 
         // Execute all column updates in a single batch operation
         await Column.bulkWrite(columnUpdates);
-        
+
         // Create an array of update operations for tasks
         const taskUpdates = Object.entries(updatedTasks).map(([id, task]) => {
             return {
@@ -245,7 +245,7 @@ export const updateBoard = async (board) => {
                 }
             };
         });
-        
+
         // Execute all task updates in a single batch operation
         await Task.bulkWrite(taskUpdates);
 
@@ -334,5 +334,22 @@ export const updateLabel = async (req, res) => {
     }
 };
 
+
+/**
+ * Get all users' information
+ * @returns {User[]}
+ */
+export const getUsers = async (req, res) => {
+    try {
+        const usersArray = await User.find({}).exec(); // Replace 'User' with your actual MongoDB model
+        const usersObject = usersArray.reduce((acc, user) => {
+            acc[user.id] = user;
+            return acc;
+        }, {});
+        return usersObject;
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 

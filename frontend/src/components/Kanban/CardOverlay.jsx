@@ -7,6 +7,7 @@ function CardOverlay({
   updateTaskContents,
   allLabels,
   setAllLabels,
+  users,
   // fetchAllLabels,
 }) {
   const [description, setDescription] = useState(task.description || "");
@@ -122,7 +123,7 @@ function CardOverlay({
             />
           </div>
         </div>
-        <h5 className="assign-user-header">Assign User to Task</h5>
+        <h5 className="assign-user-header">Assign user to task</h5>
         <div className="assign-user">
           <img
             className="discord-logo"
@@ -134,9 +135,12 @@ function CardOverlay({
             value={selectedUser}
             onChange={handleUserChange}
           >
-            <option value="">Select User</option>
-            <option value="user1">User 1</option>
-            <option value="user2">User 2</option>
+            <option value="">Select a Discord user</option>
+            {users.map((user) => (
+              <option key={user.discordId} value={user.id}>
+                {user.username}
+              </option>
+            ))}
           </select>
         </div>
         <button onClick={onClose} className="close-button-overlay">

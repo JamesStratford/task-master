@@ -57,6 +57,7 @@ function CardOverlay({
       labels: cardLabels,
       startDate: startDate,
       dueDate: dueDate,
+      assignedUser: selectedUser,
     };
 
     // Check if the label is new

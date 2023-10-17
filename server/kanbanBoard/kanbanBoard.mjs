@@ -1,7 +1,7 @@
 import Task from '../models/kanbanBoard/task.mjs';
 import Column from '../models/kanbanBoard/column.mjs';
 import Label from '../models/kanbanBoard/label.mjs';
-import User from '../models/kanbanBoard/users.mjs';
+import UserInfo from '../models/kanbanBoard/users.mjs';
 
 /**
 *   Add a task to the database
@@ -341,7 +341,8 @@ export const updateLabel = async (req, res) => {
 export const getUser = async () => {
     console.log("Request to get-users endpoint received");
     try {
-        const users = await User.find(); // Fetch all users without specifying fields
+        const users = await UserInfo.find(); // Fetch all users without specifying fields
+        console.log("users:", users);
         return users;
     } catch (error) {
         console.error("> Error fetching users:", error);

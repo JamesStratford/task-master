@@ -7,7 +7,8 @@
         "discordBot": "cd discordBot && npm start",
         "start": "concurrently \"npm run server\" \"npm run frontend\" \"npm run discordBot\"",
         "test": "npm --prefix ./frontend test && npm --prefix ./server test && npm --prefix ./discordBot test",
-        "install_all": "npm install && cd server && npm install && cd ../frontend && npm install && cd ../discordBot && npm install"
+        "install_all": "npm install && cd server && npm install && cd ../frontend && npm install && cd ../discordBot && npm install",
+        "deploy-commands": "cd discordBot && node deploy-commands.js"
     },
     "dependencies": {
         "react-contenteditable": "^3.3.7"

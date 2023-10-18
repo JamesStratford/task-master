@@ -3,7 +3,7 @@ const {
   handleTaskSelection,
   getColumnMenu,
   execute,
-} = require(".../../../commands/editTasks/setDeadline.js"); // adjust the path
+} = require("../../../commands/editTasks/setDeadline.js");
 
 const axios = require("axios");
 

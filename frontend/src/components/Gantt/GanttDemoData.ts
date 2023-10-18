@@ -1,7 +1,7 @@
-import { Task } from "gantt-task-react";
+//import { Task } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 
-let tasks: Task[] = [
+let tasks = [
     {
         id: "1",
         type:'task',

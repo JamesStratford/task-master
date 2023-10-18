@@ -7,6 +7,7 @@ import MongoStore from "connect-mongo";
 import discordRoutes from "./routes/discordAuth.mjs"
 import discordKanbanRoutes from "./routes/discord-bot/kanban.mjs";
 import kanbanRoutes from "./routes/kanbanBoard/kanbanBoardRoutes.mjs";
+import ganttRoutes from "./routes/ganttChart/ganttChartRoutes.mjs";
 import discordWidgetRoutes from "./routes/discordWidget.mjs";
 import "./loadEnvironment.mjs";
 const socketIo = require('socket.io');
@@ -55,6 +56,7 @@ app.use(session({
 app.use("/api/discordAuth", discordRoutes);
 app.use("/api/discord-bot/kanban", discordKanbanRoutes);
 app.use("/api/kanban", kanbanRoutes);
+app.use("/api/gantt", ganttRoutes);
 app.use("/api/discordWidget", discordWidgetRoutes);
 
 app.get("/", (req, res) => {

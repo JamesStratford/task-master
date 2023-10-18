@@ -7,7 +7,6 @@ import DiscordAuth from './components/DiscordOAuth';
 import KanbanParent from './components/Kanban/KanbanParent';
 import axios from 'axios';
 import GanttChart from './components/Gantt/GanttChart';
-import tasks from './components/Gantt/GanttDemoData.ts';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -64,7 +63,7 @@ function App() {
             </TabPanel>
 
             <TabPanel>
-              <GanttChart tasks={tasks}/>
+              <GanttChart/>
             </TabPanel>
 
             <TabPanel>

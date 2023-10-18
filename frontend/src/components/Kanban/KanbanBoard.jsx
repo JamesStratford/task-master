@@ -157,8 +157,10 @@ function KanbanBoard({ userInfo }) {
 
   const deleteColumn = async (columnId) => {
     try {
-      const updatedColumns = kanbanColumns['columns'].filter(column => column.id !== columnId);
-      const updatedTasks = kanbanColumns['tasks'] || {};
+      const updatedColumns = kanbanColumns["columns"].filter(
+        (column) => column.id !== columnId
+      );
+      const updatedTasks = kanbanColumns["tasks"] || {};
       // Set the updated state
       setKanbanColumns({
         ...kanbanColumns,
@@ -176,7 +178,6 @@ function KanbanBoard({ userInfo }) {
       );
 
       await updateKanbanBoard(updatedColumns, updatedTasks);
-
     } catch (error) {
       console.error("Failed to delete column:", error);
     }
@@ -209,7 +210,12 @@ function KanbanBoard({ userInfo }) {
           moveTaskWithinSameColumn(column, source.index, destination.index);
           return;
         default:
-          moveTaskToDifferentColumn(kanbanColumns, source, destination, draggableId);
+          moveTaskToDifferentColumn(
+            kanbanColumns,
+            source,
+            destination,
+            draggableId
+          );
           return;
       }
     }
@@ -218,13 +224,22 @@ function KanbanBoard({ userInfo }) {
   const addCardToColumn = async (columnId, newCard) => {
     try {
       // Find the column to which the card should be added
-      const columnIndex = kanbanColumns.columns.findIndex((column) => column.id === columnId);
+      const columnIndex = kanbanColumns.columns.findIndex(
+        (column) => column.id === columnId
+      );
       if (columnIndex === -1) {
-        console.error('Column not found:', columnId);
+        console.error("Column not found:", columnId);
         return; // Column not found
       }
 
-      await axios.post(
+      // Set the start_date to the current date and due_date to null
+      const currentDate = new Date();
+      const formattedStartDate = currentDate.toISOString().split("T")[0]; // Get current date in "YYYY-MM-DD" format
+      newCard.startDate = formattedStartDate;
+      newCard.dueDate = null;
+
+      // Send a POST request to add the task to the backend
+      const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/kanban/add-task`,
         {
           columnId,
@@ -232,24 +247,29 @@ function KanbanBoard({ userInfo }) {
         }
       );
 
-      // Clone the columns and tasks to avoid mutating state directly
-      const updatedColumns = [...kanbanColumns.columns];
-      const updatedTasks = { ...kanbanColumns.tasks };
+      if (response.status === 201) {
+        // Task was successfully added to the server
+        const addedTask = response.data;
 
-      // Prepare the newTask object and add it to updatedTasks
-      const newTask = {
-        ...newCard,
-      };
-      updatedTasks[newTask.id] = newTask;
+        // Clone the columns and tasks to avoid mutating state directly
+        const updatedColumns = [...kanbanColumns.columns];
+        const updatedTasks = { ...kanbanColumns.tasks };
 
-      // Add the new task's id to the taskIds array of the appropriate column
-      const updatedColumn = { ...updatedColumns[columnIndex] };
-      updatedColumn.taskIds = [...updatedColumn.taskIds, newTask.id];
-      updatedColumns[columnIndex] = updatedColumn;
+        // Prepare the newTask object and add it to updatedTasks
+        const newTask = {
+          ...newCard,
+          ...addedTask, // Include any additional data returned by the server
+        };
+        updatedTasks[newTask.id] = newTask;
 
-      // Call updateKanbanBoard to update local state and sync with the backend
-      await updateKanbanBoard(updatedColumns, updatedTasks);
+        // Add the new task's id to the taskIds array of the appropriate column
+        const updatedColumn = { ...updatedColumns[columnIndex] };
+        updatedColumn.taskIds = [...updatedColumn.taskIds, newTask.id];
+        updatedColumns[columnIndex] = updatedColumn;
 
+        // Call updateKanbanBoard to update local state and sync with the backend
+        await updateKanbanBoard(updatedColumns, updatedTasks);
+      }
     } catch (error) {
       console.error("Failed to add card:", error);
     }
@@ -330,17 +350,17 @@ function KanbanBoard({ userInfo }) {
     <DragDropContext
       onDragStart={(start) => {
         // Emit socket.io event for drag start
-        socket.emit('dragStart', { ...start, userInfo });
+        socket.emit("dragStart", { ...start, userInfo });
       }}
       onDragUpdate={(update) => {
         // Emit socket.io event for drag update
-        socket.emit('dragUpdate', { ...update, userInfo: userInfo });
+        socket.emit("dragUpdate", { ...update, userInfo: userInfo });
       }}
       onDragEnd={(result) => {
         onDragEnd(result);
 
         // Emit socket.io event for drag end
-        socket.emit('dragEnd', { ...result, userInfo: userInfo });
+        socket.emit("dragEnd", { ...result, userInfo: userInfo });
       }}
     >
       <Droppable droppableId="all-columns" direction="horizontal" type="column">
@@ -349,14 +369,16 @@ function KanbanBoard({ userInfo }) {
             className="kanban-board"
             ref={provided.innerRef}
             {...provided.droppableProps}
-            style={{ overflow: 'hidden' }}
+            style={{ overflow: "hidden" }}
           >
             {kanbanColumns.columns &&
               kanbanColumns.columns.map((column, index) => {
                 const validTaskIds = column.taskIds.filter((taskId) =>
                   kanbanColumns.tasks.hasOwnProperty(taskId)
                 );
-                const tasks = validTaskIds.map((taskId) => kanbanColumns.tasks[taskId]);
+                const tasks = validTaskIds.map(
+                  (taskId) => kanbanColumns.tasks[taskId]
+                );
                 return (
                   <Draggable
                     draggableId={String(column.id)}
@@ -407,7 +429,11 @@ function KanbanBoard({ userInfo }) {
                                         provided={provided}
                                         style={{
                                           ...provided.draggableProps.style,
-                                          backgroundColor: remoteDrags[String(task.taskId)] ? 'red' : 'white', // Change background color if being dragged remotely
+                                          backgroundColor: remoteDrags[
+                                            String(task.taskId)
+                                          ]
+                                            ? "red"
+                                            : "white", // Change background color if being dragged remotely
                                         }}
                                       />
                                     )}

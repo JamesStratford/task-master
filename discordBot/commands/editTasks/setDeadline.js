@@ -117,7 +117,7 @@ async function handleTaskSelection(interaction, selectedTaskId) {
 
     await Response.delete();
 
-    // Check if due_date is valid
+    // Check if due date is valid
 
     const dateFormatRegex =
       /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
@@ -141,7 +141,7 @@ async function handleTaskSelection(interaction, selectedTaskId) {
       axios.put(`${process.env.SERVER_ORIGIN}/api/kanban/update-task`, {
         newTask: {
           taskId: selectedTask.taskId,
-          due_date: dueDate,
+          dueDate: dueDate,
         },
       });
 

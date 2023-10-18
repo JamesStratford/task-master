@@ -1,5 +1,5 @@
 const { Events } = require("discord.js");
-const { handleButtonClick } = require('../commands/editTasks/setDeadline');
+const { handleButtonClick, handleTaskSelection } = require("../commands/editTasks/setDeadline");
 
 module.exports = {
   name: Events.InteractionCreate,
@@ -28,6 +28,11 @@ module.exports = {
       ) {
         await handleButtonClick(interaction);
       }
-    } 
+    } else if (interaction.isStringSelectMenu()) {
+      if (interaction.customId === "task_select") {
+        const selectedTaskId = interaction.values[0];
+        await handleTaskSelection(interaction, selectedTaskId);
+      }
+    }
   },
 };

@@ -4,9 +4,7 @@ const {
   EmbedBuilder,
   ActionRowBuilder,
   StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
   SlashCommandBuilder,
-  MessageCollector,
 } = require("discord.js");
 const axios = require("axios");
 require("dotenv").config({ path: "frontend/.env" });
@@ -20,6 +18,8 @@ module.exports = {
 
   execute: execute,
   handleButtonClick: handleButtonClick,
+  handleTaskSelection: handleTaskSelection,
+  getColumnMenu: getColumnMenu,
 };
 
 // Create Next and Previous Buttons
@@ -65,119 +65,112 @@ async function handleButtonClick(interaction) {
 
   const columnMenuEmbed = new EmbedBuilder()
     .setTitle("Select a Task to Set a Deadline For")
-    .setDescription(`Select a task from: **${column.title}**`);
+    .setDescription(`Select a task from: **${column.title}**`)
+    .setColor("Blue");
 
-  const columnMenuResponse = await interaction.update({
+  await interaction.update({
     embeds: [columnMenuEmbed],
     components: [
       selectMenu,
       new ActionRowBuilder().addComponents(prevButton, nextButton),
     ],
-    ephemeral: true,
   });
-
-  checkSelectedTask(interaction, columnMenuResponse);
 }
 
-async function checkSelectedTask(interaction, columnMenuResponse) {
-  // Wait for user to select a task
-  const collectorFilter = (i) => i.user.id === interaction.user.id;
+async function handleTaskSelection(interaction, selectedTaskId) {
+  await interaction.deferReply();
 
-  try {
-    const confirmation = await columnMenuResponse.awaitMessageComponent({
-      filter: collectorFilter,
-      time: 60000,
-    });
+  await interaction.message.delete();
 
-    // Check which task was selected
-    let selectedTask;
-    const tasksResponse = await axios.post(
-      `${process.env.SERVER_ORIGIN}/api/kanban/get-tasks-by-ids`,
-      {
-        taskIds: [confirmation.value],
-      }
-    );
-    selectedTask = tasksResponse.data[0];
-
-    if (!selectedTask) {
-      await interaction.editReply({
-        content: `You selected task: ${selectedTask.content}`,
-        components: [],
-      });
+  const tasksResponse = await axios.post(
+    `${process.env.SERVER_ORIGIN}/api/kanban/get-tasks-by-ids`,
+    {
+      taskIds: [selectedTaskId],
     }
-  } catch (e) {
-    const errorEmbed = new EmbedBuilder()
-      .setTitle("Set Deadline Timed Out")
-      .setDescription("Please try again");
+  );
 
-    await interaction.editReply({
-      embeds: [errorEmbed],
-      components: [],
-      ephemeral: true,
-    });
-    console.error(e);
-  }
+  const selectedTask = tasksResponse.data[0];
+
+  const taskEmbed = new EmbedBuilder()
+    .setTitle("Set a Deadline for Your Task")
+    .setDescription(
+      `You selected task: **${selectedTask.content}**, please reply with a due date in the format DD/MM/YYYY.`
+    )
+    .setColor("Blue");
+
+  await interaction.editReply({
+    embeds: [taskEmbed],
+  });
 
   // Ask user for due date
 
-  // const dateInput = new TextInputBuilder()
-  //   .setCustomId("dateInput")
-  //   .setPlaceholder("DD/MM/YYYY")
-  //   .setMinLength(10)
-  //   .setMaxLength(10)
-  //   .setStyle(TextInputStyle.Short)
-  //   .setRequired(true);
+  const filter = (Response) => Response.author.id === interaction.user.id;
 
-  // const dateModalComponent = new ActionRowBuilder().addComponents(dateInput);
+  const collector = interaction.channel.createMessageCollector({
+    filter,
+    max: 1,
+    time: 60000,
+  });
 
-  // const dateModal = new ModalBuilder()
-  //   .setCustomId("dateModal")
-  //   .setTitle("Set deadline")
-  //   .addComponents(dateModalComponent);
+  collector.on("collect", async (Response) => {
+    const dueDate = Response.content;
 
-  // await interaction.showModal(dateModal);
+    await Response.delete();
 
-  // // Wait for user to submit due date
+    // Check if due_date is valid
 
-  // client.on(Events.InteractionCreate, async (interaction) => {
-  //   if (!interaction.isModalSubmit()) return;
-  //   if (interaction.customId === "dateModal") {
-  //     const dueDate = interaction.fields.getTextInputValue("dateInput");
+    const dateFormatRegex =
+      /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
 
-  //     // Check if due_date is valid
+    if (!dateFormatRegex.test(dueDate)) {
+      const invalidDateEmbed = new EmbedBuilder()
+        .setTitle("Invalid Date Format")
+        .setDescription("Please use the format DD/MM/YYYY")
+        .setColor("Red");
 
-  //     const dateFormatRegex =
-  //       /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+      await interaction.editReply({
+        embeds: [invalidDateEmbed],
+        ephemeral: true,
+      });
+      return;
+    }
 
-  //     if (!dateFormatRegex.test(dueDate)) {
-  //       await interaction.reply({
-  //         content: "Please use the format DD/MM/YYYY",
-  //         ephemeral: true,
-  //       });
-  //       return;
-  //     }
+    // Set deadline to task in web server
 
-  //     // Set deadline to task in web server
+    try {
+      axios.put(`${process.env.SERVER_ORIGIN}/api/kanban/update-task`, {
+        newTask: {
+          taskId: selectedTask.taskId,
+          due_date: dueDate,
+        },
+      });
 
-  //     try {
-  //       axios.put(`${process.env.SERVER_ORIGIN}/api/kanban/update-task`, {
-  //         newTask: {
-  //           taskId: selectedTask.taskId,
-  //           due_date: dueDate,
-  //         },
-  //       });
+      const successEmbed = new EmbedBuilder()
+        .setTitle("Deadline Set")
+        .setDescription(
+          `Your task: **${selectedTask.content}** has been assigned the due date: **${dueDate}**`
+        )
+        .setColor("Green");
 
-  //       await interaction.reply(
-  //         `Your task has been assigned the due date: ${dueDate}`
-  //       );
-  //     } catch (error) {
-  //       console.error("Error fetching tasks: ", error.message);
-  //       await interaction.reply(
-  //         "Sorry, something went wrong while updating your task."
-  //       );
-  //     }
-  //   }
-  // });
+      await interaction.editReply({
+        embeds: [successEmbed],
+      });
+    } catch (error) {
+      console.error("Error fetching tasks: ", error.message);
+
+      const errorEmbed = new EmbedBuilder()
+        .setTitle("Error")
+        .setDescription(
+          "Sorry, something went wrong while updating your task."
+        )
+        .setColor("Red");
+
+      await interaction.editReply({
+        embeds: [errorEmbed],
+        ephemeral: true,
+      });
+    }
+  });
 }
 
 async function getColumnMenu() {
@@ -248,7 +241,7 @@ async function getColumnMenu() {
 }
 
 async function execute(interaction) {
-  await interaction.deferReply({ ephemeral: true });
+  await interaction.deferReply();
 
   const userId = interaction.user.id;
 
@@ -272,16 +265,14 @@ async function execute(interaction) {
 
   const columnMenuEmbed = new EmbedBuilder()
     .setTitle("Select a Task to Set a Deadline For")
-    .setDescription(`Select a task from: **${column.title}**`);
+    .setDescription(`Select a task from: **${column.title}**`)
+    .setColor("Blue");
 
-  const columnMenuResponse = await interaction.editReply({
+  await interaction.editReply({
     embeds: [columnMenuEmbed],
     components: [
       selectMenu,
       new ActionRowBuilder().addComponents(prevButton, nextButton),
     ],
-    ephemeral: true,
   });
-
-  checkSelectedTask(interaction, columnMenuResponse);
 }

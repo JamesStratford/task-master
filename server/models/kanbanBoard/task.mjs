@@ -2,13 +2,13 @@ import mongoose from '../../db/mongooseConn.mjs';
 
 const checklistItemSchema = new mongoose.Schema({
   description: String,
-  isCompleted: Boolean
+  isCompleted: { type: Boolean, default: false }
 });
-
 
 const taskSchema = new mongoose.Schema({
   taskId: String,
   content: String,
+  startDate: String,
   due_date: String,
   description: String,
   labels: Array,

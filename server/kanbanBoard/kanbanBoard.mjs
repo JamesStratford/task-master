@@ -334,9 +334,6 @@ export const updateLabel = async (req, res) => {
     }
 };
 
-
-
-
 export const addChecklistItem = async (req, res) => {
     const { taskId, checklistItem } = req.body;
     try {
@@ -350,27 +347,28 @@ export const addChecklistItem = async (req, res) => {
     }
 };
 
-export const updateChecklistItem = async (req, res) => {
-    const { taskId, itemIndex, newItem } = req.body;
+
+export const deleteChecklistItem = async (req, res) => {
+    const { taskId, checklistItemId } = req.body;
     try {
         await Task.updateOne(
-            { taskId, "checklist.index": itemIndex },
-            { $set: { "checklist.$.description": newItem.description, "checklist.$.isCompleted": newItem.isCompleted } }
+            { taskId },
+            { $pull: { checklist: { _id: checklistItemId } } }
         );
-        res.status(200).json({ message: "Checklist item updated successfully!" });
+        res.status(200).json({ message: "Checklist item deleted successfully!" });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
 
-export const deleteChecklistItem = async (req, res) => {
-    const { taskId, itemIndex } = req.body;
+export const updateChecklistItemStatus = async (req, res) => {
+    const { taskId, checklistItemId, isCompleted } = req.body;
     try {
         await Task.updateOne(
-            { taskId },
-            { $pull: { checklist: { index: itemIndex } } }
+            { taskId, "checklist._id": checklistItemId },
+            { $set: { "checklist.$.isCompleted": isCompleted } }
         );
-        res.status(200).json({ message: "Checklist item deleted successfully!" });
+        res.status(200).json({ message: "Checklist item status updated successfully!" });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

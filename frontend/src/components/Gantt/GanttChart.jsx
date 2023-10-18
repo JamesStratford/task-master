@@ -14,12 +14,12 @@ const GanttChart = () => {
                 `${process.env.REACT_APP_BACKEND_URL}/api/gantt/get-tasks`
             );
             const taskDict = data.data;
-            let taskList = [];
+            const taskList = [];
 
             // Change date format to be compatible with gantt chart
 
             for (let key in taskDict) {
-                if (taskDict[key].startDate === null || taskDict[key].dueDate === null) {
+                if (taskDict[key].startDate == null || taskDict[key].dueDate == null) {
                     continue;
                 }
 
@@ -37,7 +37,6 @@ const GanttChart = () => {
             // Convert dict to list
 
             setTasks(taskList);
-            console.log(taskList);
         };
 
         fetchData();

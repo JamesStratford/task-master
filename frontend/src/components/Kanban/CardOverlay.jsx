@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LabelOverlay from "./LabelOverlay";
 
 
@@ -10,43 +10,55 @@ function CardOverlay({
   setAllLabels,
   // fetchAllLabels,
 }) {
-  const [description, setDescription] = useState(task.description || ""); // Manage the description state
-  const [labelColor, setLabelColor] = useState("#ffffff"); // Manage the label color state
-  const [cardLabels, setCardLabels] = useState(task.labels || []); // Manage the labels state
-  const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false); // Manage the label overlay visibility state
+  const [description, setDescription] = useState(task.description || "");
+  const [labelColor, setLabelColor] = useState("#ffffff");
+  const [cardLabels, setCardLabels] = useState(task.labels || []);
+  const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
+  const [startDate, setStartDate] = useState(task.startDate);
+  const [dueDate, setDueDate] = useState(task.dueDate);
 
-  /* Function to handle description change */
+  useEffect(() => {
+    handleUpdateTask();
+  }, [startDate, dueDate]);
+
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
+
+  const handleDueDateChange = (e) => {
+    setDueDate(e.target.value);
+  };
+
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
-  /* Function to cancel editing description */
   const handleCancelEdit = () => {
     setDescription(task.description || "");
   };
 
-  /* Function to toggle the label overlay */
   const toggleLabelOverlay = () => {
     setIsLabelOverlayVisible(!isLabelOverlayVisible);
   };
 
   /* *
-   * Function to handle the updating of task contents.
-   * */
+  * Updates the task with its new contents.
+  */
   const handleUpdateTask = () => {
-    // Data for the updated task
     const updatedTask = {
       ...task,
       description: description,
       labels: cardLabels,
+      startDate: startDate,
+      dueDate: dueDate,
     };
 
-    // Check if the edited label is new (not in allLabels)
+    // Check if the label is new
     const isNewLabel = !allLabels.some((label) =>
       cardLabels.some((l) => l.text === label.text)
     );
 
-    // If it's a new label, add it to allLabels
+    // Add the new label to the list of all labels
     if (isNewLabel) {
       setAllLabels([...allLabels, ...cardLabels]);
     }
@@ -82,7 +94,30 @@ function CardOverlay({
             </span>
           ))}
         </div>
-
+        <div className="task-dates">
+          <div className="date-input">
+            <label htmlFor="start-date" className="start-date-title">
+              Start Date
+            </label>
+            <input
+              type="date"
+              id="start-date"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+          </div>
+          <div className="date-input">
+            <label htmlFor="due-date" className="due-date-title">
+              Due Date
+            </label>
+            <input
+              type="date"
+              id="due-date"
+              value={dueDate}
+              onChange={handleDueDateChange}
+            />
+          </div>
+        </div>
         <div className="description">
           <h5 className="description-header">Description</h5>
           <input
@@ -108,19 +143,14 @@ function CardOverlay({
         </button>
         {isLabelOverlayVisible && (
           <LabelOverlay
-            task={task} // The current task
-            // All saved labels for the current card
+            task={task}
             cardLabels={cardLabels}
             setCardLabels={setCardLabels}
-            // All labels tha have been saved
             allLabels={allLabels}
             setAllLabels={setAllLabels}
-            // Label color properties
             labelColor={labelColor}
             setLabelColor={setLabelColor}
             toggleLabelOverlay={toggleLabelOverlay} // Function to toggle the label overlay
-            // fetchAllLabels={fetchAllLabels} // Function to fetch all labels
-            handleUpdateTask={handleUpdateTask} // Function to handle the updating of task contents
             updateTaskContents={updateTaskContents} // Function to update the task contents
           />
         )}

@@ -1,53 +1,25 @@
 const { execute } = require("../../../commands/misc/help.js");
+
+const { EmbedBuilder } = require("discord.js");
+
 const fs = require("node:fs");
-const realPath = require("node:path");
+const path = require("node:path");
+const realPath = jest.requireActual("node:path");
 
 // Mocking the required modules
 jest.mock("node:fs");
 jest.mock("node:path");
 
-jest.mock(
-  "../../commands/folder1/command2.js",
-  () => ({
-    data: {
-      name: "command2",
-      description: "description2",
-    },
-  }),
-  { virtual: true }
-);
-
 describe("help command", () => {
-  beforeEach(() => {
-    const pathToHelp = require.resolve("../../../commands/misc/help.js");
-
-    const helpDir = realPath.dirname(pathToHelp);
-
-    const command1Path = realPath.join(
-      helpDir,
-      "../../commands/folder1/command1.js"
-    );
-    const command1PathNormal = realPath.normalize(command1Path);
-
-    jest.domock(
-      command1PathNormal,
-      () => ({
-        data: {
-          name: "command1",
-          description: "description1",
-        },
-      }),
-      { virtual: true }
-    );
-  });
-
   it("should return a list of commands", async () => {
     // Setup
     const mockInteraction = {
       reply: jest.fn(),
     };
 
-    path.join.mockImplementation((...args) => args.join("/"));
+    path.join.mockImplementation((...args) =>
+      realPath.join("../../tests/commands/misc/testCommands", args[1])
+    );
     fs.readdirSync
       .mockReturnValueOnce(["folder1"])
       .mockReturnValueOnce(["command1.js", "command2.js"]);
@@ -55,16 +27,17 @@ describe("help command", () => {
     // Execute
     await execute(mockInteraction);
 
+    const testEmbed = new EmbedBuilder()
+      .setTitle("Welcome to TaskMaster!")
+      .setDescription(
+        "> *Here is a list of commands:*\n\n" +
+          "- **command1:**  \n\tdescription1\n\n" +
+          "- **command2:**  \n\tdescription2\n\n"
+      )
+      .setColor("Green");
     // Assertion
     expect(mockInteraction.reply).toHaveBeenCalledWith({
-      embeds: [
-        expect.objectContaining({
-          title: "Welcome to TaskMaster!",
-          description: expect.stringContaining(
-            "- **command1:**  \n\tdescription1"
-          ),
-        }),
-      ],
+      embeds: [testEmbed],
     });
   });
 });

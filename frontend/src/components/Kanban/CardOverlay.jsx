@@ -141,6 +141,7 @@ function CardOverlay({
           />
           <select
             className="assign-user-menu"
+            data-testid="assignUserSelect"
             value={selectedUser}
             onChange={handleUserChange}
           >

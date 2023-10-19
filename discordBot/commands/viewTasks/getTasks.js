@@ -18,6 +18,9 @@ module.exports = {
   execute: execute,
   handleGetTasksColumn: handleGetTasksColumn,
   handleGetTasksSelection: handleGetTasksSelection,
+  getTasksAdd: getTasksAdd,
+  getTasksEdit: getTasksEdit,
+  getTasksDelete: getTasksDelete,
 };
 
 const nextButton = new ButtonBuilder()
@@ -29,21 +32,6 @@ const prevButton = new ButtonBuilder()
   .setCustomId("get_tasks_prev")
   .setLabel("Previous")
   .setStyle(ButtonStyle.Secondary);
-
-const addButton = new ButtonBuilder()
-  .setCustomId("get_tasks_add")
-  .setLabel("Add")
-  .setStyle(ButtonStyle.Success);
-
-const editButton = new ButtonBuilder()
-  .setCustomId("get_tasks_edit")
-  .setLabel("Edit")
-  .setStyle(ButtonStyle.Primary);
-
-const deleteButton = new ButtonBuilder()
-  .setCustomId("get_tasks_delete")
-  .setLabel("Delete")
-  .setStyle(ButtonStyle.Danger);
 
 let currentColumnIndex = 0;
 
@@ -158,11 +146,14 @@ async function handleGetTasksColumn(interaction) {
   const totalColumns = totalColumnsResponse.data.count;
 
   if (
-    interaction.customId === "next_column" &&
+    interaction.customId === "get_tasks_next" &&
     currentColumnIndex < totalColumns - 1
   ) {
     currentColumnIndex++;
-  } else if (interaction.customId === "prev_column" && currentColumnIndex > 0) {
+  } else if (
+    interaction.customId === "get_tasks_prev" &&
+    currentColumnIndex > 0
+  ) {
     currentColumnIndex--;
   }
 
@@ -196,6 +187,21 @@ async function handleGetTasksSelection(interaction, selectedTaskId) {
 
   await interaction.message.delete();
 
+  const addButton = new ButtonBuilder()
+    .setCustomId("get_tasks_add")
+    .setLabel("Add")
+    .setStyle(ButtonStyle.Success);
+
+  const editButton = new ButtonBuilder()
+    .setCustomId(`get_tasks_edit:${selectedTaskId}`)
+    .setLabel("Edit")
+    .setStyle(ButtonStyle.Primary);
+
+  const deleteButton = new ButtonBuilder()
+    .setCustomId(`get_tasks_delete:${selectedTaskId}`)
+    .setLabel("Delete")
+    .setStyle(ButtonStyle.Danger);
+
   const tasksResponse = await axios.post(
     `${process.env.SERVER_ORIGIN}/api/kanban/get-tasks-by-ids`,
     {
@@ -208,10 +214,14 @@ async function handleGetTasksSelection(interaction, selectedTaskId) {
   const taskEmbed = new EmbedBuilder()
     .setTitle(`${selectedTask.content}`)
     .setDescription(
-      `**Description:** \n\t${selectedTask.content}` +
+      `**Description:** \n\t${selectedTask.description}` +
         `\n\n**Start Date:** \n\t${selectedTask.startDate}` +
         `\n\n**Due Date:** \n\t${selectedTask.dueDate}` +
-        `\n\n**Labels:** \n\t${selectedTask.labels.join(", ")}`
+        `\n\n**Labels:** \n\t[${selectedTask.labels
+          .map((label) => {
+            return label.text;
+          })
+          .join("], [")}]`
     )
     .setColor("Blue");
 
@@ -220,5 +230,39 @@ async function handleGetTasksSelection(interaction, selectedTaskId) {
     components: [
       new ActionRowBuilder().addComponents(addButton, editButton, deleteButton),
     ],
+  });
+}
+
+async function getTasksAdd(interaction) {}
+
+async function getTasksEdit(interaction, selectedTaskId) {}
+
+async function getTasksDelete(interaction, selectedTaskId) {
+  await interaction.deferReply();
+
+  await interaction.message.delete();
+
+  const tasksResponse = await axios.post(
+    `${process.env.SERVER_ORIGIN}/api/kanban/get-tasks-by-ids`,
+    {
+      taskIds: [selectedTaskId],
+    }
+  );
+
+  const task = tasksResponse.data[0];
+
+  await axios.delete(`${process.env.SERVER_ORIGIN}/api/kanban/delete-task`, {
+    data: {
+      taskId: selectedTaskId,
+    },
+  });
+
+  const deleteEmbed = new EmbedBuilder()
+    .setTitle("Task Deleted")
+    .setDescription(`Task: **${task.content}** has been deleted.`)
+    .setColor("Green");
+
+  await interaction.editReply({
+    embeds: [deleteEmbed],
   });
 }

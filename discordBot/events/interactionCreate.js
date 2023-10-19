@@ -6,7 +6,9 @@ const {
 const {
   handleGetTasksColumn,
   handleGetTasksSelection,
-  handleGetTasksEdit,
+  getTasksAdd,
+  getTasksEdit,
+  getTasksDelete,
 } = require("../commands/viewTasks/getTasks");
 
 module.exports = {
@@ -40,12 +42,14 @@ module.exports = {
         interaction.customId === "get_tasks_prev"
       ) {
         await handleGetTasksColumn(interaction);
-      } else if (
-        interaction.customId === "get_tasks_add" ||
-        interaction.customId === "get_tasks_edit" ||
-        interaction.customId === "get_tasks_delete"
-      ) {
-        await handleGetTasksEdit(interaction);
+      } else if (interaction.customId === "get_tasks_add") {
+        await getTasksAdd(interaction);
+      } else if (interaction.customId.startsWith("get_tasks_edit")) {
+        const selectedTaskId = interaction.customId.split(":")[1];
+        await getTasksEdit(interaction, selectedTaskId);
+      } else if (interaction.customId.startsWith("get_tasks_delete")) {
+        const selectedTaskId = interaction.customId.split(":")[1];
+        await getTasksDelete(interaction, selectedTaskId);
       }
     } else if (interaction.isStringSelectMenu()) {
       if (interaction.customId === "set_deadline_select") {

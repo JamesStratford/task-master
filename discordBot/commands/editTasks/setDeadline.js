@@ -17,26 +17,26 @@ module.exports = {
     .setDescription("Sets the deadline for a task"),
 
   execute: execute,
-  handleButtonClick: handleButtonClick,
-  handleTaskSelection: handleTaskSelection,
+  handleSetDeadlineColumn: handleSetDeadlineColumn,
+  handleSetDeadlineSelection: handleSetDeadlineSelection,
   getColumnMenu: getColumnMenu,
 };
 
 // Create Next and Previous Buttons
 
 const nextButton = new ButtonBuilder()
-  .setCustomId("next_column")
+  .setCustomId("set_deadline_next")
   .setLabel("Next")
   .setStyle(ButtonStyle.Primary);
 
 const prevButton = new ButtonBuilder()
-  .setCustomId("prev_column")
+  .setCustomId("set_deadline_prev")
   .setLabel("Previous")
   .setStyle(ButtonStyle.Secondary);
 
 let currentColumnIndex = 0;
 
-async function handleButtonClick(interaction) {
+async function handleSetDeadlineColumn(interaction) {
   const totalColumnsResponse = await axios.get(
     `${process.env.SERVER_ORIGIN}/api/kanban/get-total-column-count`
   );
@@ -44,11 +44,11 @@ async function handleButtonClick(interaction) {
   const totalColumns = totalColumnsResponse.data.count;
 
   if (
-    interaction.customId === "next_column" &&
+    interaction.customId === "set_deadline_next" &&
     currentColumnIndex < totalColumns - 1
   ) {
     currentColumnIndex++;
-  } else if (interaction.customId === "prev_column" && currentColumnIndex > 0) {
+  } else if (interaction.customId === "set_deadline_prev" && currentColumnIndex > 0) {
     currentColumnIndex--;
   }
 
@@ -77,7 +77,7 @@ async function handleButtonClick(interaction) {
   });
 }
 
-async function handleTaskSelection(interaction, selectedTaskId) {
+async function handleSetDeadlineSelection(interaction, selectedTaskId) {
   await interaction.deferReply();
 
   await interaction.message.delete();
@@ -195,7 +195,7 @@ async function getColumnMenu() {
 
     if (tasks.length === 0) {
       const taskSelectMenu = new StringSelectMenuBuilder()
-        .setCustomId("task_select")
+        .setCustomId("set_deadline_select")
         .setPlaceholder("No tasks")
         .addOptions({ label: "No tasks", value: "no_tasks" })
         .setDisabled(true);
@@ -222,7 +222,7 @@ async function getColumnMenu() {
 
     // Construct the select menu
     const taskSelectMenu = new StringSelectMenuBuilder()
-      .setCustomId("task_select")
+      .setCustomId("set_deadline_select")
       .setPlaceholder("Select a task")
       .addOptions(taskOptions);
 

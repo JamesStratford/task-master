@@ -1,11 +1,12 @@
 const { Events } = require("discord.js");
 const {
-  handleButtonClick,
-  handleTaskSelection,
+  handleSetDeadlineColumn,
+  handleSetDeadlineSelection,
 } = require("../commands/editTasks/setDeadline");
 const {
   handleGetTasksColumn,
   handleGetTasksSelection,
+  handleGetTasksEdit,
 } = require("../commands/viewTasks/getTasks");
 
 module.exports = {
@@ -30,20 +31,26 @@ module.exports = {
       }
     } else if (interaction.isButton()) {
       if (
-        interaction.customId === "next_column" ||
-        interaction.customId === "prev_column"
+        interaction.customId === "set_deadline_next" ||
+        interaction.customId === "set_deadline_prev"
       ) {
-        await handleButtonClick(interaction);
+        await handleSetDeadlineColumn(interaction);
       } else if (
         interaction.customId === "get_tasks_next" ||
         interaction.customId === "get_tasks_prev"
       ) {
         await handleGetTasksColumn(interaction);
+      } else if (
+        interaction.customId === "get_tasks_add" ||
+        interaction.customId === "get_tasks_edit" ||
+        interaction.customId === "get_tasks_delete"
+      ) {
+        await handleGetTasksEdit(interaction);
       }
     } else if (interaction.isStringSelectMenu()) {
-      if (interaction.customId === "task_select") {
+      if (interaction.customId === "set_deadline_select") {
         const selectedTaskId = interaction.values[0];
-        await handleTaskSelection(interaction, selectedTaskId);
+        await handleSetDeadlineSelection(interaction, selectedTaskId);
       } else if (interaction.customId === "get_tasks_select") {
         const selectedTaskId = interaction.values[0];
         await handleGetTasksSelection(interaction, selectedTaskId);

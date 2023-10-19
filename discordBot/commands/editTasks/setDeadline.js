@@ -94,7 +94,7 @@ async function handleTaskSelection(interaction, selectedTaskId) {
   const taskEmbed = new EmbedBuilder()
     .setTitle("Set a Deadline for Your Task")
     .setDescription(
-      `You selected task: **${selectedTask.content}**, please reply with a due date in the format DD/MM/YYYY.`
+      `You selected task: **${selectedTask.content}**, please reply with a due date in the format YYYY-MM-DD.`
     )
     .setColor("Blue");
 
@@ -119,13 +119,12 @@ async function handleTaskSelection(interaction, selectedTaskId) {
 
     // Check if due date is valid
 
-    const dateFormatRegex =
-      /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+    const dateFormatRegex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/;
 
     if (!dateFormatRegex.test(dueDate)) {
       const invalidDateEmbed = new EmbedBuilder()
         .setTitle("Invalid Date Format")
-        .setDescription("Please use the format DD/MM/YYYY")
+        .setDescription("Please use the format YYYY-MM-DD")
         .setColor("Red");
 
       await interaction.editReply({
@@ -160,9 +159,7 @@ async function handleTaskSelection(interaction, selectedTaskId) {
 
       const errorEmbed = new EmbedBuilder()
         .setTitle("Error")
-        .setDescription(
-          "Sorry, something went wrong while updating your task."
-        )
+        .setDescription("Sorry, something went wrong while updating your task.")
         .setColor("Red");
 
       await interaction.editReply({

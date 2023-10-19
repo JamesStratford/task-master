@@ -4,14 +4,19 @@ import {
     getTasks,
     getColumns,
     updateColumn,
-    reorderColumns,
+    updateBoard,
     deleteColumn,
     assignTaskToColumn,
     updateColumnTaskIds,
     removeTaskFromColumn,
     updateTask,
-    deleteTask
+    saveLabel,
+    getAllLabels,
+    deleteTask,
+    deleteLabel,
+    updateLabel,
 } from "../../kanbanBoard/kanbanBoard.mjs";
+import Label from '../../models/kanbanBoard/label.mjs';
 import express from 'express';
 import { io } from '../../server.mjs';
 
@@ -21,10 +26,14 @@ const router = express.Router();
 *   Update the board
 *   @param {SocketIO.Server} io - The Socket.IO server
 */
+// export const boardUpdatedHook = async (io) => {
+//     const tasks = await getTasks();
+//     const columns = await getColumns();
+//     io.emit('updateBoard', { tasks, columns });
+// };
+
 export const boardUpdatedHook = async (io) => {
-    const tasks = await getTasks();
-    const columns = await getColumns();
-    io.emit('updateBoard', { tasks, columns });
+    io.emit('updateBoard');
 };
 
 router.post('/add-task', async (req, res) => {
@@ -56,9 +65,8 @@ router.delete('/delete-task', async (req, res) => {
     }
 });
 
-
 router.post('/add-column', async (req, res) => {
-    const columnData = req.body; // Retrieve the column data from the request body
+    const columnData = req.body;
     try {
         await addColumn(columnData, res).then(() => {
             boardUpdatedHook(io)
@@ -91,7 +99,6 @@ router.put('/update-column', async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
-
 
 router.get('/get-columns', async (req, res) => {
     try {
@@ -143,22 +150,87 @@ router.put('/update-task', async (req, res) => {
     const task = req.body.newTask;
     try {
         await updateTask({ body: { ...task } }, res).then(() => {
-            boardUpdatedHook(io)
+            boardUpdatedHook(io);
         });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 });
 
-router.put('/reorder-columns', async (req, res) => {
+router.put('/update-board', async (req, res) => {
     try {
-        const updatedColumns = req.body;
-        await reorderColumns(updatedColumns).then(() => {
-            boardUpdatedHook(io)
+        const board = req.body;
+        await updateBoard(board).then(async () => {
+            boardUpdatedHook(io);
         });
-        res.status(200).json({ message: 'Columns updated successfully' });
+
+        // Respond with a success message
+        res.status(200).json({ message: 'Columns updated successfully.' });
+    } catch (error) {
+        console.error('Error updating columns:', error.message);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.post('/save-label', async (req, res) => {
+    try {
+        await saveLabel(req, res);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+router.get('/get-all-labels', async (req, res) => {
+    try {
+        const labels = await getAllLabels();
+        res.json(labels);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+router.delete('/delete-label', async (req, res) => {
+    console.log("deleting label...");
+    try {
+        await deleteLabel(req, res);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/update-label', async (req, res) => {
+    try {
+        await updateLabel(req, res);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/update-label-list', async (req, res) => {
+    const updatedLabels = req.body.updatedLabels; // Updated list of labels
+
+    try {
+        // Loop through the updatedLabels and update each label in the database
+        for (const updatedLabel of updatedLabels) {
+            // Find the label by its ID
+            const label = await Label.findOne({ _id: updatedLabel._id });
+
+            if (!label) {
+                return res.status(404).json({ message: 'Label not found' });
+            }
+
+            // Update the label data with the new data
+            label.text = updatedLabel.text;
+            label.color = updatedLabel.color;
+
+            // Save the updated label
+            await label.save();
+        }
+
+        res.status(200).json({ message: 'Label list updated successfully' });
+    } catch (error) {
+        console.error("Error updating label list:", error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

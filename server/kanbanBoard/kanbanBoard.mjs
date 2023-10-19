@@ -1,5 +1,6 @@
 import Task from '../models/kanbanBoard/task.mjs';
 import Column from '../models/kanbanBoard/column.mjs';
+import Label from '../models/kanbanBoard/label.mjs';
 
 /**
 *   Add a task to the database
@@ -212,25 +213,126 @@ export const updateColumnTaskIds = async (req, res) => {
     }
 };
 
+export const updateBoard = async (board) => {
+    try {
+        const { updatedColumns, updatedTasks } = board;
+        // Create an array of update operations for columns
+        const columnUpdates = updatedColumns.map((column, index) => {
+            const nextColumnId = index === updatedColumns.length - 1 ? null : updatedColumns[index + 1].id;
+            return {
+                updateOne: {
+                    filter: { id: column.id },
+                    update: { 
+                        $set: { 
+                            title: column.title,
+                            taskIds: column.taskIds,
+                            nextColumnId: nextColumnId, 
+                        } 
+                    }
+                }
+            };
+        });
+
+        // Execute all column updates in a single batch operation
+        await Column.bulkWrite(columnUpdates);
+        
+        // Create an array of update operations for tasks
+        const taskUpdates = Object.entries(updatedTasks).map(([id, task]) => {
+            return {
+                updateOne: {
+                    filter: { id: id },
+                    update: { $set: task }
+                }
+            };
+        });
+        
+        // Execute all task updates in a single batch operation
+        await Task.bulkWrite(taskUpdates);
+
+    } catch (error) {
+        console.error("Error updating columns and tasks:", error.message);
+        throw error;  // Propagate the error to the caller
+    }
+};
+
 /**
- * Update columns in the database based on the provided data.
- *
- * @param {object} req - The HTTP request object containing updated columns.
+ * Save a label to the database.
+ * @param {object} req - The HTTP request object containing saved label data.
  * @param {object} res - The HTTP response object.
  * @returns {void}
  */
-export const reorderColumns = async (req, res) => {
-    const columns = req.updatedColumns; // Assuming req.body contains an array of columns in the desired order
-    
+export const saveLabel = async (req, res) => {
+    console.log('Request to save-label endpoint received');
+    const labelData = req.body;
+    console.log("labelData:", labelData);
+
     try {
-        // Iterate through the columns and update them in the database
-        for (let i = 0; i < columns.length; i++) {
-            const column = columns[i];
-            await Column.updateOne({ id: column.id }, { ...column });
-        }
-        console.log("Successfully updated columns in the database.");
+        const newLabel = new Label(labelData);
+        await newLabel.save();
+        res.status(201).json(newLabel);
     } catch (error) {
-        console.error("Error updating columns:", error.message);
+        console.error("Error creating label:", error);
+        res.status(400).json({ message: "Failed to create label", error: error.message });
+    }
+
+};
+
+/**
+ * Get all labels from the database.
+ * @returns {Label[]} - An array of all labels in the database.
+ */
+export const getAllLabels = async () => {
+    try {
+        const labels = await Label.find({});
+        return labels;
+    } catch (error) {
+        throw new Error(`Failed to get labels: ${error.message}`);
+    }
+};
+
+/**
+ * Delete a label from the database
+ * @param {object} req - The HTTP request object containing labelId
+ * @param {object} res - The HTTP response object.
+ * @returns {void}
+ */
+export const deleteLabel = async (req, res) => {
+    console.log("Request to delete-label endpoint received");
+    const labelId = req.body.labelId;
+    console.log("labelId:", req.body.labelId)
+    try {
+        await Label.deleteOne({ labelId: labelId }); // Assuming the label ID is stored as _id in MongoDB
+        res.status(200).json({ message: 'Label deleted successfully' });
+    } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
+
+/**
+ * Handle PUT request to update a label
+ * @param {object} req - The HTTP request object
+ * @param {object} res - The HTTP response object
+ */
+export const updateLabel = async (req, res) => {
+    try {
+        const updatedLabel = req.body;
+        console.log("Updating label...", updatedLabel);
+
+        const label = await Label.findOneAndUpdate(
+            { labelId: updatedLabel.labelId },
+            updatedLabel,
+            { new: true }
+        );
+
+        if (!label) {
+            return res.status(404).json({ message: "Label not found" });
+        }
+
+        res.status(200).json(label);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+
+

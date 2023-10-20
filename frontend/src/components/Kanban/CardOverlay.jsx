@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import LabelOverlay from "./LabelOverlay";
+import axios from "axios";
 
 function CardOverlay({
   task,
@@ -8,6 +9,7 @@ function CardOverlay({
   allLabels,
   setAllLabels,
   users,
+  setUsers,
 }) {
   const [description, setDescription] = useState(task.description || "");
   const [labelColor, setLabelColor] = useState("#ffffff");
@@ -17,6 +19,10 @@ function CardOverlay({
   const [dueDate, setDueDate] = useState(task.dueDate);
   const [selectedUser, setSelectedUser] = useState(task.assignedUser || "");
   const [selectedUsername, setSelectedUsername] = useState("");
+
+  useEffect(() => {
+    handleUpdateTask();
+  }, [startDate, dueDate, selectedUsername]);
 
   useEffect(() => {
     const selectedUserObject = users.find((user) => user.id === selectedUser);
@@ -51,7 +57,7 @@ function CardOverlay({
   /* *
    * Updates the task with its new contents.
    */
-  const handleUpdateTask = useCallback(() => {
+  const handleUpdateTask = () => {
     const updatedTask = {
       ...task,
       description: description,
@@ -72,21 +78,7 @@ function CardOverlay({
     }
 
     updateTaskContents(updatedTask); // Update this tasks contents
-  }, [
-    task,
-    description,
-    cardLabels,
-    startDate,
-    dueDate,
-    selectedUser,
-    allLabels,
-    setAllLabels,
-    updateTaskContents,
-  ]);
-
-  useEffect(() => {
-    handleUpdateTask();
-  }, [startDate, dueDate, selectedUsername, handleUpdateTask]);
+  };
 
   return (
     <div className="card-overlay">

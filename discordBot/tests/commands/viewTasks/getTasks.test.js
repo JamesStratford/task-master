@@ -10,6 +10,7 @@ const {
   handleGetTasksSelectDescription,
   handleGetTasksSelectStartDate,
   handleGetTasksSelectDueDate,
+  handleGetTasksSelectAssignedUser,
 } = require("../../../commands/viewTasks/getTasks.js");
 
 jest.mock("axios"); // Mocking axios calls
@@ -335,5 +336,17 @@ describe("handleGetTasksSelectDueDate", () => {
 
     await handleGetTasksSelectDueDate(interaction, "1");
     expect(interaction.showModal).toHaveBeenCalled();
+  });
+});
+
+describe("handleGetTasksSelectAssignedUser", () => {
+  it("should handle assigned user selection and display the edit menu", async () => {
+    const interaction = {
+      message: { delete: jest.fn() },
+      reply: jest.fn(),
+    };
+
+    await handleGetTasksSelectAssignedUser(interaction, "1");
+    expect(interaction.reply).toHaveBeenCalled();
   });
 });

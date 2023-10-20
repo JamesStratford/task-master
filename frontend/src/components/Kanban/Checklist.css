@@ -80,3 +80,17 @@
   .delete-checklist-item-btn:hover {
     background-color: lightcoral;
   }
+
+  .error-message {
+    color: red;
+    margin-top: 5px;
+    font-size: 14px;
+  }
+
+  .error-box {
+    border: 1px solid #f08080;
+    background-color: #fdd;
+    padding: 8px;
+    border-radius: 4px;
+    margin: 8px 0;
+  }

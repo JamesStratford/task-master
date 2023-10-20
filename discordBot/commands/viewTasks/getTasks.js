@@ -20,6 +20,7 @@ module.exports = {
     .setDescription("Replies with the users current tasks"),
 
   execute: execute,
+  getColumnMenu: getColumnMenu,
   handleGetTasksColumn: handleGetTasksColumn,
   handleGetTasksSelection: handleGetTasksSelection,
   handleGetTasksButtonEdit: handleGetTasksButtonEdit,

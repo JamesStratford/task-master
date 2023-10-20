@@ -1,6 +1,7 @@
 const axios = require("axios");
 const {
   execute,
+  getColumnMenu,
   handleGetTasksColumn,
 } = require("../../../commands/viewTasks/getTasks.js");
 
@@ -33,6 +34,30 @@ describe("execute", () => {
 
     await execute(interaction);
     expect(interaction.editReply).toHaveBeenCalled();
+  });
+});
+
+describe("getColumnMenu", () => {
+  it("should get column menu with tasks", async () => {
+    const totalColumnsResponse = { data: { count: 5 } };
+    const columnResponse = { data: { title: "Sample Column" } };
+    const taskIdsResponse = { data: { taskIds: ["1", "2", "3"] } };
+    const tasksResponse = {
+      data: [
+        { taskId: "1", content: "Test Task" },
+        { taskId: "2", content: "Test Task 2" },
+        { taskId: "3", content: "Test Task 3" },
+      ],
+    };
+
+    axios.get
+      .mockResolvedValueOnce(totalColumnsResponse)
+      .mockResolvedValueOnce(columnResponse)
+      .mockResolvedValueOnce(taskIdsResponse);
+    axios.post.mockResolvedValueOnce(tasksResponse);
+
+    const columnMenu = await getColumnMenu();
+    expect(columnMenu).toBeDefined();
   });
 });
 

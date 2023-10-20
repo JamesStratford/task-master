@@ -141,7 +141,7 @@ function CardOverlay({
           />
           <select
             className="assign-user-menu"
-            data-testid="assignUserSelect"
+            data-testid="assign-user-select"
             value={selectedUser}
             onChange={handleUserChange}
           >
@@ -157,7 +157,11 @@ function CardOverlay({
             ))}
           </select>
           {selectedUser !== "" && (
-            <button className="unassign-button" onClick={handleUserChange}>
+            <button
+              data-testid="unassign-button"
+              className="unassign-button"
+              onClick={handleUserChange}
+            >
               Unassign
             </button>
           )}

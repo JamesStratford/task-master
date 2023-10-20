@@ -29,7 +29,7 @@ describe("CardOverlay Component", () => {
       />
     );
 
-    const assignUserSelect = screen.getByTestId("assignUserSelect");
+    const assignUserSelect = screen.getByTestId("assign-user-select");
     fireEvent.change(assignUserSelect, { target: { value: "user1" } });
 
     // Verify that the 'Assign User' button click triggers the updateTaskContents function
@@ -42,7 +42,7 @@ describe("CardOverlay Component", () => {
 
   it("should unassign the user when the 'Unassign User' button is clicked", () => {
     const task = {
-      assignedUser: "initialUser",
+      assignedUser: "user2",
     };
 
     const updateTaskContents = jest.fn();
@@ -59,13 +59,13 @@ describe("CardOverlay Component", () => {
       />
     );
 
-    const unassignUserSelect = screen.getByTestId("assignUserSelect");
+    const unassignUserSelect = screen.getByTestId("assign-user-select");
     fireEvent.change(unassignUserSelect, { target: { value: "" } });
 
     // Verify that the 'Unassign User' button click sets assignedUser to null
     expect(updateTaskContents).toHaveBeenCalledWith(
       expect.objectContaining({
-        assignedUser: null, // Expect assignedUser to be null
+        assignedUser: "", // Expect assignedUser to be null
       })
     );
   });

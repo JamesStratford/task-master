@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LabelOverlay from "./LabelOverlay";
 import './Checklist.css';
 import ChecklistComponent from './ChecklistComponent.jsx';
@@ -15,6 +15,20 @@ function CardOverlay({
   const [labelColor, setLabelColor] = useState("#ffffff");
   const [cardLabels, setCardLabels] = useState(task.labels || []);
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
+  const [startDate, setStartDate] = useState(task.startDate);
+  const [dueDate, setDueDate] = useState(task.dueDate);
+
+  useEffect(() => {
+    handleUpdateTask();
+  }, [startDate, dueDate]);
+
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
+
+  const handleDueDateChange = (e) => {
+    setDueDate(e.target.value);
+  };
 
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
@@ -28,17 +42,24 @@ function CardOverlay({
     setIsLabelOverlayVisible(!isLabelOverlayVisible);
   };
 
+  /* *
+  * Updates the task with its new contents.
+  */
   const handleUpdateTask = () => {
     const updatedTask = {
       ...task,
       description: description,
       labels: cardLabels,
+      startDate: startDate,
+      dueDate: dueDate,
     };
 
+    // Check if the label is new
     const isNewLabel = !allLabels.some((label) =>
       cardLabels.some((l) => l.text === label.text)
     );
 
+    // Add the new label to the list of all labels
     if (isNewLabel) {
       setAllLabels([...allLabels, ...cardLabels]);
     }
@@ -69,7 +90,30 @@ function CardOverlay({
             </span>
           ))}
         </div>
-
+        <div className="task-dates">
+          <div className="date-input">
+            <label htmlFor="start-date" className="start-date-title">
+              Start Date
+            </label>
+            <input
+              type="date"
+              id="start-date"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+          </div>
+          <div className="date-input">
+            <label htmlFor="due-date" className="due-date-title">
+              Due Date
+            </label>
+            <input
+              type="date"
+              id="due-date"
+              value={dueDate}
+              onChange={handleDueDateChange}
+            />
+          </div>
+        </div>
         <div className="description">
           <h5 className="description-header">Description</h5>
           <input
@@ -107,9 +151,8 @@ function CardOverlay({
             setAllLabels={setAllLabels}
             labelColor={labelColor}
             setLabelColor={setLabelColor}
-            toggleLabelOverlay={toggleLabelOverlay}
-            handleUpdateTask={handleUpdateTask}
-            updateTaskContents={updateTaskContents}
+            toggleLabelOverlay={toggleLabelOverlay} // Function to toggle the label overlay
+            updateTaskContents={updateTaskContents} // Function to update the task contents
           />
         )}
       </div>

@@ -9,7 +9,7 @@ const taskSchema = new mongoose.Schema({
   taskId: String,
   content: String,
   startDate: String,
-  due_date: String,
+  dueDate: String,
   description: String,
   labels: Array,
   nextTaskId: String,

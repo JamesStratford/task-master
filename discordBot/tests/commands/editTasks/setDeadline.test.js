@@ -118,7 +118,7 @@ describe("Kanban Commands", () => {
           createMessageCollector: jest.fn().mockReturnValue({
             on: jest.fn((event, cb) => {
               if (event === "collect") {
-                cb({ content: "01/01/2022", delete: jest.fn() });
+                cb({ content: "2022-01-01", delete: jest.fn() });
               }
             }),
           }),
@@ -128,7 +128,7 @@ describe("Kanban Commands", () => {
 
       const successEmbed = new EmbedBuilder()
         .setTitle("Deadline Set")
-        .setDescription("Your task: **Test Task** has been assigned the due date: **01/01/2022**")
+        .setDescription("Your task: **Test Task** has been assigned the due date: **2022-01-01**")
         .setColor("Green");
 
       await handleTaskSelection(interaction, "1");
@@ -150,7 +150,7 @@ describe("Kanban Commands", () => {
           createMessageCollector: jest.fn().mockReturnValue({
             on: jest.fn((event, cb) => {
               if (event === "collect") {
-                cb({ content: "01/31/2022", delete: jest.fn() });
+                cb({ content: "2022-31-01", delete: jest.fn() });
               }
             }),
           }),
@@ -160,7 +160,7 @@ describe("Kanban Commands", () => {
 
       const invalidDateEmbed = new EmbedBuilder()
         .setTitle("Invalid Date Format")
-        .setDescription("Please use the format DD/MM/YYYY")
+        .setDescription("Please use the format YYYY-MM-DD")
         .setColor("Red");
 
       await handleTaskSelection(interaction, "1");

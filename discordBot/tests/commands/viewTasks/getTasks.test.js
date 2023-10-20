@@ -8,6 +8,7 @@ const {
   handleGetTasksButtonDelete,
   handleGetTasksSelectName,
   handleGetTasksSelectDescription,
+  handleGetTasksSelectStartDate,
 } = require("../../../commands/viewTasks/getTasks.js");
 
 jest.mock("axios"); // Mocking axios calls
@@ -278,6 +279,33 @@ describe("handleGetTasksSelectDescription", () => {
     };
 
     await handleGetTasksSelectDescription(interaction, "1");
+    expect(interaction.showModal).toHaveBeenCalled();
+  });
+});
+
+describe("handleGetTasksSelectStartDate", () => {
+  it("should handle start date selection and display the edit menu", async () => {
+    const tasksResponse = {
+      data: [
+        {
+          taskId: "1",
+          content: "Test Task",
+          startDate: "2023-10-20",
+          dueDate: "2023-10-31",
+          description: "test description",
+          assignedUser: "1234",
+          labels: ["1", "2"],
+        },
+      ],
+    };
+
+    axios.post.mockResolvedValueOnce(tasksResponse);
+
+    const interaction = {
+      showModal: jest.fn(),
+    };
+
+    await handleGetTasksSelectStartDate(interaction, "1");
     expect(interaction.showModal).toHaveBeenCalled();
   });
 });

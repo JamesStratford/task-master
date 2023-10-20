@@ -262,7 +262,7 @@ async function handleGetTasksEditModal(interaction, selectedTaskId) {
   const startDate = interaction.fields.getTextInputValue("startDate");
   const dueDate = interaction.fields.getTextInputValue("dueDate");
 
-  axios.put(`${process.env.SERVER_ORIGIN}/api/kanban/update-task`, {
+  await axios.put(`${process.env.SERVER_ORIGIN}/api/kanban/update-task`, {
     newTask: {
       taskId: selectedTaskId,
       content: content,
@@ -272,13 +272,22 @@ async function handleGetTasksEditModal(interaction, selectedTaskId) {
     },
   });
 
+  const tasksResponse = await axios.post(
+    `${process.env.SERVER_ORIGIN}/api/kanban/get-tasks-by-ids`,
+    {
+      taskIds: [selectedTaskId],
+    }
+  );
+
+  const updatedTask = tasksResponse.data[0];
+
   const taskEmbed = new EmbedBuilder()
-    .setTitle(`${selectedTask.content}`)
+    .setTitle(`${updatedTask.content}`)
     .setDescription(
-      `**Description:** \n\t${selectedTask.description}` +
-        `\n\n**Start Date:** \n\t${selectedTask.startDate}` +
-        `\n\n**Due Date:** \n\t${selectedTask.dueDate}` +
-        `\n\n**Labels:** \n\t[${selectedTask.labels
+      `**Description:** \n\t${updatedTask.description}` +
+        `\n\n**Start Date:** \n\t${updatedTask.startDate}` +
+        `\n\n**Due Date:** \n\t${updatedTask.dueDate}` +
+        `\n\n**Labels:** \n\t[${updatedTask.labels
           .map((label) => {
             return label.text;
           })

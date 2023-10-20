@@ -1,10 +1,13 @@
 const {
+  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
-  ActionRowBuilder,
+  ModalBuilder,
   StringSelectMenuBuilder,
   SlashCommandBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } = require("discord.js");
 const axios = require("axios");
 
@@ -18,6 +21,7 @@ module.exports = {
   execute: execute,
   handleGetTasksColumn: handleGetTasksColumn,
   handleGetTasksSelection: handleGetTasksSelection,
+  handleGetTasksEditModal: handleGetTasksEditModal,
   getTasksAdd: getTasksAdd,
   getTasksEdit: getTasksEdit,
   getTasksDelete: getTasksDelete,
@@ -233,9 +237,121 @@ async function handleGetTasksSelection(interaction, selectedTaskId) {
   });
 }
 
+async function handleGetTasksEditModal(interaction, selectedTaskId) {
+  await interaction.deferReply();
+
+  await interaction.message.delete();
+
+  const addButton = new ButtonBuilder()
+    .setCustomId("get_tasks_add")
+    .setLabel("Add")
+    .setStyle(ButtonStyle.Success);
+
+  const editButton = new ButtonBuilder()
+    .setCustomId(`get_tasks_edit:${selectedTaskId}`)
+    .setLabel("Edit")
+    .setStyle(ButtonStyle.Primary);
+
+  const deleteButton = new ButtonBuilder()
+    .setCustomId(`get_tasks_delete:${selectedTaskId}`)
+    .setLabel("Delete")
+    .setStyle(ButtonStyle.Danger);
+
+  const content = interaction.fields.getTextInputValue("name");
+  const description = interaction.fields.getTextInputValue("description");
+  const startDate = interaction.fields.getTextInputValue("startDate");
+  const dueDate = interaction.fields.getTextInputValue("dueDate");
+
+  axios.put(`${process.env.SERVER_ORIGIN}/api/kanban/update-task`, {
+    newTask: {
+      taskId: selectedTaskId,
+      content: content,
+      startDate: startDate,
+      dueDate: dueDate,
+      description: description,
+    },
+  });
+
+  const taskEmbed = new EmbedBuilder()
+    .setTitle(`${selectedTask.content}`)
+    .setDescription(
+      `**Description:** \n\t${selectedTask.description}` +
+        `\n\n**Start Date:** \n\t${selectedTask.startDate}` +
+        `\n\n**Due Date:** \n\t${selectedTask.dueDate}` +
+        `\n\n**Labels:** \n\t[${selectedTask.labels
+          .map((label) => {
+            return label.text;
+          })
+          .join("], [")}]`
+    )
+    .setColor("Blue");
+
+  await interaction.editReply({
+    embeds: [taskEmbed],
+    components: [
+      new ActionRowBuilder().addComponents(addButton, editButton, deleteButton),
+    ],
+  });
+}
+
 async function getTasksAdd(interaction) {}
 
-async function getTasksEdit(interaction, selectedTaskId) {}
+async function getTasksEdit(interaction, selectedTaskId) {
+  const tasksResponse = await axios.post(
+    `${process.env.SERVER_ORIGIN}/api/kanban/get-tasks-by-ids`,
+    {
+      taskIds: [selectedTaskId],
+    }
+  );
+
+  const task = tasksResponse.data[0];
+
+  const editModal = new ModalBuilder()
+    .setCustomId(`get_tasks_modal:${selectedTaskId}`)
+    .setTitle("Edit Task");
+
+  const nameInput = new ActionRowBuilder().addComponents(
+    new TextInputBuilder()
+      .setCustomId("name")
+      .setLabel("Name")
+      .setValue(task.content)
+      .setStyle(TextInputStyle.Short)
+      .setRequired(true)
+  );
+
+  const descriptionInput = new ActionRowBuilder().addComponents(
+    new TextInputBuilder()
+      .setCustomId("description")
+      .setLabel("Description")
+      .setValue(task.description)
+      .setStyle(TextInputStyle.Paragraph)
+  );
+
+  const startDateInput = new ActionRowBuilder().addComponents(
+    new TextInputBuilder()
+      .setCustomId("startDate")
+      .setLabel("Start Date")
+      .setValue(task.startDate)
+      .setStyle(TextInputStyle.Short)
+  );
+
+  const dueDateInput = new ActionRowBuilder().addComponents(
+    new TextInputBuilder()
+      .setCustomId("dueDate")
+      .setLabel("Due Date")
+      .setValue(task.dueDate)
+      .setStyle(TextInputStyle.Short)
+  );
+
+  editModal.addComponents(
+    nameInput,
+    descriptionInput,
+    startDateInput,
+    dueDateInput
+  );
+
+  await interaction.showModal(editModal);
+}
 
 async function getTasksDelete(interaction, selectedTaskId) {
   await interaction.deferReply();

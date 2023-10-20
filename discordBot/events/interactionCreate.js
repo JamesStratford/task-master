@@ -6,6 +6,7 @@ const {
 const {
   handleGetTasksColumn,
   handleGetTasksSelection,
+  handleGetTasksEditModal,
   getTasksAdd,
   getTasksEdit,
   getTasksDelete,
@@ -58,6 +59,11 @@ module.exports = {
       } else if (interaction.customId === "get_tasks_select") {
         const selectedTaskId = interaction.values[0];
         await handleGetTasksSelection(interaction, selectedTaskId);
+      }
+    } else if (interaction.isModalSubmit()) {
+      if (interaction.customId.startsWith("get_tasks_modal")) {
+        const selectedTaskId = interaction.customId.split(":")[1];
+        await handleGetTasksEditModal(interaction, selectedTaskId);
       }
     }
   },

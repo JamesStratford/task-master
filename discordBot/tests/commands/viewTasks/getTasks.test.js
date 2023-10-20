@@ -35,3 +35,48 @@ describe("execute", () => {
     expect(interaction.editReply).toHaveBeenCalled();
   });
 });
+
+describe("handleGetTasksColumn", () => {
+  it("should handle next button click and get the next column", async () => {
+    axios.get
+      .mockResolvedValueOnce({ data: { count: 3 } }) // mock totalColumnsResponse
+      .mockResolvedValueOnce({ data: { title: "Test Column" } }) // mock columnResponse
+      .mockResolvedValueOnce({ data: { taskIds: ["1", "2", "3"] } }); // mock taskIdsResponse
+    axios.post.mockResolvedValueOnce({
+      data: [
+        { taskId: "1", content: "Test Task" },
+        { taskId: "2", content: "Test Task 2" },
+        { taskId: "3", content: "Test Task 3" },
+      ],
+    }); // mock tasksResponse
+
+    const interaction = {
+      customId: "next_column",
+      update: jest.fn(),
+    };
+
+    await handleGetTasksColumn(interaction);
+    expect(interaction.update).toHaveBeenCalled();
+  });
+  it("should handle previous button click and get the previous column", async () => {
+    axios.get
+      .mockResolvedValueOnce({ data: { count: 3 } }) // mock totalColumnsResponse
+      .mockResolvedValueOnce({ data: { title: "Test Column" } }) // mock columnResponse
+      .mockResolvedValueOnce({ data: { taskIds: ["1", "2", "3"] } }); // mock taskIdsResponse
+    axios.post.mockResolvedValueOnce({
+      data: [
+        { taskId: "1", content: "Test Task" },
+        { taskId: "2", content: "Test Task 2" },
+        { taskId: "3", content: "Test Task 3" },
+      ],
+    }); // mock tasksResponse
+
+    const interaction = {
+      customId: "next_column",
+      update: jest.fn(),
+    };
+
+    await handleGetTasksColumn(interaction);
+    expect(interaction.update).toHaveBeenCalled();
+  });
+});

@@ -3,6 +3,7 @@ const {
   execute,
   getColumnMenu,
   handleGetTasksColumn,
+  handleGetTasksSelection,
 } = require("../../../commands/viewTasks/getTasks.js");
 
 jest.mock("axios"); // Mocking axios calls
@@ -113,5 +114,43 @@ describe("handleGetTasksColumn", () => {
 
     await handleGetTasksColumn(interaction);
     expect(interaction.update).toHaveBeenCalled();
+  });
+});
+
+describe("handleGetTasksSelection", () => {
+  it("should handle task selection", async () => {
+    const tasksResponse = {
+      data: [
+        {
+          taskId: "1",
+          content: "Test Task",
+          startDate: "2023-10-20",
+          dueDate: "2023-10-31",
+          description: "test description",
+          assignedUser: "1234",
+          labels: ["1", "2"],
+        },
+      ],
+    };
+
+    axios.post.mockResolvedValueOnce(tasksResponse);
+
+    const interaction = {
+      deferReply: jest.fn(),
+      message: { delete: jest.fn() },
+      editReply: jest.fn(),
+      client: {
+        users: {
+          fetch: jest.fn(() => {
+            return { username: "Test User" };
+          }),
+        },
+      },
+    };
+
+    await handleGetTasksSelection(interaction, "1");
+    expect(interaction.deferReply).toHaveBeenCalled();
+    expect(interaction.message.delete).toHaveBeenCalled();
+    expect(interaction.editReply).toHaveBeenCalled();
   });
 });

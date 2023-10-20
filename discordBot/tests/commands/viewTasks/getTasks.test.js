@@ -38,17 +38,22 @@ describe("execute", () => {
 
 describe("handleGetTasksColumn", () => {
   it("should handle next button click and get the next column", async () => {
-    axios.get
-      .mockResolvedValueOnce({ data: { count: 3 } }) // mock totalColumnsResponse
-      .mockResolvedValueOnce({ data: { title: "Test Column" } }) // mock columnResponse
-      .mockResolvedValueOnce({ data: { taskIds: ["1", "2", "3"] } }); // mock taskIdsResponse
-    axios.post.mockResolvedValueOnce({
+    const totalColumnsResponse = { data: { count: 5 } };
+    const columnResponse = { data: { title: "Sample Column" } };
+    const taskIdsResponse = { data: { taskIds: ["1", "2", "3"] } };
+    const tasksResponse = {
       data: [
         { taskId: "1", content: "Test Task" },
         { taskId: "2", content: "Test Task 2" },
         { taskId: "3", content: "Test Task 3" },
       ],
-    }); // mock tasksResponse
+    };
+
+    axios.get
+      .mockResolvedValueOnce(totalColumnsResponse)
+      .mockResolvedValueOnce(columnResponse)
+      .mockResolvedValueOnce(taskIdsResponse);
+    axios.post.mockResolvedValueOnce(tasksResponse);
 
     const interaction = {
       customId: "next_column",
@@ -59,17 +64,22 @@ describe("handleGetTasksColumn", () => {
     expect(interaction.update).toHaveBeenCalled();
   });
   it("should handle previous button click and get the previous column", async () => {
-    axios.get
-      .mockResolvedValueOnce({ data: { count: 3 } }) // mock totalColumnsResponse
-      .mockResolvedValueOnce({ data: { title: "Test Column" } }) // mock columnResponse
-      .mockResolvedValueOnce({ data: { taskIds: ["1", "2", "3"] } }); // mock taskIdsResponse
-    axios.post.mockResolvedValueOnce({
+    const totalColumnsResponse = { data: { count: 5 } };
+    const columnResponse = { data: { title: "Sample Column" } };
+    const taskIdsResponse = { data: { taskIds: ["1", "2", "3"] } };
+    const tasksResponse = {
       data: [
         { taskId: "1", content: "Test Task" },
         { taskId: "2", content: "Test Task 2" },
         { taskId: "3", content: "Test Task 3" },
       ],
-    }); // mock tasksResponse
+    };
+
+    axios.get
+      .mockResolvedValueOnce(totalColumnsResponse)
+      .mockResolvedValueOnce(columnResponse)
+      .mockResolvedValueOnce(taskIdsResponse);
+    axios.post.mockResolvedValueOnce(tasksResponse);
 
     const interaction = {
       customId: "next_column",

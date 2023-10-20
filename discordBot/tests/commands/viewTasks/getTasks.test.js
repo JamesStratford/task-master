@@ -4,6 +4,7 @@ const {
   getColumnMenu,
   handleGetTasksColumn,
   handleGetTasksSelection,
+  handleGetTasksButtonEdit,
 } = require("../../../commands/viewTasks/getTasks.js");
 
 jest.mock("axios"); // Mocking axios calls
@@ -149,6 +150,44 @@ describe("handleGetTasksSelection", () => {
     };
 
     await handleGetTasksSelection(interaction, "1");
+    expect(interaction.deferReply).toHaveBeenCalled();
+    expect(interaction.message.delete).toHaveBeenCalled();
+    expect(interaction.editReply).toHaveBeenCalled();
+  });
+});
+
+describe("handleGetTasksButtonEdit", () => {
+  it("should handle edit button click and display the edit menu", async () => {
+    const tasksResponse = {
+      data: [
+        {
+          taskId: "1",
+          content: "Test Task",
+          startDate: "2023-10-20",
+          dueDate: "2023-10-31",
+          description: "test description",
+          assignedUser: "1234",
+          labels: ["1", "2"],
+        },
+      ],
+    };
+
+    axios.post.mockResolvedValueOnce(tasksResponse);
+
+    const interaction = {
+      deferReply: jest.fn(),
+      message: { delete: jest.fn() },
+      editReply: jest.fn(),
+      client: {
+        users: {
+          fetch: jest.fn(() => {
+            return { username: "Test User" };
+          }),
+        },
+      },
+    };
+
+    await handleGetTasksButtonEdit(interaction, "1");
     expect(interaction.deferReply).toHaveBeenCalled();
     expect(interaction.message.delete).toHaveBeenCalled();
     expect(interaction.editReply).toHaveBeenCalled();

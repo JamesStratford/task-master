@@ -1,6 +1,6 @@
 const axios = require("axios");
 const MockAdapter = require("axios-mock-adapter");
-const command = require("../../../commands/viewTasks/currentTasks.js");
+const command = require("../../../commands/viewTasks/getMyTasks.js");
 
 // Mocking discord.js interaction
 const mockInteraction = {
@@ -8,7 +8,7 @@ const mockInteraction = {
     reply: jest.fn(),
 };
 
-describe("Test /getTasks command", () => {
+describe("Test /getMyTasks command", () => {
     let mockAxios;
 
     beforeEach(() => {

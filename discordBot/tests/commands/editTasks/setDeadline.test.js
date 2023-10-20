@@ -1,6 +1,6 @@
 const {
-  handleButtonClick,
-  handleTaskSelection,
+  handleSetDeadlineColumn,
+  handleSetDeadlineSelection,
   getColumnMenu,
   execute,
 } = require("../../../commands/editTasks/setDeadline.js");
@@ -23,7 +23,7 @@ describe("Kanban Commands", () => {
     jest.resetAllMocks();
   });
 
-  describe("handleButtonClick", () => {
+  describe("handleSetDeadlineColumn", () => {
     it("should handle next button click and get the next column", async () => {
       axios.get
         .mockResolvedValueOnce({ data: { count: 3 } }) // mock totalColumnsResponse
@@ -42,7 +42,7 @@ describe("Kanban Commands", () => {
         update: jest.fn(),
       };
 
-      await handleButtonClick(interaction);
+      await handleSetDeadlineColumn(interaction);
       expect(interaction.update).toHaveBeenCalled();
     });
     it("should handle previous button click and get the previous column", async () => {
@@ -63,7 +63,7 @@ describe("Kanban Commands", () => {
         update: jest.fn(),
       };
 
-      await handleButtonClick(interaction);
+      await handleSetDeadlineColumn(interaction);
 
       axios.get
         .mockResolvedValueOnce({ data: { count: 3 } }) // mock totalColumnsResponse
@@ -82,7 +82,7 @@ describe("Kanban Commands", () => {
         update: jest.fn(),
       };
 
-      await handleButtonClick(interaction2);
+      await handleSetDeadlineColumn(interaction2);
       expect(interaction2.update).toHaveBeenCalled();
     });
   });
@@ -104,7 +104,7 @@ describe("Kanban Commands", () => {
     });
   });
 
-  describe("handleTaskSelection", () => {
+  describe("handleSetDeadlineSelection", () => {
     it("should handle task selection and ask for due date then display success message", async () => {
       axios.post.mockResolvedValueOnce({
         data: [{ taskId: 1, content: "Test Task" }],
@@ -128,10 +128,12 @@ describe("Kanban Commands", () => {
 
       const successEmbed = new EmbedBuilder()
         .setTitle("Deadline Set")
-        .setDescription("Your task: **Test Task** has been assigned the due date: **2022-01-01**")
+        .setDescription(
+          "Your task: **Test Task** has been assigned the due date: **2022-01-01**"
+        )
         .setColor("Green");
 
-      await handleTaskSelection(interaction, "1");
+      await handleSetDeadlineSelection(interaction, "1");
       expect(interaction.editReply).toHaveBeenCalled();
       expect(interaction.editReply).toHaveBeenCalledWith({
         embeds: [successEmbed],
@@ -163,7 +165,7 @@ describe("Kanban Commands", () => {
         .setDescription("Please use the format YYYY-MM-DD")
         .setColor("Red");
 
-      await handleTaskSelection(interaction, "1");
+      await handleSetDeadlineSelection(interaction, "1");
       expect(interaction.editReply).toHaveBeenCalled();
       expect(interaction.editReply).toHaveBeenCalledWith({
         embeds: [invalidDateEmbed],

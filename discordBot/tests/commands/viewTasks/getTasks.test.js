@@ -399,24 +399,46 @@ describe("Kanban Commands", () => {
 
   describe("handleGetTasksModalName", () => {
     it("should handle name modal submission and display the edit menu", async () => {
+      const tasksResponse = {
+        data: [
+          {
+            taskId: "1",
+            content: "Test Task",
+            startDate: "2023-10-20",
+            dueDate: "2023-10-31",
+            description: "test description",
+            assignedUser: "1234",
+            labels: ["1", "2"],
+          },
+        ],
+      };
+
+      axios.post.mockResolvedValueOnce(tasksResponse);
+
       const interaction = {
         fields: {
           getTextInputValue: jest.fn(() => {
             return "Test Task";
           }),
         },
+        deferReply: jest.fn(),
+        message: { delete: jest.fn() },
+        editReply: jest.fn(),
+        client: {
+          users: {
+            fetch: jest.fn(() => {
+              return { username: "Test User" };
+            }),
+          },
+        },
       };
 
       axios.put = jest.fn();
 
-      const spy = jest
-        .spyOn(getTasks, "handleGetTasksSelection")
-        .mockImplementation(() => {});
-
       await handleGetTasksModalName(interaction, "1");
-      expect(getTasks.handleGetTasksSelection).toHaveBeenCalled();
-
-      spy.mockRestore();
+      expect(interaction.deferReply).toHaveBeenCalled();
+      expect(interaction.message.delete).toHaveBeenCalled();
+      expect(interaction.editReply).toHaveBeenCalled();
     });
   });
 });

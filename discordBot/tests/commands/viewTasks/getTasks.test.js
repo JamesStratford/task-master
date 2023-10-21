@@ -1,3 +1,5 @@
+const getTasks = require("../../../commands/viewTasks/getTasks.js");
+
 const axios = require("axios");
 const {
   execute,
@@ -12,6 +14,7 @@ const {
   handleGetTasksSelectDueDate,
   handleGetTasksSelectAssignedUser,
   handleGetTasksSelectLabels,
+  handleGetTasksModalName,
 } = require("../../../commands/viewTasks/getTasks.js");
 
 jest.mock("axios"); // Mocking axios calls
@@ -391,6 +394,29 @@ describe("Kanban Commands", () => {
       expect(interaction.deferReply).toHaveBeenCalled();
       expect(interaction.message.delete).toHaveBeenCalled();
       expect(interaction.editReply).toHaveBeenCalled();
+    });
+  });
+
+  describe("handleGetTasksModalName", () => {
+    it("should handle name modal submission and display the edit menu", async () => {
+      const interaction = {
+        fields: {
+          getTextInputValue: jest.fn(() => {
+            return "Test Task";
+          }),
+        },
+      };
+
+      axios.put = jest.fn();
+
+      const spy = jest
+        .spyOn(getTasks, "handleGetTasksSelection")
+        .mockImplementation(() => {});
+
+      await handleGetTasksModalName(interaction, "1");
+      expect(getTasks.handleGetTasksSelection).toHaveBeenCalled();
+
+      spy.mockRestore();
     });
   });
 });

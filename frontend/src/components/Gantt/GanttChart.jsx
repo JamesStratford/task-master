@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Gantt } from 'gantt-task-react';
 import axios from 'axios';
 import "gantt-task-react/dist/index.css";
+import "./GanttChart.css";
 
 
 const GanttChart = () => {
@@ -10,7 +11,9 @@ const GanttChart = () => {
         taskDict: {},
         tasks: []
     });
-    
+
+    const [viewMode, setViewMode] = useState("Week");
+
 
     const transformDataToTasks = (data) => {
         const taskList = [];
@@ -24,7 +27,8 @@ const GanttChart = () => {
             task.start = new Date(data[key].startDate);
             task.end = new Date(data[key].dueDate);
             task.progress = 0;
-            task.styles = { progressColor: '#ffbb54', progressSelectedColor: '#ff9e0d' };
+            // Nice orange colour :)
+            task.styles = { backgroundColor: '#ffbb54', backgroundSelectedColor: '#ff9e0d' };
             taskList.push(task);
         }
         return taskList;
@@ -44,16 +48,36 @@ const GanttChart = () => {
         };
         fetchData();
     }, []);
-    
+
 
     const onDateChange = async (task) => {
         // Update task in taskDict with new dates, then put in db
-        const taskToUpdate = state.taskDict[task.id];
+        const taskToUpdate = { ...state.taskDict[task.id] }
         // Convert date object to '%Y-%m-%d' string
         const startDate = task.start.toISOString().slice(0, 10);
         const dueDate = task.end.toISOString().slice(0, 10);
         taskToUpdate.startDate = startDate;
         taskToUpdate.dueDate = dueDate;
+
+        const updatedTasks = state.tasks.map(t => {
+            if (t.id === task.id) {
+                return {
+                    ...t,
+                    start: new Date(startDate),
+                    end: new Date(dueDate)
+                };
+            }
+            return t;
+        });
+
+        setState(prevState => ({
+            ...prevState,
+            taskDict: {
+                ...prevState.taskDict,
+                [task.id]: taskToUpdate
+            },
+            tasks: updatedTasks
+        }));
 
         await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}/api/gantt/update-task-date`,
@@ -61,23 +85,22 @@ const GanttChart = () => {
         );
     }
 
-
     return (
-        <div className="gantt-container" style={{ height: "100vh", padding: "0 20px" }}>
+        <div className="gantt-container">
+            <button className="toggle-button" onClick={() => {
+                setViewMode(viewMode === "Week" ? "Day" : "Week")
+            }}>
+                {viewMode === "Week" ? "Switch to Day View" : "Switch to Week View"}
+            </button>
             {state.tasks.length > 0 ? (
                 <Gantt
                     tasks={state.tasks}
-                    viewMode={"Week"}
-                    onClickTask={(task) => console.log("Task Clicked: ", task)}
-                    onCompleteChange={(task) => console.log("Status Changed: ", task)}
+                    viewMode={viewMode}
+                    viewDate={new Date()}
                     onDateChange={onDateChange}
-                    TaskListHeader={({ style, className }) => {
-                        return null;
-                    }}
-                    TaskListTable={({ style, className, tasks, selectedTaskIds, onRowClick }) => {
-                        return null;
-                    }}
-                    columnWidth={150}
+                    columnWidth={viewMode === "Week" ? 150 : 75}
+                    barCornerRadius={7}
+                    handleWidth={20}
                 />
             ) : (<div>Loading...</div>)}
         </div>

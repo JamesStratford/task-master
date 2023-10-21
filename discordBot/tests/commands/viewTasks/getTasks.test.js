@@ -16,6 +16,7 @@ const {
   handleGetTasksSelectLabels,
   handleGetTasksModalName,
   handleGetTasksModalDescription,
+  handleGetTasksModalStartDate,
 } = require("../../../commands/viewTasks/getTasks.js");
 
 jest.mock("axios"); // Mocking axios calls
@@ -499,6 +500,65 @@ describe("Kanban Commands", () => {
       expect(interaction.deferReply).toHaveBeenCalled();
       expect(interaction.message.delete).toHaveBeenCalled();
       expect(interaction.editReply).toHaveBeenCalled();
+    });
+  });
+
+  describe("handleGetTasksModalStartDate", () => {
+    it("should handle start date modal submission and display the edit menu", async () => {
+      const tasksResponse = {
+        data: [
+          {
+            taskId: "1",
+            content: "Test Task",
+            startDate: "2023-10-20",
+            dueDate: "2023-10-31",
+            description: "test description",
+            assignedUser: "1234",
+            labels: ["1", "2"],
+          },
+        ],
+      };
+
+      axios.post.mockResolvedValueOnce(tasksResponse);
+
+      const interaction = {
+        fields: {
+          getTextInputValue: jest.fn(() => {
+            return "2023-10-20";
+          }),
+        },
+        deferReply: jest.fn(),
+        message: { delete: jest.fn() },
+        editReply: jest.fn(),
+        client: {
+          users: {
+            fetch: jest.fn(() => {
+              return { username: "Test User" };
+            }),
+          },
+        },
+      };
+
+      axios.put = jest.fn();
+
+      await handleGetTasksModalStartDate(interaction, "1");
+      expect(interaction.deferReply).toHaveBeenCalled();
+      expect(interaction.message.delete).toHaveBeenCalled();
+      expect(interaction.editReply).toHaveBeenCalled();
+    });
+
+    it("should handle a incorrect date and display an error message", async () => {
+      const interaction = {
+        fields: {
+          getTextInputValue: jest.fn(() => {
+            return "06/03/2024";
+          }),
+        },
+        reply: jest.fn(),
+      };
+
+      await handleGetTasksModalStartDate(interaction, "1");
+      expect(interaction.reply).toHaveBeenCalled();
     });
   });
 });

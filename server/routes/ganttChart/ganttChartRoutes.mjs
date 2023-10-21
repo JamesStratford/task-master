@@ -1,6 +1,7 @@
 import express from 'express';
-const router = express.Router();
 import { getTasks, updateTask } from '../../kanbanBoard/kanbanBoard.mjs';
+
+const router = express.Router();
 
 router.get('/get-tasks', async (req, res) => {
     try {

@@ -49,8 +49,11 @@ const GanttChart = () => {
     const onDateChange = async (task) => {
         // Update task in taskDict with new dates, then put in db
         const taskToUpdate = state.taskDict[task.id];
-        taskToUpdate.startDate = task.start;
-        taskToUpdate.dueDate = task.end;
+        // Convert date object to '%Y-%m-%d' string
+        const startDate = task.start.toISOString().slice(0, 10);
+        const dueDate = task.end.toISOString().slice(0, 10);
+        taskToUpdate.startDate = startDate;
+        taskToUpdate.dueDate = dueDate;
 
         await axios.put(
             `${process.env.REACT_APP_BACKEND_URL}/api/gantt/update-task-date`,

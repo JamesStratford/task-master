@@ -19,6 +19,7 @@ const {
   handleGetTasksModalStartDate,
   handleGetTasksModalDueDate,
   handleGetTasksAssignedUserSelection,
+  handleGetTasksLabelsSelection,
 } = require("../../../commands/viewTasks/getTasks.js");
 
 jest.mock("axios"); // Mocking axios calls
@@ -656,6 +657,69 @@ describe("Kanban Commands", () => {
       axios.put = jest.fn();
 
       await handleGetTasksAssignedUserSelection(interaction, "1");
+      expect(interaction.deferReply).toHaveBeenCalled();
+      expect(interaction.message.delete).toHaveBeenCalled();
+      expect(interaction.editReply).toHaveBeenCalled();
+    });
+  });
+
+  describe("handleGetTasksLabelsSelection", () => {
+    it("should handle labels selection and display the edit menu", async () => {
+      const labelsResponse = {
+        data: [
+          { labelId: 1.0, text: "Test Label" },
+          { labelId: 2.0, text: "Test Label 2" },
+        ],
+      };
+
+      const tasksResponse = {
+        data: [
+          {
+            taskId: "1",
+            content: "Test Task",
+            startDate: "2023-10-31",
+            dueDate: "2023-10-31",
+            description: "test description",
+            assignedUser: "1234",
+            labels: [
+              { labelId: 1.0, text: "Test Label" },
+              { labelId: 2.0, text: "Test Label 2" },
+            ],
+          },
+        ],
+      };
+
+      axios.get.mockResolvedValueOnce(labelsResponse);
+      axios.post
+        .mockResolvedValueOnce(tasksResponse)
+        .mockResolvedValueOnce(tasksResponse);
+
+      const interaction = {
+        values: ["1"],
+        deferReply: jest.fn(),
+        message: { delete: jest.fn() },
+        editReply: jest.fn(),
+        client: {
+          users: {
+            fetch: jest.fn(() => {
+              return { username: "Test User" };
+            }),
+          },
+        },
+      };
+
+      axios.put = jest.fn();
+
+      await handleGetTasksLabelsSelection(interaction, "1");
+      expect(axios.put).toHaveBeenCalledWith(
+        "http://localhost:5050/api/kanban/update-task",
+        {
+          newTask: {
+            taskId: "1",
+            labels: [{ labelId: 2.0, text: "Test Label 2" }],
+          },
+        }
+      );
       expect(interaction.deferReply).toHaveBeenCalled();
       expect(interaction.message.delete).toHaveBeenCalled();
       expect(interaction.editReply).toHaveBeenCalled();

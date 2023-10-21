@@ -333,8 +333,10 @@ async function handleGetTasksButtonEdit(interaction, selectedTaskId) {
   if (selectedTask.assignedUser === "") {
     user = "None";
   } else {
-    user = await interaction.client.users.fetch(selectedTask.assignedUser)
-      .username;
+    const userResponse = await interaction.client.users.fetch(
+      selectedTask.assignedUser
+    );
+    user = userResponse.username;
   }
 
   const taskEmbed = new EmbedBuilder()

@@ -217,9 +217,7 @@ async function getColumnMenu() {
         value: task.taskId,
       };
     });
-
-    console.log(taskOptions);
-
+    
     // Construct the select menu
     const taskSelectMenu = new StringSelectMenuBuilder()
       .setCustomId("set_deadline_select")

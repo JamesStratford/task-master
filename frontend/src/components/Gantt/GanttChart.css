@@ -1,0 +1,27 @@
+.toggle-button {
+    background: linear-gradient(to right, #ff9e0d, #ffbb54);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-button:hover {
+    background: linear-gradient(to right, #ff7e00, #ffaa44);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-button:active {
+    transform: translateY(1px);
+}
+
+.gantt-container {
+    background-color: #ffffff;
+    color: black;
+    padding: "0 20px";
+}

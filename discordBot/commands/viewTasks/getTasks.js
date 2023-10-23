@@ -249,14 +249,14 @@ async function handleGetTasksSelection(interaction, selectedTaskId) {
     .setTitle(`${selectedTask.content}`)
     .setDescription(
       `**Description:** \n\t${selectedTask.description}` +
-        `\n\n**Start Date:** \n\t${selectedTask.startDate}` +
-        `\n\n**Due Date:** \n\t${selectedTask.dueDate}` +
-        `\n\n**Assigned User:** \n\t${user}` +
-        `\n\n**Labels:** \n\t[${selectedTask.labels
-          .map((label) => {
-            return label.text;
-          })
-          .join("], [")}]`
+      `\n\n**Start Date:** \n\t${selectedTask.startDate}` +
+      `\n\n**Due Date:** \n\t${selectedTask.dueDate}` +
+      `\n\n**Assigned User:** \n\t${user}` +
+      `\n\n**Labels:** \n\t[${selectedTask.labels
+        .map((label) => {
+          return label.text;
+        })
+        .join("], [")}]`
     )
     .setColor("Blue");
 
@@ -343,14 +343,14 @@ async function handleGetTasksButtonEdit(interaction, selectedTaskId) {
     .setTitle(`${selectedTask.content}`)
     .setDescription(
       `**Description:** \n\t${selectedTask.description}` +
-        `\n\n**Start Date:** \n\t${selectedTask.startDate}` +
-        `\n\n**Due Date:** \n\t${selectedTask.dueDate}` +
-        `\n\n**Assigned User:** \n\t${user}` +
-        `\n\n**Labels:** \n\t[${selectedTask.labels
-          .map((label) => {
-            return label.text;
-          })
-          .join("], [")}]`
+      `\n\n**Start Date:** \n\t${selectedTask.startDate}` +
+      `\n\n**Due Date:** \n\t${selectedTask.dueDate}` +
+      `\n\n**Assigned User:** \n\t${user}` +
+      `\n\n**Labels:** \n\t[${selectedTask.labels
+        .map((label) => {
+          return label.text;
+        })
+        .join("], [")}]`
     )
     .setColor("Blue");
 

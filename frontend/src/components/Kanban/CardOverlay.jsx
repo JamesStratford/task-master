@@ -1,86 +1,69 @@
-import React, { useState } from "react";
-import { SketchPicker } from "react-color";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import LabelOverlay from "./LabelOverlay";
 
-function CardOverlay({ task, onClose, updateTaskContents }) {
-  // State to manage task description and labels
+
+function CardOverlay({
+  task,
+  onClose,
+  updateTaskContents,
+  allLabels,
+  setAllLabels,
+  // fetchAllLabels,
+}) {
   const [description, setDescription] = useState(task.description || "");
-  const [newLabel, setNewLabel] = useState(false);
   const [labelColor, setLabelColor] = useState("#ffffff");
-  const [labels, setLabels] = useState(task.labels || []);
-  const [isLabelInputVisible, setIsLabelInputVisible] = useState(false);
-  const [isColorPickerVisible, setIsColorPickerVisible] = useState(false);
+  const [cardLabels, setCardLabels] = useState(task.labels || []);
+  const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
+  const [startDate, setStartDate] = useState(task.startDate);
+  const [dueDate, setDueDate] = useState(task.dueDate);
 
-  // Function to handle description change
+  useEffect(() => {
+    handleUpdateTask();
+  }, [startDate, dueDate]);
+
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
+
+  const handleDueDateChange = (e) => {
+    setDueDate(e.target.value);
+  };
+
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
   };
 
-  // Function to save task description and labels
-  const handleUpdateTask = () => {
-    const updatedTask = {
-      ...task, // Keep the existing task data
-      description: description, // Update the description
-      labels: labels, // Update the labels
-    };
-    updateTaskContents(updatedTask);
-  };
-
-  // Function to cancel editing description
   const handleCancelEdit = () => {
     setDescription(task.description || "");
   };
 
-  // Function to toggle label input visibility
-  const toggleLabelInput = () => {
-    setIsLabelInputVisible(!isLabelInputVisible);
-    setNewLabel("");
+  const toggleLabelOverlay = () => {
+    setIsLabelOverlayVisible(!isLabelOverlayVisible);
   };
 
-  // Function to toggle color picker visibility
-  const toggleColorPicker = () => {
-    setIsColorPickerVisible(!isColorPickerVisible);
-  };
+  /* *
+  * Updates the task with its new contents.
+  */
+  const handleUpdateTask = () => {
+    const updatedTask = {
+      ...task,
+      description: description,
+      labels: cardLabels,
+      startDate: startDate,
+      dueDate: dueDate,
+    };
 
-  // Function to create a new label
-  const createNewLabel = async () => {
-    // Check if the newLabel is empty or contains only whitespace
-    if (!newLabel.trim()) {
-      console.error("Label text is required."); 
-      return;
-    }
-
-    console.log(
-      "Making API request to:",
-      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`
+    // Check if the label is new
+    const isNewLabel = !allLabels.some((label) =>
+      cardLabels.some((l) => l.text === label.text)
     );
 
-    try {
-      // Create a new label object using the text from the input field and the selected color
-      const newLabelObject = { text: newLabel.trim(), color: labelColor };
-
-      // Update the task in the local state
-      setLabels([...labels, newLabelObject]);
-
-      // Update the task in the database
-      await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/save-label`,
-        {
-          label: newLabelObject,
-        }
-      );
-
-      // If successful, log a success message
-      console.log("Label successfully created:", newLabelObject);
-    } catch (error) {
-      console.error("Failed to create label:", error);
-
-      // Log the response data if available
-      if (error.response) {
-        console.error("Response Data:", error.response.data);
-      }
+    // Add the new label to the list of all labels
+    if (isNewLabel) {
+      setAllLabels([...allLabels, ...cardLabels]);
     }
-    toggleLabelInput();
+
+    updateTaskContents(updatedTask); // Update this tasks contents
   };
 
   return (
@@ -92,57 +75,47 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
         <div className="labels">
           <h5 className="labels-header">
             Labels
-            {isLabelInputVisible ? (
-              <div className="label-input-container">
-                <input
-                  type="text"
-                  placeholder="Enter label text"
-                  value={newLabel}
-                  onChange={(e) => setNewLabel(e.target.value)}
-                  className="create-label-input"
-                />
-                <button
-                  className="change-color-btn"
-                  onClick={toggleColorPicker}
-                >
-                  <img
-                    src={require("./pick-color.png")}
-                    alt="Edit"
-                    style={{ width: "18px", height: "18px" }}
-                  />
-                </button>
-                <button onClick={createNewLabel} className="create-label-btn">
-                  Create Label
-                </button>
-                <div className="color-picker-container">
-                  {isColorPickerVisible && (
-                    <div className="color-picker-popover">
-                      <SketchPicker
-                        color={labelColor}
-                        onChange={(color) => setLabelColor(color.hex)}
-                        disableAlpha={true}
-                        presetColors={[]}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <button className="add-labels-btn" onClick={toggleLabelInput}>
-                +
-              </button>
-            )}
+            <button className="add-labels-btn" onClick={toggleLabelOverlay}>
+              +
+            </button>
           </h5>
-          <div className="labels-list">
-            {labels.map((label, index) => (
-              <span
-                key={index}
-                className="label-text"
-                style={{ backgroundColor: label.color }}
-              >
-                {label.text}
-              </span>
-            ))}
+        </div>
+        <div
+          className="labels-list"
+          style={{ display: "flex", flexWrap: "wrap" }}
+        >
+          {cardLabels.map((label, index) => (
+            <span
+              key={index}
+              className="label-text"
+              style={{ backgroundColor: label.color }}
+            >
+              {label.text}
+            </span>
+          ))}
+        </div>
+        <div className="task-dates">
+          <div className="date-input">
+            <label htmlFor="start-date" className="start-date-title">
+              Start Date
+            </label>
+            <input
+              type="date"
+              id="start-date"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+          </div>
+          <div className="date-input">
+            <label htmlFor="due-date" className="due-date-title">
+              Due Date
+            </label>
+            <input
+              type="date"
+              id="due-date"
+              value={dueDate}
+              onChange={handleDueDateChange}
+            />
           </div>
         </div>
         <div className="description">
@@ -168,6 +141,19 @@ function CardOverlay({ task, onClose, updateTaskContents }) {
         <button onClick={onClose} className="close-button-overlay">
           <img src={require("./close.png")} alt="Close" />
         </button>
+        {isLabelOverlayVisible && (
+          <LabelOverlay
+            task={task}
+            cardLabels={cardLabels}
+            setCardLabels={setCardLabels}
+            allLabels={allLabels}
+            setAllLabels={setAllLabels}
+            labelColor={labelColor}
+            setLabelColor={setLabelColor}
+            toggleLabelOverlay={toggleLabelOverlay} // Function to toggle the label overlay
+            updateTaskContents={updateTaskContents} // Function to update the task contents
+          />
+        )}
       </div>
     </div>
   );

@@ -68,6 +68,7 @@ module.exports = {
       description: interaction.options.getString("task_description") ?? "",
       labels: [],
       nextTaskId: "",
+      assignedUser: userId,
     };
 
     // Add the task to the specified column

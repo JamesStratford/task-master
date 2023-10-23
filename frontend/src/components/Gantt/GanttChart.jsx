@@ -18,7 +18,11 @@ const GanttChart = () => {
     const transformDataToTasks = (data) => {
         const taskList = [];
         for (let key in data) {
-            if (data[key].startDate == null || data[key].dueDate == null) {
+            const isValidDate = (dateString) => {
+                const date = new Date(dateString);
+                return !isNaN(date.getTime());
+            };
+            if (!isValidDate(data[key].startDate) || !isValidDate(data[key].dueDate)) {
                 continue;
             }
             let task = {};

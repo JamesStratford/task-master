@@ -5,7 +5,7 @@ require("dotenv").config();
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("get-tasks")
+        .setName("get-my-tasks")
         .setDescription("Replies a list of current tasks in order of priority"),
 
     async execute(interaction) {

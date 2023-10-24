@@ -379,3 +379,59 @@ export const getTotalColumnCount = async () => {
   const columns = await getColumns();
   return columns.length;
 };
+export const addChecklistItem = async (req, res) => {
+    const { taskId, checklistItem } = req.body;
+    try {
+        await Task.updateOne(
+            { taskId },
+            { $push: { checklist: checklistItem } }
+        );
+
+        // Fetch the updated task
+        const task = await Task.findOne({ taskId });
+
+        // Send the updated checklist in the response
+        res.status(200).json({ message: "Checklist item added successfully!", checklist: task.checklist });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+
+
+export const deleteChecklistItem = async (req, res) => {
+    const { taskId, checklistItemId } = req.body;
+    try {
+        await Task.updateOne(
+            { taskId },
+            { $pull: { checklist: { _id: checklistItemId } } }
+        );
+
+        // Fetch the updated task
+        const task = await Task.findOne({ taskId });
+
+        // Send the updated checklist in the response
+        res.status(200).json({ message: "Checklist item deleted successfully!", checklist: task.checklist });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+
+export const updateChecklistItemStatus = async (req, res) => {
+    const { taskId, checklistItemId, isCompleted } = req.body;
+    try {
+        await Task.updateOne(
+            { taskId, "checklist._id": checklistItemId },
+            { $set: { "checklist.$.isCompleted": isCompleted } }
+        );
+
+        // Fetch the updated task
+        const task = await Task.findOne({ taskId });
+
+        // Send the updated checklist in the response
+        res.status(200).json({ message: "Checklist item status updated successfully!", checklist: task.checklist });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

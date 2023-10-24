@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import LabelOverlay from "./LabelOverlay";
-import axios from "axios";
+import axios from "axios";import './Checklist.css';
+import ChecklistComponent from './ChecklistComponent.jsx';
 
 function CardOverlay({
   task,
@@ -77,7 +78,7 @@ function CardOverlay({
       setAllLabels([...allLabels, ...cardLabels]);
     }
 
-    updateTaskContents(updatedTask); // Update this tasks contents
+    updateTaskContents(updatedTask);
   };
 
   return (
@@ -86,6 +87,7 @@ function CardOverlay({
         <div className="task-details">
           <h4 className="task-name">{task.content}</h4>
         </div>
+
         <div className="labels">
           <h5 className="labels-header">
             Labels
@@ -94,16 +96,10 @@ function CardOverlay({
             </button>
           </h5>
         </div>
-        <div
-          className="labels-list"
-          style={{ display: "flex", flexWrap: "wrap" }}
-        >
+        
+        <div className="labels-list" style={{ display: "flex", flexWrap: "wrap" }}>
           {cardLabels.map((label, index) => (
-            <span
-              key={index}
-              className="label-text"
-              style={{ backgroundColor: label.color }}
-            >
+            <span key={index} className="label-text" style={{ backgroundColor: label.color }}>
               {label.text}
             </span>
           ))}
@@ -181,17 +177,22 @@ function CardOverlay({
             <button className="save-description-btn" onClick={handleUpdateTask}>
               Save
             </button>
-            <button
-              className="cancel-description-btn"
-              onClick={handleCancelEdit}
-            >
+            <button className="cancel-description-btn" onClick={handleCancelEdit}>
               Cancel
             </button>
           </div>
         </div>
+
+        
+        <ChecklistComponent
+          taskId={task.taskId}
+          initialChecklist={task.checklist}
+        />
+
         <button onClick={onClose} className="close-button-overlay">
           <img src={require("./close.png")} alt="Close" />
         </button>
+
         {isLabelOverlayVisible && (
           <LabelOverlay
             task={task}

@@ -16,6 +16,9 @@ import {
     deleteLabel,
     updateLabel,
     getUser,
+    addChecklistItem,
+    deleteChecklistItem,
+    updateChecklistItemStatus
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import Label from "../../models/kanbanBoard/label.mjs";
 import express from "express";
@@ -292,5 +295,35 @@ router.get('/get-users', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+router.post('/add-checklist-item', async (req, res) => {
+    try {
+        await addChecklistItem(req, res);
+        // emit an event to all clients to inform them that a checklist item has been added.
+        boardUpdatedHook(io); 
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+
+router.post('/delete-checklist-item', async (req, res) => {
+    try {
+        await deleteChecklistItem(req, res);
+        boardUpdatedHook(io); 
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+router.post('/update-checklist-item-status', async (req, res) => {
+    try {
+        await updateChecklistItemStatus(req, res);
+        boardUpdatedHook(io); 
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
 
 export default router;

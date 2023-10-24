@@ -1,55 +1,100 @@
-const { expect } = require('chai'); // Assertion library
-const sinon = require('sinon'); // For spies, mocks, and stubs
 const axios = require('axios');
-const { Client, CommandInteraction, GuildMember, VoiceChannel } = require('discord.js');
-const { execute } = require('../../commands/misc/checkAttendance.js'); // Update with your actual command file path
+const { execute } = require('../../../commands/misc/checkAttendance.js');
 
-describe('check-attendance command', () => {
-  let interaction, client, mockAxios;
+jest.mock('axios');
 
-  beforeEach(() => {
-    client = new Client();
-    interaction = new CommandInteraction(client, {
-      // Mock interaction data here, refer to Discord.js documentation for the structure
-    });
+// Mock interaction.reply so we can check if it's called and with what content
+const mockInteractionReply = jest.fn();
 
-    interaction.reply = sinon.stub();
-    interaction.member = new GuildMember(client, {
-      // Mock guild member data here
-    }, interaction.guild);
+const mockInteractionNotInChannel = {
+  reply: mockInteractionReply,
+  member: {
+    voice: {
+      channel: null
+    }
+  }
+};
 
-    mockAxios = sinon.stub(axios, 'post');
-    sinon.stub(axios, 'get');
-  });
+const mockInteractionInChannelAlone = {
+  reply: mockInteractionReply,
+  member: {
+    voice: {
+      channel: {
+        members: [
+          { displayName: 'JohnDoe' }
+        ]
+      }
+    }
+  }
+};
 
-  afterEach(() => {
-    sinon.restore();
-  });
+const mockInteractionInChannelMultiple = {
+  reply: mockInteractionReply,
+  member: {
+    voice: {
+      channel: {
+        members: [
+          { displayName: 'JohnDoe' },
+          { displayName: 'JaneDoe' },
+          { displayName: 'Alice' }
+        ]
+      }
+    }
+  }
+};
 
-  it('responds with an error if the member is not in a voice channel', async () => {
-    interaction.member.voice.channel = null;
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
-    await execute(interaction);
+test('it should reply with an error if user is not in a voice channel', async () => {
+  await execute(mockInteractionNotInChannel);
 
-    expect(interaction.reply.calledOnce).to.be.true;
-    expect(interaction.reply.firstCall.args[0]).to.equal('You must be in a voice channel to use this command.');
-  });
+  expect(mockInteractionReply).toHaveBeenCalledWith('You must be in a voice channel to use this command.');
+});
 
-  it('creates a meeting column if it does not exist', async () => {
-    interaction.member.voice.channel = new VoiceChannel(client, {
-      // Mock voice channel data here
-    }, interaction.guild);
-    axios.get.resolves({ data: [] }); // No columns
-    axios.post.onFirstCall().resolves({ data: { id: 'mockColumnId' } }); // Column creation response
+test('it should handle an error when fetching the "Meeting" column', async () => {
+  axios.get.mockRejectedValueOnce(new Error('Fetch error'));
 
-    await execute(interaction);
+  await execute(mockInteractionInChannelAlone);
 
-    expect(axios.post.calledWith(`${process.env.SERVER_ORIGIN}/api/kanban/add-column`)).to.be.true;
-    expect(axios.post.calledWith(`${process.env.SERVER_ORIGIN}/api/kanban/add-task`)).to.be.true;
-  });
+  expect(mockInteractionReply).toHaveBeenCalledWith('Error fetching or creating the Meetings column. Please try again.');
+});
 
-  // Add more test cases as needed, for example:
-  // - It adds a task to the existing meeting column
-  // - It handles API errors gracefully
-  // - It sends the expected reply content
+test('it should create the "Meeting" column if it does not exist', async () => {
+  axios.get.mockResolvedValueOnce({ data: [] }); 
+  axios.post.mockResolvedValueOnce({ data: { id: 'newColumnId' } }); 
+
+  await execute(mockInteractionInChannelAlone);
+
+  expect(axios.post).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ title: 'Meetings' }));
+});
+
+test('it should handle an error when adding a task', async () => {
+  axios.get.mockResolvedValueOnce({ data: [{ title: 'Meetings', id: 'columnId' }] });
+  axios.post.mockRejectedValueOnce(new Error('Post error'));
+
+  await execute(mockInteractionInChannelAlone);
+
+  expect(mockInteractionReply).toHaveBeenCalledWith("There was an error adding the task to the 'Meetings' column. Please try again.");
+});
+
+test('it should add a task when user is in a voice channel alone', async () => {
+  axios.get.mockResolvedValueOnce({ data: [{ title: 'Meetings', id: 'columnId' }] });
+  axios.post.mockResolvedValueOnce({});
+
+  await execute(mockInteractionInChannelAlone);
+
+  const formattedDate = `${new Date().toLocaleString('default', { month: 'short' })} ${new Date().getDate()}, ${new Date().getFullYear()}`;
+  expect(mockInteractionReply).toHaveBeenCalledWith(`The Meeting attendee on ${formattedDate}: JohnDoe has been added as a task in the 'Meetings' column!`);
+});
+
+test('it should add a task when multiple users are in the voice channel', async () => {
+  axios.get.mockResolvedValueOnce({ data: [{ title: 'Meetings', id: 'columnId' }] });
+  axios.post.mockResolvedValueOnce({});
+
+  await execute(mockInteractionInChannelMultiple);
+
+  const formattedDate = `${new Date().toLocaleString('default', { month: 'short' })} ${new Date().getDate()}, ${new Date().getFullYear()}`;
+  expect(mockInteractionReply).toHaveBeenCalledWith(`Meeting attendees for ${formattedDate}: JohnDoe, JaneDoe, Alice have been added as a task in the 'Meetings' column!`);
 });

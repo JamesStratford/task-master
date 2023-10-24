@@ -5,7 +5,7 @@ require("dotenv").config();
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("get-tasks")
+        .setName("get-my-tasks")
         .setDescription("Replies a list of current tasks in order of priority"),
 
     async execute(interaction) {
@@ -14,7 +14,7 @@ module.exports = {
 
         // Get tasks from web server
         try {
-            const response = await axios.get(`${process.env.SERVER_ORIGIN}/api/discord-bot/kanban/getTasks?userId=${userId}`, {
+            const response = await axios.get(`${process.env.SERVER_ORIGIN}/api/discord-bot/kanban/getTasks?=${userId}`, {
                 headers: {
                     'Authorization': `Bearer ${process.env.SERVER_AUTH_TOKEN}`
                 }

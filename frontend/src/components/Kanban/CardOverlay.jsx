@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import LabelOverlay from "./LabelOverlay";
-import './Checklist.css';
+import axios from "axios";import './Checklist.css';
 import ChecklistComponent from './ChecklistComponent.jsx';
 
 function CardOverlay({
@@ -9,7 +9,8 @@ function CardOverlay({
   updateTaskContents,
   allLabels,
   setAllLabels,
-  // fetchAllLabels,
+  users,
+  setUsers,
 }) {
   const [description, setDescription] = useState(task.description || "");
   const [labelColor, setLabelColor] = useState("#ffffff");
@@ -17,10 +18,17 @@ function CardOverlay({
   const [isLabelOverlayVisible, setIsLabelOverlayVisible] = useState(false);
   const [startDate, setStartDate] = useState(task.startDate);
   const [dueDate, setDueDate] = useState(task.dueDate);
+  const [selectedUser, setSelectedUser] = useState(task.assignedUser || "");
+  const [selectedUsername, setSelectedUsername] = useState("");
 
   useEffect(() => {
     handleUpdateTask();
-  }, [startDate, dueDate]);
+  }, [startDate, dueDate, selectedUsername]);
+
+  useEffect(() => {
+    const selectedUserObject = users.find((user) => user.id === selectedUser);
+    setSelectedUsername(selectedUserObject ? selectedUserObject.username : "");
+  }, [selectedUser, users]);
 
   const handleStartDateChange = (e) => {
     setStartDate(e.target.value);
@@ -42,9 +50,14 @@ function CardOverlay({
     setIsLabelOverlayVisible(!isLabelOverlayVisible);
   };
 
+  const handleUserChange = (e) => {
+    const selectedUserId = e.target.value;
+    setSelectedUser(selectedUserId);
+  };
+
   /* *
-  * Updates the task with its new contents.
-  */
+   * Updates the task with its new contents.
+   */
   const handleUpdateTask = () => {
     const updatedTask = {
       ...task,
@@ -52,6 +65,7 @@ function CardOverlay({
       labels: cardLabels,
       startDate: startDate,
       dueDate: dueDate,
+      assignedUser: selectedUser,
     };
 
     // Check if the label is new
@@ -114,6 +128,43 @@ function CardOverlay({
             />
           </div>
         </div>
+        <h5 className="assign-user-header">Assign user to task</h5>
+        <div className="assign-user">
+          <img
+            className="discord-logo"
+            src={require("./discord.png")}
+            alt="Discord Logo"
+          />
+          <select
+            className="assign-user-menu"
+            data-testid="assign-user-select"
+            value={selectedUser}
+            onChange={handleUserChange}
+          >
+            <option value="">Select a Discord user</option>
+            {users.map((user) => (
+              <option
+                key={user.discordId}
+                value={user.id}
+                style={{ color: "white" }}
+              >
+                {user.global_name ? user.global_name : user.username}
+              </option>
+            ))}
+          </select>
+          {selectedUser !== "" && (
+            <button
+              data-testid="unassign-button"
+              className="unassign-button"
+              onClick={handleUserChange}
+            >
+              Unassign
+            </button>
+          )}
+        </div>
+        <button onClick={onClose} className="close-button-overlay">
+          <img src={require("./close.png")} alt="Close" />
+        </button>
         <div className="description">
           <h5 className="description-header">Description</h5>
           <input

@@ -2,6 +2,12 @@ import React from "react";
 import { render, fireEvent, screen } from "@testing-library/react";
 import CardOverlay from "../components/Kanban/CardOverlay";
 
+const sampleUsers = [
+  { id: "user1", discordId: "discordUser1" },
+  { id: "user2", discordId: "discordUser2" },
+  // Add more sample users as needed
+];
+
 describe("CardOverlay Component", () => {
   it("renders the CardOverlay component", () => {
     const { container } = render(
@@ -12,6 +18,7 @@ describe("CardOverlay Component", () => {
         allLabels={[]}
         setAllLabels={() => {}}
         fetchAllLabels={() => {}}
+        users={sampleUsers} // Pass sampleUsers as a prop
       />
     );
     expect(container).toBeTruthy();
@@ -32,6 +39,7 @@ describe("CardOverlay Component", () => {
         allLabels={[]}
         setAllLabels={() => {}}
         fetchAllLabels={() => {}}
+        users={sampleUsers} // Pass sampleUsers as a prop
       />
     );
 
@@ -57,10 +65,11 @@ describe("CardOverlay Component", () => {
         updateTaskContents={updateTaskContents}
         allLabels={[]}
         setAllLabels={() => {}}
-        fetchAllLabels={() => {}}>
-        </CardOverlay>
-      );
-  
+        fetchAllLabels={() => {}}
+        users={sampleUsers} // Pass sampleUsers as a prop
+      />
+    );
+
     const startDateInput = screen.getByLabelText("Start Date");
     const dueDateInput = screen.getByLabelText("Due Date");
     const saveButton = screen.getByText("Save");
@@ -73,5 +82,4 @@ describe("CardOverlay Component", () => {
     expect(startDateInput.value).toBe("2023-01-05");
     expect(dueDateInput.value).toBe("2023-01-15");
   });
-  
 });

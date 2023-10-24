@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -23,10 +23,15 @@ module.exports = {
         const filePath = path.join(commandsPath, file);
         const command = require(filePath);
 
-        commands += `${command.data.name}:  ${command.data.description}\n`;
+        commands += `- **${command.data.name}:**  \n\t${command.data.description}\n\n`;
       }
     }
 
-    await interaction.reply("Welcome to TaskMaster!\n\n" + commands);
+    const embed = new EmbedBuilder()
+      .setTitle("Welcome to TaskMaster!")
+      .setDescription("> *Here is a list of commands:*\n\n" + commands)
+      .setColor("Green");
+
+    await interaction.reply({ embeds: [embed] });
   },
 };

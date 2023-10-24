@@ -18,6 +18,7 @@ Task Master is a comprehensive task management system that integrates with Disco
 ### Web Interface
 
 - **Kanban Board**: Drag and drop tasks to different columns based on their status.
+- **Gantt Chart**: Visualise project timelines and adjust start and end dates.
 - **Discord OAuth**: Log in using your Discord account.
 
 ### Server
@@ -36,12 +37,31 @@ Task Master is a comprehensive task management system that integrates with Disco
 2. **Install Dependencies**
 
     ```bash
-    npm install
+    npm run install_all
     ```
 
 3. **Environment Variables**
-    - Create a `.env` file in the root directory.
-    - Add your Discord bot token and MongoDB URI.
+    - Create a `.env` file in the root directories for discordBot and server.
+    - Discord env variables:
+        - TOKEN
+        - CLIENT_ID
+        - GUILD_ID
+        - SERVER_ORIGIN
+        - SERVER_AUTH_TOKEN
+    - Server env variables:
+        - DISCORD_CLIENT_ID
+        - DISCORD_CLIENT_SECRET
+        - DISCORD_SERVER_ID
+        - DISCORD_CHANNEL_ID
+        - SESSION_SECRET
+        - FRONTEND_ORIGIN
+        - FRONTEND_PORT
+        - ORIGIN
+        - PORT
+        - MONGO_USERNAME
+        - MONGO_PASSWORD
+        - MONGO_URI
+        - BOT_SERVER_AUTH_TOKEN
 
 4. **Run the Project**
 

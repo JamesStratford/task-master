@@ -1,23 +1,21 @@
 import {
-  addTask,
-  addColumn,
-  getTasks,
-  getColumns,
-  updateColumn,
-  updateBoard,
-  deleteColumn,
-  assignTaskToColumn,
-  updateColumnTaskIds,
-  removeTaskFromColumn,
-  updateTask,
-  saveLabel,
-  getAllLabels,
-  deleteTask,
-  getColumnByIndex,
-  getTasksByIds,
-  getTotalColumnCount,
-  deleteLabel,
-  updateLabel,
+    addTask,
+    addColumn,
+    getTasks,
+    getColumns,
+    updateColumn,
+    updateBoard,
+    deleteColumn,
+    assignTaskToColumn,
+    updateColumnTaskIds,
+    removeTaskFromColumn,
+    updateTask,
+    saveLabel,
+    getAllLabels,
+    deleteTask,
+    deleteLabel,
+    updateLabel,
+    getUser,
 } from "../../kanbanBoard/kanbanBoard.mjs";
 import Label from "../../models/kanbanBoard/label.mjs";
 import express from "express";
@@ -283,6 +281,15 @@ router.put('/update-label-list', async (req, res) => {
     } catch (error) {
         console.error("Error updating label list:", error);
         res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.get('/get-users', async (req, res) => {
+    try {
+        const users = await getUser();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 });
 

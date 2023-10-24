@@ -8,7 +8,7 @@ const taskSchema = new mongoose.Schema({
   description: String,
   labels: Array,
   nextTaskId: String,
-  assignedUser: String,
+  assignedUser: String
 });
 
 export default mongoose.model('Task', taskSchema);

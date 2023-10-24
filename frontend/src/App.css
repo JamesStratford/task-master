@@ -624,3 +624,45 @@ body {
   font-size: 14px;
   text-align: center; /* Center the label text */
 }
+
+.assign-user {
+  padding-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.assign-user-header {
+  color: black;
+  font-size: 20px;
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+
+.discord-logo {
+  width: 35px;
+  height: 35px;
+  margin-right: 5px;
+}
+
+.assign-user-menu {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  margin-top: -3px;
+  border-radius: 4px;
+  background-color: #7289DA; /* Background color of the dropdown */
+  color: #ffffff; /* Text color */
+  cursor: pointer;
+  outline: none;
+}
+
+.unassign-button{
+  background-color: #e31f4d;
+  color: #fff;
+  border: none;
+  padding: 9px 7px;
+  cursor: pointer;
+  margin-top: -3px;
+  margin-left: 5px;
+  border-radius: 5px;
+}

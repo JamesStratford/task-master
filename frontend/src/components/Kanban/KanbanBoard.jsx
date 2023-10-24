@@ -371,6 +371,7 @@ function KanbanBoard({ userInfo }) {
       );
     } catch (error) {
       console.error("Failed to update task:", error);
+      // You can add further error handling here, such as showing an error message to the user.
     }
   };
 

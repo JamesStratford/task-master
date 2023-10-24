@@ -24,6 +24,11 @@ export const useKanban = (socket, kanbanBoard, setKanbanBoard) => {
 
 
   const updateKanbanBoard = async (updatedColumns, updatedTasks) => {
+    // Clean updatedColumns[key].taskIds array of Null values.
+    Object.keys(updatedColumns).forEach(key => {
+      updatedColumns[key].taskIds = updatedColumns[key].taskIds.filter(taskId => taskId !== null);
+    });
+
     // Update local state
     setKanbanBoard(prevKanbanColumns => {
       const updatedKanbanColumns = {
@@ -33,7 +38,6 @@ export const useKanban = (socket, kanbanBoard, setKanbanBoard) => {
       };
       return updatedKanbanColumns;
     });
-
     // Set the flag to make an API call
     setShouldUpdateBackend(true);
   };

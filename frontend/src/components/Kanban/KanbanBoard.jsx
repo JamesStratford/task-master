@@ -32,12 +32,10 @@ function KanbanBoard({ userInfo }) {
      * Fetch all users from the database.
      */
     async function fetchUsers() {
-      console.log("Fetching users...");
       try {
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/kanban/get-users`
         );
-        console.log("Users:", response.data);
         setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -57,11 +55,7 @@ function KanbanBoard({ userInfo }) {
     }
   };
 
-  const moveTaskWithinSameColumn = async (
-    column,
-    sourceIndex,
-    destinationIndex
-  ) => {
+  const moveTaskWithinSameColumn = async (column, sourceIndex, destinationIndex) => {
     const newTaskIds = Array.from(column.taskIds);
     const [movedTask] = newTaskIds.splice(sourceIndex, 1);
     newTaskIds.splice(destinationIndex, 0, movedTask);
@@ -69,30 +63,13 @@ function KanbanBoard({ userInfo }) {
     // Update the column object with the new taskIds
     const updatedColumn = { ...column, taskIds: newTaskIds };
 
-    setKanbanColumns({
-      ...kanbanColumns,
-      columns: kanbanColumns.columns.map((col) =>
-        col.id === column.id ? updatedColumn : col
-      ),
-    });
+    // Get the updated columns array
+    const updatedColumns = kanbanColumns.columns.map((col) =>
+      col.id === column.id ? updatedColumn : col
+    );
 
-    // Update the database
-    try {
-      await axios.put(
-        `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task-column`,
-        {
-          columnId: column.id,
-          newColumnId: column.id,
-          newColumnTaskIds: newTaskIds,
-        }
-      );
-      console.log("Successfully updated column task IDs in the database.");
-    } catch (error) {
-      console.error(
-        "Failed to update column task IDs in the database:",
-        error.response.data
-      );
-    }
+    // Call the updateKanbanBoard function
+    await updateKanbanBoard(updatedColumns, kanbanColumns.tasks);
   };
 
   const moveTaskToDifferentColumn = async (
@@ -108,44 +85,30 @@ function KanbanBoard({ userInfo }) {
     const destinationColumnIndex = state.columns.findIndex(
       (column) => column.id === destination.droppableId
     );
-
+  
     // Clone the columns array and the specific column objects
     const updatedColumns = [...state.columns];
     const updatedSourceColumn = { ...updatedColumns[sourceColumnIndex] };
     const updatedDestinationColumn = {
       ...updatedColumns[destinationColumnIndex],
     };
-
+  
     // Update the taskIds array for the source column
     const newSourceTaskIds = Array.from(updatedSourceColumn.taskIds);
     newSourceTaskIds.splice(source.index, 1);
     updatedSourceColumn.taskIds = newSourceTaskIds;
-
+  
     // Update the taskIds array for the destination column
     const newDestinationTaskIds = Array.from(updatedDestinationColumn.taskIds);
     newDestinationTaskIds.splice(destination.index, 0, draggableId);
     updatedDestinationColumn.taskIds = newDestinationTaskIds;
-
+  
     // Update the specific columns in the columns array
     updatedColumns[sourceColumnIndex] = updatedSourceColumn;
     updatedColumns[destinationColumnIndex] = updatedDestinationColumn;
-
-    // Create a new state object preserving the previous state
-    const newState = {
-      ...state,
-      columns: updatedColumns,
-    };
-
-    setKanbanColumns(newState);
-    await axios.put(
-      `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-task-column`,
-      {
-        taskId: draggableId,
-        columnId: source.droppableId,
-        newColumnId: destination.droppableId,
-        newColumnTaskIds: newDestinationTaskIds,
-      }
-    );
+  
+    // Use the updateKanbanBoard function to update local state
+    updateKanbanBoard(updatedColumns, kanbanColumns.tasks);
   };
 
   const addColumn = async (newColumnTitle) => {

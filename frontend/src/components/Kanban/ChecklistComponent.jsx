@@ -8,16 +8,15 @@ function ChecklistComponent({ taskId, initialChecklist, onChecklistUpdate }) {
     const [newChecklistItem, setNewChecklistItem] = React.useState("");
     const [isErrorVisible, setIsErrorVisible] = React.useState(false);
 
-    /**
-     * Adds a new item to the checklist after validating the input.
-     */
+    const handleNewItemChange = (e) => {
+        setNewChecklistItem(e.target.value);
+    };
+
     const handleAddItem = async () => {
-        // Check if the new checklist item input is not empty
         if (newChecklistItem.trim()) {
             setIsErrorVisible(false); 
       
             try {
-                // Post request to add a new checklist item
                 const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/add-checklist-item`, {
                     taskId: taskId,
                     checklistItem: {
@@ -26,32 +25,24 @@ function ChecklistComponent({ taskId, initialChecklist, onChecklistUpdate }) {
                     }
                 });
 
-                // If the response is successful, update the local checklist and clear the input field
-                if(response.status === 200) {
-                    const updatedChecklist = [...checklist, { description: newChecklistItem, isCompleted: false }];
-                    setChecklist(updatedChecklist);
+                if(response.status === 200 && response.data.checklist) {
+                    setChecklist(response.data.checklist);
                     setNewChecklistItem("");
-                    onChecklistUpdate(updatedChecklist); // Notify parent of the change
+                    onChecklistUpdate(response.data.checklist);
                 }
             } catch(error) {
                 console.error("Error adding checklist item:", error);
             }
         } else {
-            // Display an error if the input is empty
             setIsErrorVisible(true);
         }
     };
 
-    /**
-     * Toggles the completion status of a checklist item.
-     * @param {number} index - The index of the item in the checklist array
-     */
     const handleCheckItem = async (index) => {
         const currentItem = checklist[index];
         const updatedStatus = !currentItem.isCompleted; 
-      
+        
         try {
-            // Post request to update the status of a checklist item
             const response = await axios.post(
                 `${process.env.REACT_APP_BACKEND_URL}/api/kanban/update-checklist-item-status`,
                 {
@@ -61,55 +52,33 @@ function ChecklistComponent({ taskId, initialChecklist, onChecklistUpdate }) {
                 }
             );
 
-            // If the response is successful, update the local checklist
-            if(response.status === 200) {
-                const updatedChecklist = checklist.map((item, idx) => {
-                    if (idx === index) {
-                        return { ...item, isCompleted: updatedStatus };
-                    }
-                    return item;
-                });
-                setChecklist(updatedChecklist);
-                onChecklistUpdate(updatedChecklist); // Notify parent of the change
+            if(response.status === 200 && response.data.checklist) {
+                setChecklist(response.data.checklist);
+                onChecklistUpdate(response.data.checklist);
             }
         } catch(error) {
             console.error("Error updating checklist item status:", error);
         }
     };
 
-    /**
-     * Handles changes to the new checklist item input.
-     * @param {Event} e - The input change event
-     */
-    const handleNewItemChange = (e) => {
-        setNewChecklistItem(e.target.value);
-    };
-
-    /**
-     * Deletes a checklist item.
-     * @param {number} index - The index of the item in the checklist array
-     */
     const handleDeleteItem = async (index) => {
         const currentItem = checklist[index];
+        
         try {
-            // Post request to delete a checklist item
             const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/kanban/delete-checklist-item`, {
                 taskId: taskId,
                 checklistItemId: currentItem._id
             });
 
-            // If the response is successful, update the local checklist
-            if(response.status === 200) {
-                const updatedChecklist = checklist.filter((_, idx) => idx !== index);
-                setChecklist(updatedChecklist);
-                onChecklistUpdate(updatedChecklist); // Notify parent of the change
+            if(response.status === 200 && response.data.checklist) {
+                setChecklist(response.data.checklist);
+                onChecklistUpdate(response.data.checklist);
             }
         } catch(error) {
             console.error("Error deleting checklist item:", error);
         }
     };
 
-    // Render the checklist component
     return (
         <div className="checklist">
             <h5 className="checklist-header">

@@ -241,7 +241,7 @@ router.post('/add-checklist-item', async (req, res) => {
     try {
         await addChecklistItem(req, res);
         // emit an event to all clients to inform them that a checklist item has been added.
-        io.emit('updateBoard');
+        boardUpdatedHook(io); 
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -251,7 +251,7 @@ router.post('/add-checklist-item', async (req, res) => {
 router.post('/delete-checklist-item', async (req, res) => {
     try {
         await deleteChecklistItem(req, res);
-        io.emit('updateBoard');
+        boardUpdatedHook(io); 
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -260,7 +260,7 @@ router.post('/delete-checklist-item', async (req, res) => {
 router.post('/update-checklist-item-status', async (req, res) => {
     try {
         await updateChecklistItemStatus(req, res);
-        io.emit('updateBoard'); // Inform all clients about the change.
+        boardUpdatedHook(io); 
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

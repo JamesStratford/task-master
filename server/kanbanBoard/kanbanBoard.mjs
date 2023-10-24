@@ -341,11 +341,17 @@ export const addChecklistItem = async (req, res) => {
             { taskId },
             { $push: { checklist: checklistItem } }
         );
-        res.status(200).json({ message: "Checklist item added successfully!" });
+
+        // Fetch the updated task
+        const task = await Task.findOne({ taskId });
+
+        // Send the updated checklist in the response
+        res.status(200).json({ message: "Checklist item added successfully!", checklist: task.checklist });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
+
 
 
 export const deleteChecklistItem = async (req, res) => {
@@ -355,11 +361,17 @@ export const deleteChecklistItem = async (req, res) => {
             { taskId },
             { $pull: { checklist: { _id: checklistItemId } } }
         );
-        res.status(200).json({ message: "Checklist item deleted successfully!" });
+
+        // Fetch the updated task
+        const task = await Task.findOne({ taskId });
+
+        // Send the updated checklist in the response
+        res.status(200).json({ message: "Checklist item deleted successfully!", checklist: task.checklist });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
+
 
 export const updateChecklistItemStatus = async (req, res) => {
     const { taskId, checklistItemId, isCompleted } = req.body;
@@ -368,7 +380,12 @@ export const updateChecklistItemStatus = async (req, res) => {
             { taskId, "checklist._id": checklistItemId },
             { $set: { "checklist.$.isCompleted": isCompleted } }
         );
-        res.status(200).json({ message: "Checklist item status updated successfully!" });
+
+        // Fetch the updated task
+        const task = await Task.findOne({ taskId });
+
+        // Send the updated checklist in the response
+        res.status(200).json({ message: "Checklist item status updated successfully!", checklist: task.checklist });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

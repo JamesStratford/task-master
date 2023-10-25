@@ -18,7 +18,9 @@ const GanttChart = () => {
     const transformDataToTasks = (data) => {
         const taskList = [];
         for (let key in data) {
+            console.log(key)
             const isValidDate = (dateString) => {
+                if (dateString == null) return false;
                 const date = new Date(dateString);
                 return !isNaN(date.getTime());
             };
